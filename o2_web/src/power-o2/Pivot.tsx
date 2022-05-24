@@ -3,7 +3,7 @@ import { PivotWidget } from "./types"
 const tableHtmlComponent = (content: string) => {
   let template = document.createElement('template')
   template.innerHTML = content.trim()
-  return template.content.firstChild
+  return template.content.firstChild as Element
 }
 
 const DefaultTable = ({ children }: any) => (

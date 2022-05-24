@@ -1,8 +1,13 @@
-import { Widget, WidgetType } from "./types"
+import { DashboardJSON, ComponentTheme, DashboardTheme, Widget, WidgetType } from "./types"
 import Pivot from "./Pivot"
 
 type WidgetMap = {
   [key in WidgetType]: ({}: Widget) => JSX.Element
+}
+
+type DashboardProps = {
+  dashboard: DashboardJSON
+  theme: DashboardTheme
 }
 
 const widgetMap: WidgetMap = {
@@ -10,9 +15,9 @@ const widgetMap: WidgetMap = {
   "column_barchart": Pivot,
 }
 
-const DefaultTitle = ({ children }) => <h3>{children}</h3>
+const DefaultTitle: ComponentTheme = ({ children }) => <h3>{children}</h3>
 
-const Dashboard = ({ dashboard, theme }) => {
+const Dashboard = ({ dashboard, theme }: DashboardProps) => {
   const TitleComponent = theme.title || DefaultTitle
   return (
     <>
