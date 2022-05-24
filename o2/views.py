@@ -35,31 +35,48 @@ def create(request):
 def fetch(request):
     # q = "SELECT resulted_by_id, follow_up_result, COUNT(distinct application_id) FROM followups GROUP BY follow_up_result"
     # df = pantab.frame_from_hyper_query("/Users/rafa/Downloads/test_follow_ups.hyper", q)
-    q = """
-    with totals as (
-        select resulted_by, follow_up_number, count(distinct application_id) t
-        from followups
-        group by resulted_by, follow_up_number
-    )
 
+    table_widget = {
+        "rows": [
+            {"column": "resulted_by", "alias": "User"},
+            {"column": "follow_up_result", "alias": "Result"},
+        ],
+        "values": [
+            {"fn": "COUNT", "column": "DISTINCT(application_id)", "alias": "#"},
+            {"fn": "CONTRIBUTION", "column": "DISTINCT(application_id)", "alias": "%"},
+        ],
+        "columns": [
+            {"column": "follow_up_number", "alias": "Follow up number"},
+        ],
+    }
+
+    q = """
     select
         f.resulted_by,
         f.follow_up_result,
         f.follow_up_number,
         count(distinct application_id) as "#",
-        MAX(totals.t) as "%"
+        ROUND(
+            COUNT(distinct application_id) / (
+                SELECT CAST(count(distinct application_id) as float)
+                FROM followups
+                WHERE follow_up_number = f.follow_up_number AND resulted_by = f.resulted_by
+            ),
+            2
+        ) as total
     from followups f
-    inner join totals on totals.resulted_by = f.resulted_by AND totals.follow_up_number = f.follow_up_number
-    where f.follow_up_number < 4
+    where f.follow_up_number IN(1, 2) AND f.follow_up_date >= '2022-01-01'
     group by f.resulted_by, follow_up_result, f.follow_up_number
     order by f.resulted_by, follow_up_result, f.follow_up_number
     """
 
     df = pantab.frame_from_hyper_query("/Users/rafa/Downloads/test_follow_ups.hyper", q)
     df2 = (df
-    .pivot(columns="follow_up_number", values=["#", "%"], index=["resulted_by", "follow_up_result"])
-    .fillna(0)
-    .stack(level=0)
+        .pivot(columns=["resulted_by", "follow_up_result"], values=["#", "total"], index=["follow_up_number"])
+        .stack(level=0)
+        .T
+        .iloc[4:13]
     )
 
-    return HttpResponse(df2.to_json())
+    print(df2.to_html(escape=False, na_rep="", index_names=False))
+    return HttpResponse(df2.to_html(escape=False, na_rep="", index_names=False))

@@ -1,44 +1,31 @@
-import { useState } from 'react'
-import logo from './logo.svg'
-import './App.css'
+import PowerO2 from "./package/power_o2"
+import { Table, Title } from "playbook-ui"
+import "../node_modules/playbook-ui/dist/playbook.css"
 
-function App() {
-  const [count, setCount] = useState(0)
+PowerO2.init({
+  host: "http://127.0.0.1:8000",
+})
+
+const theme = {
+  title: ({ children }) => <Title>{children}</Title>,
+  // gridRow: ({ children }) => <section className="widget-group">{children}</section>,
+  // lastUpdateAt: () => null,
+  widgets: {
+    pivot: {
+      table: ({ children }: any) => <Table size="sm">{children}</Table>,
+    },
+  },
+  filters: {
+    // ...
+  }
+}
+
+const App = () => {
+  const dashboardId = 1
+  const [Dashboard] = PowerO2.dashboard(dashboardId, { theme })
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>Hello Vite + React!</p>
-        <p>
-          <button type="button" onClick={() => setCount((count) => count + 1)}>
-            count is: {count}
-          </button>
-        </p>
-        <p>
-          Edit <code>App.tsx</code> and save to test HMR updates.
-        </p>
-        <p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-          {' | '}
-          <a
-            className="App-link"
-            href="https://vitejs.dev/guide/features.html"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Vite Docs
-          </a>
-        </p>
-      </header>
-    </div>
+    <Dashboard />
   )
 }
 
