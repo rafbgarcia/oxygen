@@ -10,23 +10,26 @@ from o2.models import Dashboard
 class Pivot:
   def as_json():
     q = """
-    WITH totals AS (
-        SELECT follow_up_number, resulted_by, COUNT(DISTINCT application_id) AS total
+    WITH grouped_totals AS (
+        SELECT follow_up_result, COUNT(DISTINCT application_id) AS total
         FROM followups
-        GROUP BY follow_up_number, resulted_by
+        WHERE follow_up_date >= '2022-01-01'
+        GROUP BY follow_up_result
+    ),
+
+    totals AS (
+        SELECT SUM(total) as total FROM grouped_totals
     )
 
     SELECT
-        f.resulted_by,
         f.follow_up_result,
-        f.follow_up_number,
         COUNT(DISTINCT application_id) AS "#",
+        MAX(t.total),
         ROUND(COUNT(DISTINCT application_id) / CAST(MAX(t.total) AS FLOAT) * 100, 2) as "%"
     FROM followups f
-    INNER JOIN totals t ON t.follow_up_number = f.follow_up_number AND t.resulted_by = f.resulted_by
-    WHERE f.follow_up_number IN(1, 2) AND f.follow_up_date >= '2022-01-01'
-    GROUP BY f.resulted_by, follow_up_result, f.follow_up_number
-    ORDER BY f.resulted_by, follow_up_result, f.follow_up_number
+    LEFT JOIN totals t ON 1 = 1
+    WHERE f.follow_up_date >= '2022-01-01'
+    GROUP BY follow_up_result
     """
 
     df = pantab.frame_from_hyper_query("/Users/rafa/Downloads/test_follow_ups.hyper", q)
