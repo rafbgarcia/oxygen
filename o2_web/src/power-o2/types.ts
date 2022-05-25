@@ -1,4 +1,4 @@
-import { ReactNode } from "react"
+import { ReactNode } from 'react'
 
 export interface Widget {
   meta: Record<string, any>
@@ -7,22 +7,26 @@ export interface Widget {
 
 export interface PivotWidget extends Widget {
   meta: {
-    html: string,
-  },
+    html: string
+  }
   theme: {
     table?: ComponentTheme
   }
 }
 
-export type WidgetType = "pivot" | "vertical_bar_chart"
+export type WidgetType = 'pivot' | 'vertical_bar_chart'
 
-export type ComponentTheme = ({ children }: { children: ReactNode}) => JSX.Element
+export type ComponentTheme = ({
+  children,
+}: {
+  children: ReactNode
+}) => JSX.Element
 
 export type DashboardTheme = {
   title?: ComponentTheme
   widgets?: {
     pivot?: {
-      table?: ComponentTheme,
+      table?: ComponentTheme
     }
   }
 }

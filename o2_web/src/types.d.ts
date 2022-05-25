@@ -8,22 +8,22 @@ export declare global {
 
   interface PivotWidget extends Widget {
     meta: {
-      html: string,
-    },
+      html: string
+    }
     theme: {
       table?: ComponentTheme
     }
   }
 
-  type WidgetType = "pivot" | "vertical_bar_chart"
+  type WidgetType = 'pivot' | 'vertical_bar_chart'
 
-  type ComponentTheme = ({ children }: { children: ReactNode}) => JSX.Element
+  type ComponentTheme = ({ children }: { children: ReactNode }) => JSX.Element
 
   type DashboardTheme = {
     title?: ComponentTheme
     widgets?: {
       pivot?: {
-        table?: ComponentTheme,
+        table?: ComponentTheme
       }
     }
   }

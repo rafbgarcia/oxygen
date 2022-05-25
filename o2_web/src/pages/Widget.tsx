@@ -1,9 +1,9 @@
-import { PowerO2 } from "../power-o2"
+import { PowerO2 } from '../power-o2'
 import PivotTableChartIcon from '@mui/icons-material/PivotTableChart'
 
 export const Widget = () => {
   const dashboardId = 1
-  const [Dashboard, error] = PowerO2.dashboard(dashboardId, { theme })
+  const [Dashboard, error] = PowerO2.dashboard(dashboardId)
 
   if (error) return <p>Error: {error}</p>
 

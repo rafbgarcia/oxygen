@@ -1,4 +1,4 @@
-import Pivot from "./Pivot"
+import Pivot from './Pivot'
 
 type DashboardProps = {
   dashboard: DashboardJSON
@@ -6,8 +6,8 @@ type DashboardProps = {
 }
 
 const widgetMap = {
-  "pivot": Pivot,
-  "vertical_bar_chart": Pivot,
+  pivot: Pivot,
+  vertical_bar_chart: Pivot,
 }
 
 const DefaultTitle: ComponentTheme = ({ children }) => <h3>{children}</h3>
@@ -19,10 +19,16 @@ const Dashboard = ({ dashboard, theme }: DashboardProps) => {
     <>
       <TitleComponent>{dashboard.title}</TitleComponent>
 
-      {dashboard.gridRows.map(row => {
-        return row.widgets.map(widget => {
+      {dashboard.gridRows.map((row) => {
+        return row.widgets.map((widget) => {
           const Widget = widgetMap[widget.type]
-          return <Widget key={widget.id} meta={widget.meta} theme={theme?.widgets?.pivot || {}} />
+          return (
+            <Widget
+              key={widget.id}
+              meta={widget.meta}
+              theme={theme?.widgets?.pivot || {}}
+            />
+          )
         })
       })}
     </>

@@ -1,29 +1,29 @@
 import fetch from 'unfetch'
 
-import Dashboard from "./Dashboard"
+import Dashboard from './Dashboard'
 import useSWR from 'swr'
 
 type Config = {
-  host: string,
+  host: string
 }
 
 type PowerO2 = {
-  config: Config,
-  dashboard: any,
-  init: (config: Config) => void,
+  config: Config
+  dashboard: any
+  init: (config: Config) => void
 }
 
 type DashboardOptions = {
   theme: DashboardTheme
 }
 
-const fetcher = (url: string) => fetch(url).then(r => r.json())
+const fetcher = (url: string) => fetch(url).then((r) => r.json())
 
 const path = (to: string) => powerO2.config.host + to
 
 const powerO2: PowerO2 = {
   config: {
-    host: "http://127.0.0.1:8000",
+    host: 'http://127.0.0.1:8000',
   },
 
   init: (config) => {
@@ -31,11 +31,16 @@ const powerO2: PowerO2 = {
   },
 
   dashboard: (dashboardId: number, { theme }: DashboardOptions) => {
-    const { data: dashboard, error } = useSWR<DashboardJSON>(path(`/dashboards/${dashboardId}`), fetcher)
-    const Component = dashboard ? () => <Dashboard dashboard={dashboard} theme={theme} /> : () => "Loading..."
+    const { data: dashboard, error } = useSWR<DashboardJSON>(
+      path(`/dashboards/${dashboardId}`),
+      fetcher
+    )
+    const Component = dashboard
+      ? () => <Dashboard dashboard={dashboard} theme={theme} />
+      : () => 'Loading...'
 
     return [Component, error]
-  }
+  },
 }
 
 export default powerO2

@@ -1,1 +1,1 @@
-export { default as PowerO2 } from "./PowerO2"
+export { default as PowerO2 } from './PowerO2'
