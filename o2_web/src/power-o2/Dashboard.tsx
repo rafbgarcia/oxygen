@@ -1,4 +1,3 @@
-import { DashboardJSON, ComponentTheme, DashboardTheme } from "./types"
 import Pivot from "./Pivot"
 
 type DashboardProps = {

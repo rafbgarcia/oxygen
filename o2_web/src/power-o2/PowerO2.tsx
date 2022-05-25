@@ -1,8 +1,6 @@
 import fetch from 'unfetch'
 
-import { useState } from "react"
 import Dashboard from "./Dashboard"
-import { DashboardJSON, DashboardTheme, WidgetType } from "./types"
 import useSWR from 'swr'
 
 type Config = {

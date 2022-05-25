@@ -1,4 +1,3 @@
-import { PivotWidget } from "./types"
 import { Table, TableBody, TableHead } from "@mui/material"
 
 const tableHtmlComponent = (content: string) => {
