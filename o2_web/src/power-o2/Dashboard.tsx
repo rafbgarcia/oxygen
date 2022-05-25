@@ -1,18 +1,14 @@
-import { DashboardJSON, ComponentTheme, DashboardTheme, Widget, WidgetType } from "./types"
+import { DashboardJSON, ComponentTheme, DashboardTheme } from "./types"
 import Pivot from "./Pivot"
-
-type WidgetMap = {
-  [key in WidgetType]: ({}: Widget) => JSX.Element
-}
 
 type DashboardProps = {
   dashboard: DashboardJSON
   theme: DashboardTheme
 }
 
-const widgetMap: WidgetMap = {
+const widgetMap = {
   "pivot": Pivot,
-  "column_barchart": Pivot,
+  "vertical_bar_chart": Pivot,
 }
 
 const DefaultTitle: ComponentTheme = ({ children }) => <h3>{children}</h3>
@@ -27,7 +23,7 @@ const Dashboard = ({ dashboard, theme }: DashboardProps) => {
       {dashboard.gridRows.map(row => {
         return row.widgets.map(widget => {
           const Widget = widgetMap[widget.type]
-          return <Widget key={widget.id} meta={widget.meta} theme={theme.widgets.pivot} />
+          return <Widget key={widget.id} meta={widget.meta} theme={theme?.widgets?.pivot || {}} />
         })
       })}
     </>

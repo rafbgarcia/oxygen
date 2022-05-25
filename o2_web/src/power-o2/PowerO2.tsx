@@ -33,7 +33,6 @@ const powerO2: PowerO2 = {
   },
 
   dashboard: (dashboardId: number, { theme }: DashboardOptions) => {
-    dashboardId = 1
     const { data: dashboard, error } = useSWR<DashboardJSON>(path(`/dashboards/${dashboardId}`), fetcher)
     const Component = dashboard ? () => <Dashboard dashboard={dashboard} theme={theme} /> : () => "Loading..."
 

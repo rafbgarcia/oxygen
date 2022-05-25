@@ -1,4 +1,5 @@
 import { PivotWidget } from "./types"
+import { Table, TableBody, TableHead } from "@mui/material"
 
 const tableHtmlComponent = (content: string) => {
   let template = document.createElement('template')
@@ -7,7 +8,7 @@ const tableHtmlComponent = (content: string) => {
 }
 
 const DefaultTable = ({ children }: any) => (
-  <table>{children}</table>
+  <Table>{children}</Table>
 )
 
 const Pivot = ({ meta, theme }: PivotWidget) => {
@@ -15,8 +16,8 @@ const Pivot = ({ meta, theme }: PivotWidget) => {
   const TableComponent = theme.table || DefaultTable
   return (
     <TableComponent>
-      <thead dangerouslySetInnerHTML={{__html: table?.children[0]?.innerHTML}}></thead>
-      <tbody dangerouslySetInnerHTML={{__html: table?.children[1]?.innerHTML}}></tbody>
+      <TableHead dangerouslySetInnerHTML={{__html: table?.children[0]?.innerHTML}}></TableHead>
+      <TableBody dangerouslySetInnerHTML={{__html: table?.children[1]?.innerHTML}}></TableBody>
     </TableComponent>
   )
 }

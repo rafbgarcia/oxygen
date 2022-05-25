@@ -1,8 +1,8 @@
 import { ReactNode } from "react"
 
 export interface Widget {
-  meta: any
-  theme: any
+  meta: Record<string, any>
+  theme: Record<string, any>
 }
 
 export interface PivotWidget extends Widget {
@@ -10,19 +10,19 @@ export interface PivotWidget extends Widget {
     html: string,
   },
   theme: {
-    table: ComponentTheme
+    table?: ComponentTheme
   }
 }
 
-export type WidgetType = "pivot" | "column_barchart"
+export type WidgetType = "pivot" | "vertical_bar_chart"
 
 export type ComponentTheme = ({ children }: { children: ReactNode}) => JSX.Element
 
 export type DashboardTheme = {
-  title: ComponentTheme
-  widgets: {
-    pivot: {
-      table: ComponentTheme,
+  title?: ComponentTheme
+  widgets?: {
+    pivot?: {
+      table?: ComponentTheme,
     }
   }
 }
