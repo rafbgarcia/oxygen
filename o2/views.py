@@ -40,6 +40,7 @@ def dashboard(request, id):
 
 
 def widget(request, id):
+    Pivot.as_json()
     dash = Dashboard.objects.first()
     widget = dash.grid_rows[0]['widgets'][0]
     widget['dataset'] = {

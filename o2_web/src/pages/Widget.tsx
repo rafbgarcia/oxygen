@@ -146,8 +146,8 @@ export const Widget = () => {
   return (
     <div className="flex">
       <WidgetBuild fields={fields} build={build} updateBuild={updateBuild} />
-      <div className="w-full h-full min-h-screen px-4 py-8 overflow-y-auto overflow-x-auto shadow-md">
-        {/* <Pivot meta={data.meta} /> */}
+      <div className="w-full h-screen px-4 py-8 overflow-y-auto overflow-x-auto shadow-md">
+        <Pivot meta={data.meta} theme={{}} />
       </div>
       <div className="w-96 h-screen px-4 py-8 overflow-y-auto bg-gray-100"></div>
     </div>

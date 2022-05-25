@@ -49,23 +49,22 @@ class Pivot:
                     "type": "pivot",
                     "build": {
                         "rows": [
-                            {"column": "resulted_by", "alias": "User"},
-                            {"column": "follow_up_result", "alias": "Result"},
+                            {"field": "resulted_by", "alias": "User"},
+                            {"field": "follow_up_result", "alias": "Result"},
                         ],
                         "values": [
-                            {"fn": "COUNT", "column": "DISTINCT(application_id)", "alias": "#"},
-                            {"fn": "CONTRIBUTION", "column": "DISTINCT(application_id)", "alias": "%"},
+                            {"fn": "COUNT", "field": "application_id", "distinct": True, "alias": "#"},
+                            {"fn": "CONTRIBUTION", "field": "application_id", "distinct": True, "alias": "%"},
                         ],
                         "columns": [
-                            {"column": "follow_up_number", "alias": "Follow up number"},
+                            {"field": "follow_up_number", "alias": "Follow up number"},
                         ],
                     },
                     "meta": {
-                        "html": df2.to_html(escape=False, na_rep="", index_names=False)
+                        "html": df2.to_html(escape=False, na_rep="", index_names=True)
                     }
                 }
             ]
         },
     ]
-    print(df2.to_html(escape=False, na_rep="", index_names=False))
     Dashboard.objects.update(title="Talent Acquisition Follow ups", grid_rows=grid_rows)
