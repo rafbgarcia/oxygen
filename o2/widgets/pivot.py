@@ -36,9 +36,9 @@ class Pivot:
     df['%'] = df['%'].astype(str) + '%'
 
     df2 = (df
-        .pivot(columns=["resulted_by", "follow_up_result"], values=["#", "%"], index=["follow_up_number"])
-        .stack(level=0)
-        .T
+        .pivot(columns=[], values=["#", "%"], index=["follow_up_result"])
+        # .stack(level=0)
+        # .T
         [0:25]
     )
     grid_rows = [
