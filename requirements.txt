@@ -2,3 +2,6 @@ Django==4.0.4
 pantab==2.1.1
 mysqlclient==2.1.0
 celery==5.2.6
+django-model-utils=4.2.0
+django-cors-headers==3.12.0
+pyhumps==3.7.1

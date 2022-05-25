@@ -19,6 +19,7 @@ const DefaultTitle: ComponentTheme = ({ children }) => <h3>{children}</h3>
 
 const Dashboard = ({ dashboard, theme }: DashboardProps) => {
   const TitleComponent = theme.title || DefaultTitle
+
   return (
     <>
       <TitleComponent>{dashboard.title}</TitleComponent>

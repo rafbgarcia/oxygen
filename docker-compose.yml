@@ -1,6 +1,6 @@
 version: '3.8'
 volumes:
-  # db_data:
+  db_data:
   redis_data:
 services:
   web:
@@ -22,14 +22,14 @@ services:
     ports:
       - 6379:6379
     mem_limit: 100m
-  # db:
-  #   image: docker.io/mysql/mysql-server:8.0.26
-  #   volumes:
-  #     - db_data:/var/lib/mysql
-  #     - ./config/mysql.cnf:/etc/my.cnf.d/compose.cnf
-  #   ports:
-  #     - 3306:3306
-  #   environment:
-  #     MYSQL_ROOT_HOST: "%"
-  #     MYSQL_ROOT_PASSWORD: talkbox
-  #   mem_limit: 2g
+  db:
+    image: docker.io/mysql/mysql-server:8.0.26
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./config/mysql.cnf:/etc/my.cnf.d/compose.cnf
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_HOST: "%"
+      MYSQL_ROOT_PASSWORD: talkbox
+    mem_limit: 2g
