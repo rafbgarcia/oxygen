@@ -13,12 +13,8 @@ const Pivot = ({ meta, theme }: PivotWidget) => {
   const TableComponent = theme.table || DefaultTable
   return (
     <TableComponent>
-      <TableHead
-        dangerouslySetInnerHTML={{ __html: table?.children[0]?.innerHTML }}
-      ></TableHead>
-      <TableBody
-        dangerouslySetInnerHTML={{ __html: table?.children[1]?.innerHTML }}
-      ></TableBody>
+      <TableHead dangerouslySetInnerHTML={{ __html: table?.children[0]?.innerHTML }}></TableHead>
+      <TableBody dangerouslySetInnerHTML={{ __html: table?.children[1]?.innerHTML }}></TableBody>
     </TableComponent>
   )
 }

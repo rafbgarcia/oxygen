@@ -1,12 +1,5 @@
-import { PowerO2 } from '../power-o2'
-// import { Table, Title } from "playbook-ui"
-// import "../node_modules/playbook-ui/dist/playbook.css"
-import { DashboardTheme } from '../power-o2/types'
-import PivotTableChartIcon from '@mui/icons-material/PivotTableChart'
-
-PowerO2.init({
-  host: 'http://127.0.0.1:8000',
-})
+import Dashboard from '../components/Dashboard'
+import * as o2 from '../lib/o2'
 
 const theme: DashboardTheme = {
   // title: ({ children }) => <Title>{children}</Title>,
@@ -23,10 +16,9 @@ const theme: DashboardTheme = {
 }
 
 export const Home = () => {
-  const dashboardId = 1
-  const [Dashboard, error] = PowerO2.dashboard(dashboardId, { theme })
+  const { data, error } = o2.getDashboard(1)
 
   if (error) return <p>Error: {error}</p>
 
-  return <Dashboard />
+  return <Dashboard data={data} theme={theme} />
 }

@@ -1,6 +1,7 @@
 from django.forms import model_to_dict
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
+from matplotlib.widgets import Widget
 import pandas as pd
 import pantab
 import time
@@ -34,6 +35,22 @@ def create_dataset(request):
 
 
 def dashboard(request, id):
-    Pivot.as_json()
     dashboard = Dashboard.objects.get(pk=id)
     return JsonResponse(humps.camelize(model_to_dict(dashboard)))
+
+
+def widget(request, id):
+    dash = Dashboard.objects.first()
+    widget = dash.grid_rows[0]['widgets'][0]
+    widget['dataset'] = {
+        'fields': [
+            { 'name': "application_id", 'type': 'number'},
+            { 'name': "follow_up_number", 'type': 'number'},
+            { 'name': "follow_up_date", 'type': 'datetime'},
+            { 'name': "follow_up_date_string", 'type': 'string'},
+            { 'name': "follow_up_result", 'type': 'string'},
+            { 'name': "resulted_by", 'type': 'string'},
+            { 'name': "title_name", 'type': 'string'},
+        ]
+    }
+    return JsonResponse(humps.camelize(widget))

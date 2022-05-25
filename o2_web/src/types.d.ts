@@ -1,5 +1,5 @@
 declare module 'playbook-ui'
-
+declare module 'SWRHook'
 export declare global {
   interface Widget {
     meta: Record<string, any>
@@ -15,8 +15,6 @@ export declare global {
     }
   }
 
-  type WidgetType = 'pivot' | 'vertical_bar_chart'
-
   type ComponentTheme = ({ children }: { children: ReactNode }) => JSX.Element
 
   type DashboardTheme = {
@@ -28,19 +26,40 @@ export declare global {
     }
   }
 
-  type WidgetJSON = {
-    id: number
-    type: WidgetType
-    meta: any
-  }
+  /**
+   * API Responses
+   */
 
-  type GridRowJson = {
-    widgets: Array<WidgetJSON>
-  }
-
+  /**
+   * Dashboard
+   */
   type DashboardJSON = {
     title: string
     dataLastUpdatedAt: string
-    gridRows: Array<GridRowJson>
+    gridRows: [
+      {
+        widgets: [WidgetJSON]
+      }
+    ]
+  }
+
+  /**
+   * Widget
+   */
+
+  type WidgetJSON = {
+    id: number
+    type: WidgetType
+    meta: PivotMeta
+    build: PivotBuild
+  }
+  type WidgetType = 'pivot' | 'vertical_bar_chart'
+  type PivotMeta = {
+    html: string
+  }
+  type PivotBuild = {
+    columns: [{ field: string; alias: string }]
+    rows: [{ field: string; alias: string }]
+    values: [{ fn: string; field: string; alias: string }]
   }
 }
