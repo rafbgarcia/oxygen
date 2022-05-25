@@ -21,10 +21,7 @@ class Pivot:
         f.follow_up_result,
         f.follow_up_number,
         COUNT(DISTINCT application_id) AS "#",
-        ROUND(
-            COUNT(DISTINCT application_id) / CAST(MAX(t.total) AS FLOAT),
-            2
-        ) AS "%"
+        ROUND(COUNT(DISTINCT application_id) / CAST(MAX(t.total) AS FLOAT) * 100, 2) as "%"
     FROM followups f
     INNER JOIN totals t ON t.follow_up_number = f.follow_up_number AND t.resulted_by = f.resulted_by
     WHERE f.follow_up_number IN(1, 2) AND f.follow_up_date >= '2022-01-01'
@@ -33,6 +30,8 @@ class Pivot:
     """
 
     df = pantab.frame_from_hyper_query("/Users/rafa/Downloads/test_follow_ups.hyper", q)
+    df['%'] = df['%'].astype(str) + '%'
+
     df2 = (df
         .pivot(columns=["resulted_by", "follow_up_result"], values=["#", "%"], index=["follow_up_number"])
         .stack(level=0)
@@ -54,14 +53,14 @@ class Pivot:
                         ],
                         "values": [
                             {"fn": "COUNT", "field": "application_id", "distinct": True, "alias": "#"},
-                            {"fn": "CONTRIBUTION", "field": "application_id", "distinct": True, "alias": "%"},
+                            {"fn": "PERCENT", "field": "application_id", "distinct": True, "alias": "%"},
                         ],
                         "columns": [
                             {"field": "follow_up_number", "alias": "Follow up number"},
                         ],
                     },
                     "meta": {
-                        "html": df2.to_html(escape=False, na_rep="", index_names=True)
+                        "html": df2.to_html(escape=False, na_rep="-", index_names=True)
                     }
                 }
             ]

@@ -7,7 +7,7 @@ import { useImmer } from 'use-immer'
 const trashIcon = (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    className="h-6 w-6"
+    className="h-5 w-5"
     fill="none"
     viewBox="0 0 24 24"
     stroke="currentColor"
@@ -16,7 +16,7 @@ const trashIcon = (
     <path
       strokeLinecap="round"
       strokeLinejoin="round"
-      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-5a1 1 0 00-1 1v3M4 7h16"
     />
   </svg>
 )
@@ -24,7 +24,7 @@ const trashIcon = (
 const plusSmIcon = (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    className="h-6 w-6"
+    className="h-5 w-5"
     fill="none"
     viewBox="0 0 24 24"
     stroke="currentColor"
@@ -33,6 +33,8 @@ const plusSmIcon = (
     <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
   </svg>
 )
+
+const fns = ['COUNT', 'SUM', 'PERCENT']
 
 const WidgetBuild = ({ fields, build, updateBuild }) => {
   const remove = (key, index) => () => {
@@ -46,7 +48,7 @@ const WidgetBuild = ({ fields, build, updateBuild }) => {
     })
   }
   return (
-    <div className="w-96 h-screen px-4 py-8 overflow-y-auto bg-gray-100">
+    <div className="w-3/12 h-screen px-4 py-8 overflow-y-auto bg-gray-100">
       <div className="border-b border-gray-200 pb-3 mb-3">
         <PivotTableChartIcon />
         Pivot
@@ -55,7 +57,7 @@ const WidgetBuild = ({ fields, build, updateBuild }) => {
       <div className="mb-3 pb-3 border-b-2 border-white">
         <p>Rows</p>
         {build.rows.map((row, i) => (
-          <div key={row.fn + row.field} className="flex justify-between items-center mb-1">
+          <div key={row.field} className="flex justify-between items-center mb-1">
             <select className="w-full" defaultValue={row.field}>
               <option key="blank" value="blank">
                 Select
@@ -72,19 +74,26 @@ const WidgetBuild = ({ fields, build, updateBuild }) => {
           </div>
         ))}
         <a onClick={add('rows')} className="cursor-pointer px-3 py-1 border border-gray-500 bg-white flex w-min">
-          Add {plusSmIcon}
+          <span>Add</span>
+          <span>{plusSmIcon}</span>
         </a>
       </div>
 
+      {/**
+       * Values
+       **/}
       <div className="mb-3 pb-3 border-b-2 border-white">
         <p>Values</p>
         {build.values.map((value, i) => (
           <div key={value.fn + value.field} className="flex justify-between items-center mb-1">
-            {/* {JSON.stringify(value)} */}
-            <select className="w-full" defaultValue={value.field}>
-              <option key="blank" value="blank">
-                Select
-              </option>
+            <select className="w-4/12 mr-1" defaultValue={value.fn}>
+              {fns.map((name) => (
+                <option key={name} value={name}>
+                  {name}
+                </option>
+              ))}
+            </select>
+            <select className="w-8/12" defaultValue={value.field}>
               {fields.map((name) => (
                 <option key={name} value={name}>
                   {name}
@@ -104,7 +113,7 @@ const WidgetBuild = ({ fields, build, updateBuild }) => {
       <div className="mb-3 pb-3 border-b-2 border-white">
         <p>Columns</p>
         {build.columns.map((column, i) => (
-          <div key={column.fn + column.field} className="flex justify-between items-center mb-1">
+          <div key={column.field} className="flex justify-between items-center mb-1">
             <select className="w-full" defaultValue={column.field}>
               <option key="blank" value="blank">
                 Select
@@ -146,10 +155,10 @@ export const Widget = () => {
   return (
     <div className="flex">
       <WidgetBuild fields={fields} build={build} updateBuild={updateBuild} />
-      <div className="w-full h-screen px-4 py-8 overflow-y-auto overflow-x-auto shadow-md">
+      <div className="w-9/12 h-screen px-4 py-8 overflow-y-auto overflow-x-auto shadow-md">
         <Pivot meta={data.meta} theme={{}} />
       </div>
-      <div className="w-96 h-screen px-4 py-8 overflow-y-auto bg-gray-100"></div>
+      {/* <div className="w-96 h-screen px-4 py-8 overflow-y-auto bg-gray-100"></div> */}
     </div>
   )
 }
