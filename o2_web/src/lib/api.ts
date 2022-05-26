@@ -23,6 +23,9 @@ export const api = {
   getWidget: (widgetId: number) => {
     return useSWR(path(`/widgets/${widgetId}`), fetcher)
   },
+  getDatasets: () => {
+    return useSWR(path(`/datasets`), fetcher)
+  },
   createDataset: (data) => {
     return fetch(path(`/datasets/create`), {
       method: "POST",

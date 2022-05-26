@@ -51,6 +51,11 @@ def multably_map_dtypes_user_types(dtypes_dict):
             dtypes_dict[key] = "Boolean"
 
 
+def datasets(request):
+    datasets = [model_to_dict(dataset) for dataset in Dataset.objects.all()]
+    return JsonResponse(humps.camelize({"datasets": datasets}))
+
+
 @csrf_exempt
 def preview_dataset(request):
     if request.method != "POST":
@@ -79,6 +84,7 @@ def create_dataset(request):
 
     params = json.loads(request.body)
 
+    # TODO: fetch all lines
     with MySQL(connection_config).execute(params["query"]) as cursor:
         fields = cursor.column_names
         df = pd.DataFrame(cursor.fetchmany(100_000), columns=fields)

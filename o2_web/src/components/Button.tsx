@@ -12,7 +12,7 @@ const variants = {
 }
 
 const TWButton = tw.button<TWButtonProps>`
-  rounded-md border px-6 py-2
+  rounded-md border px-6 py-2 flex items-center
   transition duration-150 ease-in-out
   disabled:opacity-50 disabled:pointer-events-none disabled:select-none
   ${(p) =>

@@ -7,6 +7,7 @@ import { api } from "../lib/api"
 import { Table } from "../components/Table"
 import { Page } from "./Page"
 import { map } from "lodash-es"
+import { useNavigate } from "react-router-dom"
 
 const Form = ({ onSubmit, register, handleSubmit, waitingResponse }) => {
   return (
@@ -53,6 +54,7 @@ const Fields = ({ fields }) => {
     </>
   )
 }
+
 const Preview = ({ preview }) => {
   return (
     <div className="flex items-start justify-between gap-5 relative mt-5">
@@ -70,6 +72,7 @@ const Preview = ({ preview }) => {
 }
 
 export const Dataset = () => {
+  const navigate = useNavigate()
   const { register, handleSubmit, getValues } = useForm()
   const [waiting, setWaiting] = useState({ preview: false, save: false })
   const [preview, setDataset] = useState()
@@ -91,8 +94,9 @@ export const Dataset = () => {
     setWaiting({ preview: false, save: true })
     api
       .createDataset(getValues())
-      .then((dataset) => {
+      .then(() => {
         setWaiting({ preview: false, save: false })
+        navigate("/datasets")
       })
       .catch((err) => {
         setWaiting({ preview: false, save: false })
