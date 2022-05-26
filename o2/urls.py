@@ -1,11 +1,24 @@
 from django.urls import path
+from o2 import dashboard_views, dataset_views, widget_views
 
-from . import views
+dataset_paths = [
+    path("datasets", dataset_views.index),
+    path("datasets/preview", dataset_views.preview),
+    path("datasets/create", dataset_views.create),
+]
+
+dashboard_paths = [
+    path("dashboards", dashboard_views.index),
+    path("dashboards/create", dashboard_views.create),
+    path("dashboards/<int:id>", dashboard_views.show),
+]
+
+widget_paths = [
+    path("widgets/<int:id>", widget_views.widget),
+]
 
 urlpatterns = [
-    path("datasets", views.datasets),
-    path("datasets/preview", views.preview_dataset),
-    path("datasets/create", views.create_dataset),
-    path("dashboards/<int:id>", views.dashboard),
-    path("widgets/<int:id>", views.widget),
+    *dataset_paths,
+    *dashboard_paths,
+    *widget_paths,
 ]

@@ -14,7 +14,7 @@ export const Datasets = () => {
 
   return (
     <>
-      <Page.Header className="flex justify-between">
+      <Page.Header $flex>
         <Page.Title>Datasets</Page.Title>
         <Link to="/datasets/new">
           <Button>New Dataset</Button>
@@ -37,7 +37,7 @@ export const Datasets = () => {
               </dt>
               <dd className="mt-2 ml-16 text-base text-gray-500">
                 <p>
-                  Updated {formatDistanceToNowStrict(parseISO(dataset.lastBuiltAt))} ago
+                  Last built {formatRelative(parseISO(dataset.lastBuiltAt), new Date())}
                   <span className="ml-1">(took {dataset.buildDurationSeconds}s)</span>
                 </p>
                 <p>{dataset.count} records</p>

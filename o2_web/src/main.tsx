@@ -1,15 +1,16 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import { Home } from './pages/Home'
-import { Widget } from './pages/Widget'
-import { Layout } from './pages/Layout'
-import { Datasets } from './pages/Datasets'
-import { Dashboards } from './pages/Dashboards'
-import { Dashboard } from './pages/Dashboard'
-import { Dataset } from './pages/Dataset'
+import React from "react"
+import ReactDOM from "react-dom/client"
+import { BrowserRouter, Route, Routes } from "react-router-dom"
+import { Home } from "./pages/Home"
+import { Widget } from "./pages/Widget"
+import { Layout } from "./pages/Layout"
+import { Datasets } from "./pages/Datasets"
+import { Dashboards } from "./pages/Dashboards"
+import { Dashboard } from "./pages/Dashboard"
+import { Dataset } from "./pages/Dataset"
+import { DashboardNew } from "./pages/DashboardNew"
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
+ReactDOM.createRoot(document.getElementById("root")!).render(
   <div>
     {/* ensure these classes, used in `index.html`, are compiled by tailwind */}
     <span className="text-gray-700 bg-gray-100"></span>
@@ -23,9 +24,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             <Route path="datasets/new" element={<Dataset />} />
             <Route path="datasets/:id/edit" element={<Dataset />} />
             <Route path="dashboards" element={<Dashboards />} />
-            <Route path="dashboards/:id" element={<Dashboard />} />
+            <Route path="dashboards/new" element={<DashboardNew />} />
             <Route path="dashboards/:id/edit" element={<Dashboard />} />
-            <Route path="dashboards/:id/widgets/:widget_id/edit" element={<Widget />} />
+            <Route path="dashboards/:id/widgets/:widget_id" element={<Widget />} />
           </Route>
         </Routes>
       </BrowserRouter>

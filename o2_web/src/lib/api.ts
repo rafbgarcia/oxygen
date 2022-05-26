@@ -13,12 +13,25 @@ const fetcher = (resource: string) => fetch(resource).then((res) => res.json())
 
 const path = (to: string) => _config.host + to
 
+const post = (url, data) =>
+  fetch(url, {
+    method: "POST",
+    body: JSON.stringify(data),
+    headers: { "Content-Type": "application/json" },
+  }).then((res) => res.json())
+
 export const api = {
   init: (config: Config) => {
     _config = { ..._config, ...config }
   },
   getDashboard: (dashboardId: number) => {
     return useSWR<DashboardJSON>(path(`/dashboards/${dashboardId}`), fetcher)
+  },
+  getDashboards: () => {
+    return useSWR(path(`/dashboards`), fetcher)
+  },
+  createDashboard: (data) => {
+    return post(path(`/dashboards/create`), data)
   },
   getWidget: (widgetId: number) => {
     return useSWR(path(`/widgets/${widgetId}`), fetcher)
@@ -27,17 +40,9 @@ export const api = {
     return useSWR(path(`/datasets`), fetcher)
   },
   createDataset: (data) => {
-    return fetch(path(`/datasets/create`), {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: { "Content-Type": "application/json" },
-    }).then((res) => res.json())
+    return post(path(`/datasets/create`), data)
   },
   previewDataset: (data) => {
-    return fetch(path(`/datasets/preview`), {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: { "Content-Type": "application/json" },
-    }).then((res) => res.json())
+    return post(path(`/datasets/preview`), data)
   },
 }

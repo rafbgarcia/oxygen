@@ -15,9 +15,20 @@ class Dataset(TimeStampedModel):
 
 
 class Dashboard(TimeStampedModel):
-    title = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
     previous_version = models.ForeignKey("self", on_delete=models.SET_NULL, null=True)
-    grid_rows = models.JSONField()
+
+
+class Widget(TimeStampedModel):
+    dataset = models.ForeignKey(Dataset, on_delete=models.SET_NULL, default=None, null=True)
+    type = models.CharField(max_length=20)
+    build_info = models.JSONField()
+    meta = models.JSONField()
+
+
+class DashboardRows(TimeStampedModel):
+    dashboard = models.ForeignKey(Dashboard, on_delete=models.CASCADE)
+    widget = models.ForeignKey(Widget, on_delete=models.CASCADE)
 
 
 # class GridRow(TimeStampedModel):

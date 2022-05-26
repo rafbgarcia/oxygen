@@ -1,22 +1,23 @@
-import { Fragment } from 'react'
-import { Link, LinkProps } from 'react-router-dom'
-import { Outlet, useMatch, useResolvedPath } from 'react-router-dom'
-import { Disclosure, Menu, Transition } from '@headlessui/react'
-import { BellIcon } from '@heroicons/react/outline'
-import { classnames } from '../lib/classnames'
-import logo from '../assets/logo.png'
+import { Fragment } from "react"
+import { Link, LinkProps } from "react-router-dom"
+import { Outlet, useMatch, useResolvedPath } from "react-router-dom"
+import { Disclosure, Menu, Transition } from "@headlessui/react"
+import { BellIcon } from "@heroicons/react/outline"
+import { classnames } from "../lib/classnames"
+import logo from "../assets/logo.png"
+import { Avatar } from "../components/Avatar"
 
 function classNames(...classes) {
-  return classes.filter(Boolean).join(' ')
+  return classes.filter(Boolean).join(" ")
 }
 
 const ActiveLink = ({ children, to, ...props }: LinkProps) => {
   let resolved = useResolvedPath(to)
   let match = useMatch({ path: resolved.pathname, end: true })
 
-  const classes = classnames('text-white px-3 py-2 rounded-md text-sm font-medium', {
-    'bg-gray-900': match,
-    'text-gray-300 hover:bg-gray-700 hover:text-white': !match,
+  const classes = classnames("text-white px-3 py-2 rounded-md text-sm font-medium", {
+    "bg-gray-900": match,
+    "text-gray-300 hover:bg-gray-700 hover:text-white": !match,
   })
   return (
     <Link className={classes} to={to} {...props}>
@@ -38,7 +39,10 @@ const Nav = () => {
         <div className="relative flex items-center justify-between h-16">
           <div className="flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">
             <Link to="/" className="flex-shrink-0 flex items-center">
-              <img className="block h-8 w-auto" src="https://tailwindui.com/img/logos/workflow-mark-indigo-500.svg" />
+              <img
+                className="block h-8 w-auto"
+                src="https://tailwindui.com/img/logos/workflow-mark-indigo-500.svg"
+              />
               <img className="block h-7 w-auto ml-2" src={logo} />
             </Link>
             <div className="hidden sm:block sm:ml-6">
@@ -61,14 +65,7 @@ const Nav = () => {
             {/* Profile dropdown */}
             <Menu as="div" className="ml-3 relative">
               <div>
-                <Menu.Button className="bg-gray-800 flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
-                  <span className="sr-only">Open user menu</span>
-                  <img
-                    className="h-8 w-8 rounded-full"
-                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                    alt=""
-                  />
-                </Menu.Button>
+                <Avatar src="https://avatars.githubusercontent.com/u/1904314?v=4" />
               </div>
               <Transition
                 as={Fragment}
@@ -84,7 +81,10 @@ const Nav = () => {
                     {({ active }) => (
                       <a
                         href="#"
-                        className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
+                        className={classNames(
+                          active ? "bg-gray-100" : "",
+                          "block px-4 py-2 text-sm text-gray-700"
+                        )}
                       >
                         Your Profile
                       </a>
@@ -94,7 +94,10 @@ const Nav = () => {
                     {({ active }) => (
                       <a
                         href="#"
-                        className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
+                        className={classNames(
+                          active ? "bg-gray-100" : "",
+                          "block px-4 py-2 text-sm text-gray-700"
+                        )}
                       >
                         Settings
                       </a>
@@ -104,7 +107,10 @@ const Nav = () => {
                     {({ active }) => (
                       <a
                         href="#"
-                        className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
+                        className={classNames(
+                          active ? "bg-gray-100" : "",
+                          "block px-4 py-2 text-sm text-gray-700"
+                        )}
                       >
                         Sign out
                       </a>

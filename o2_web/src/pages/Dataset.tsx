@@ -13,19 +13,18 @@ const Form = ({ onSubmit, register, handleSubmit, waitingResponse }) => {
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <TextField
-        defaultValue="TA - Follow ups"
         autoFocus
         label="Dataset Name"
         className="mb-5"
+        placeholder="ex: TA - Interviews"
         register={register("name", { required: true })}
       />
       <TextareaField
         label="Query"
         rows={3}
         className="mb-5"
-        placeholder="SELECT * FROM table LIMIT 10"
+        placeholder="ex: SELECT * FROM table LIMIT 10"
         register={register("query", { required: true })}
-        defaultValue="select * from untitled_name limit 1000000"
       />
       <Button className="flex items-center" loading={waitingResponse}>
         Preview

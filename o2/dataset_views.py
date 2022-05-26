@@ -71,16 +71,13 @@ def map_user_types_to_dtypes(user_types):
     return copy
 
 
-def datasets(request):
+def index(request):
     datasets = [model_to_dict(dataset) for dataset in Dataset.objects.all()]
     return JsonResponse(humps.camelize({"datasets": datasets}))
 
 
 @csrf_exempt
-def preview_dataset(request):
-    if request.method != "POST":
-        return JsonResponse({"error": "Invalid HTTP method"})
-
+def preview(request):
     params = json.loads(request.body)
     with MySQL(connection_config).execute(params["query"]) as cursor:
         fields = cursor.column_names
@@ -97,10 +94,7 @@ def preview_dataset(request):
 
 
 @csrf_exempt
-def create_dataset(request):
-    if request.method != "POST":
-        return JsonResponse({"error": "Invalid HTTP method"})
-
+def create(request):
     params = json.loads(request.body)
     filepath = DATASETS_FOLDER / f"{params['name']}.hyper"
     dtypes = map_user_types_to_dtypes(params["dtypes"])
@@ -125,26 +119,3 @@ def create_dataset(request):
     dataset = Dataset.objects.create(**params)
 
     return JsonResponse(humps.camelize(model_to_dict(dataset)))
-
-
-def dashboard(request, id):
-    dashboard = Dashboard.objects.get(pk=id)
-    return JsonResponse(humps.camelize(model_to_dict(dashboard)))
-
-
-def widget(request, id):
-    Pivot.as_json()
-    dash = Dashboard.objects.first()
-    widget = dash.grid_rows[0]["widgets"][0]
-    widget["dataset"] = {
-        "fields": [
-            {"name": "application_id", "type": "number"},
-            {"name": "follow_up_number", "type": "number"},
-            {"name": "follow_up_date", "type": "datetime"},
-            {"name": "follow_up_date_string", "type": "string"},
-            {"name": "follow_up_result", "type": "string"},
-            {"name": "resulted_by", "type": "string"},
-            {"name": "title_name", "type": "string"},
-        ]
-    }
-    return JsonResponse(humps.camelize(widget))
