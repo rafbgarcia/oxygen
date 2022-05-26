@@ -1,2 +1,3 @@
+- Preview is slow for a large number of records. Is there a way to limit it?
 - Remove immer, use-immer?
 - Remove Lodash?

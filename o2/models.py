@@ -1,13 +1,17 @@
+from email.policy import default
 from django.db import models
 from model_utils.models import TimeStampedModel
 
 
 class Dataset(TimeStampedModel):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, unique=True)
     query = models.TextField()
     is_building = models.BooleanField(default=False)
-    size_mb = models.DecimalField(null=True, max_digits=10, decimal_places=1)
-    last_built_at = models.DateTimeField(null=True)
+    size_mb = models.DecimalField(default=None, max_digits=10, decimal_places=1)
+    last_built_at = models.DateTimeField(default=None)
+    build_duration_seconds = models.SmallIntegerField(default=None)
+    dtypes = models.JSONField(default=None)
+    count = models.IntegerField(default=None)
 
 
 class Dashboard(TimeStampedModel):

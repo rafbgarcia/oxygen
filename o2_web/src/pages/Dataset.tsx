@@ -25,7 +25,7 @@ const Form = ({ onSubmit, register, handleSubmit, waitingResponse }) => {
         className="mb-5"
         placeholder="SELECT * FROM table LIMIT 10"
         register={register("query", { required: true })}
-        defaultValue="select * from untitled_name limit 1000"
+        defaultValue="select * from untitled_name limit 1000000"
       />
       <Button className="flex items-center" loading={waitingResponse}>
         Preview
@@ -75,7 +75,7 @@ export const Dataset = () => {
   const navigate = useNavigate()
   const { register, handleSubmit, getValues } = useForm()
   const [waiting, setWaiting] = useState({ preview: false, save: false })
-  const [preview, setDataset] = useState()
+  const [preview, setDataset] = useState<Record<any, any>>()
   const [error, setError] = useState()
   const onSubmit = (data) => {
     setWaiting({ preview: true, save: false })
@@ -93,7 +93,7 @@ export const Dataset = () => {
   const save = () => {
     setWaiting({ preview: false, save: true })
     api
-      .createDataset(getValues())
+      .createDataset({ ...getValues(), dtypes: preview?.fields })
       .then(() => {
         setWaiting({ preview: false, save: false })
         navigate("/datasets")
@@ -114,7 +114,12 @@ export const Dataset = () => {
       </Page.Header>
       <Page.Main>
         <div className="container max-w-4xl m-auto p-4">
-          <Form onSubmit={onSubmit} register={register} handleSubmit={handleSubmit} waitingResponse={waiting.preview} />
+          <Form
+            onSubmit={onSubmit}
+            register={register}
+            handleSubmit={handleSubmit}
+            waitingResponse={waiting.preview}
+          />
           {error && <span className="text-sm text-gray-500">{JSON.stringify(error)}</span>}
         </div>
 

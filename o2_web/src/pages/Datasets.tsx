@@ -4,7 +4,7 @@ import { Chip } from "../components/Chip"
 import { Link } from "react-router-dom"
 import { Page } from "./Page"
 import { api } from "../lib/api"
-import { formatDistance, formatRelative } from "date-fns"
+import { formatDistanceToNowStrict, parseISO, formatRelative } from "date-fns"
 
 export const Datasets = () => {
   const { data, error } = api.getDatasets()
@@ -21,7 +21,7 @@ export const Datasets = () => {
         </Link>
       </Page.Header>
       <Page.Main>
-        <dl className="space-y-10 grid grid-cols-4 gap-x-8 gap-y-10 p-4">
+        <dl className="grid grid-cols-4 gap-x-14 gap-y-14 p-14">
           {data.datasets.map((dataset) => (
             <div key={dataset.id} className="relative bg-white p-4 rounded-md shadow-sm">
               <dt>
@@ -30,22 +30,18 @@ export const Datasets = () => {
                 </div>
                 <p className="ml-16 text-lg leading-6 font-medium text-gray-900 flex items-center">
                   {dataset.name}
+                  <Chip className="ml-2" color="gray">
+                    {dataset.sizeMb}MB
+                  </Chip>
                 </p>
               </dt>
               <dd className="mt-2 ml-16 text-base text-gray-500">
+                <p>
+                  Updated {formatDistanceToNowStrict(parseISO(dataset.lastBuiltAt))} ago
+                  <span className="ml-1">(took {dataset.buildDurationSeconds}s)</span>
+                </p>
+                <p>{dataset.count} records</p>
                 <p>Builds every 1 hour</p>
-                <p>Last update 35 minutes ago</p>
-                {dataset.id == 1 && (
-                  <div>
-                    Used by
-                    <ul>
-                      <li>
-                        <Chip color="gray">TA - Follow Ups Dashboard</Chip>
-                      </li>
-                    </ul>
-                  </div>
-                )}
-                <p>Size: {dataset.sizeMb}MB</p>
                 <p className="flex items-center">Created by Rafael Garcia</p>
                 <Button className="mt-4">Edit</Button>
               </dd>
