@@ -5,11 +5,14 @@ from model_utils.models import TimeStampedModel
 class Dataset(TimeStampedModel):
     name = models.CharField(max_length=100)
     query = models.TextField()
+    is_building = models.BooleanField(default=False)
+    size_mb = models.DecimalField(null=True, max_digits=10, decimal_places=1)
+    last_built_at = models.DateTimeField(null=True)
 
 
 class Dashboard(TimeStampedModel):
     title = models.CharField(max_length=100)
-    previous_version = models.ForeignKey('self', on_delete=models.SET_NULL, null=True)
+    previous_version = models.ForeignKey("self", on_delete=models.SET_NULL, null=True)
     grid_rows = models.JSONField()
 
 

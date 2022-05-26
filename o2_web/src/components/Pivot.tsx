@@ -1,7 +1,7 @@
-import './Pivot.css'
+import "./Pivot.css"
 
 const tableHtmlComponent = (content: string) => {
-  let template = document.createElement('template')
+  let template = document.createElement("template")
   template.innerHTML = content.trim()
   return template.content.firstChild as Element
 }
@@ -10,7 +10,7 @@ const DefaultTable = ({ children }: any) => (
   <table className="o2-default-pivot-widget w-full text-sm table-auto border-collapse">{children}</table>
 )
 
-const Pivot = ({ meta, theme }: PivotWidget) => {
+export const Pivot = ({ meta, theme }: PivotWidget) => {
   const table = tableHtmlComponent(meta.html)
   const TableComponent = theme.table || DefaultTable
   return (
@@ -20,5 +20,3 @@ const Pivot = ({ meta, theme }: PivotWidget) => {
     </TableComponent>
   )
 }
-
-export default Pivot

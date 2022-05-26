@@ -2,8 +2,8 @@ import { Fragment } from 'react'
 import { Link, LinkProps } from 'react-router-dom'
 import { Outlet, useMatch, useResolvedPath } from 'react-router-dom'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
-import { BellIcon, MenuIcon, XIcon } from '@heroicons/react/outline'
-import classnames from 'classnames'
+import { BellIcon } from '@heroicons/react/outline'
+import { classnames } from '../lib/classnames'
 import logo from '../assets/logo.png'
 
 function classNames(...classes) {
@@ -37,10 +37,10 @@ const Nav = () => {
       <div className="px-4">
         <div className="relative flex items-center justify-between h-16">
           <div className="flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">
-            <div className="flex-shrink-0 flex items-center">
+            <Link to="/" className="flex-shrink-0 flex items-center">
               <img className="block h-8 w-auto" src="https://tailwindui.com/img/logos/workflow-mark-indigo-500.svg" />
               <img className="block h-7 w-auto ml-2" src={logo} />
-            </div>
+            </Link>
             <div className="hidden sm:block sm:ml-6">
               <div className="flex space-x-4">
                 <ActiveLink to="/">Home</ActiveLink>
@@ -124,9 +124,7 @@ export const Layout = () => {
   return (
     <>
       <Nav />
-      <main>
-        <Outlet />
-      </main>
+      <Outlet />
     </>
   )
 }

@@ -1,4 +1,4 @@
-import Pivot from './Pivot'
+import { Pivot } from "./Pivot"
 
 type DashboardProps = {
   data: DashboardJSON | undefined

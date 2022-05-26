@@ -1,8 +1,7 @@
-import * as o2 from '../lib/o2'
-import PivotTableChartIcon from '@mui/icons-material/PivotTableChart'
-import Pivot from '../components/Pivot'
-import { useEffect } from 'react'
-import { useImmer } from 'use-immer'
+import { api } from "../lib/api"
+import { Pivot } from "../components/Pivot"
+import { useEffect } from "react"
+import { useImmer } from "use-immer"
 
 const trashIcon = (
   <svg
@@ -34,7 +33,7 @@ const plusSmIcon = (
   </svg>
 )
 
-const fns = ['COUNT', 'SUM', 'PERCENT']
+const fns = ["COUNT", "SUM", "PERCENT"]
 
 const WidgetBuild = ({ fields, build, updateBuild }) => {
   const remove = (key, index) => () => {
@@ -49,10 +48,7 @@ const WidgetBuild = ({ fields, build, updateBuild }) => {
   }
   return (
     <div className="w-3/12 h-screen px-4 py-8 overflow-y-auto bg-gray-100">
-      <div className="border-b border-gray-200 pb-3 mb-3">
-        <PivotTableChartIcon />
-        Pivot
-      </div>
+      <div className="border-b border-gray-200 pb-3 mb-3">Pivot</div>
 
       <div className="mb-3 pb-3 border-b-2 border-white">
         <p>Rows</p>
@@ -68,12 +64,12 @@ const WidgetBuild = ({ fields, build, updateBuild }) => {
                 </option>
               ))}
             </select>
-            <a className="cursor-pointer" onClick={remove('rows', i)}>
+            <a className="cursor-pointer" onClick={remove("rows", i)}>
               {trashIcon}
             </a>
           </div>
         ))}
-        <a onClick={add('rows')} className="cursor-pointer px-3 py-1 border border-gray-500 bg-white flex w-min">
+        <a onClick={add("rows")} className="cursor-pointer px-3 py-1 border border-gray-500 bg-white flex w-min">
           <span>Add</span>
           <span>{plusSmIcon}</span>
         </a>
@@ -100,12 +96,12 @@ const WidgetBuild = ({ fields, build, updateBuild }) => {
                 </option>
               ))}
             </select>
-            <a className="cursor-pointer" onClick={remove('values', i)}>
+            <a className="cursor-pointer" onClick={remove("values", i)}>
               {trashIcon}
             </a>
           </div>
         ))}
-        <a onClick={add('rows')} className="cursor-pointer px-3 py-1 border border-gray-500 bg-white flex w-min">
+        <a onClick={add("rows")} className="cursor-pointer px-3 py-1 border border-gray-500 bg-white flex w-min">
           Add {plusSmIcon}
         </a>
       </div>
@@ -124,12 +120,12 @@ const WidgetBuild = ({ fields, build, updateBuild }) => {
                 </option>
               ))}
             </select>
-            <a className="cursor-pointer" onClick={remove('columns', i)}>
+            <a className="cursor-pointer" onClick={remove("columns", i)}>
               {trashIcon}
             </a>
           </div>
         ))}
-        <a onClick={add('columns')} className="cursor-pointer px-3 py-1 border border-gray-500 bg-white flex w-min">
+        <a onClick={add("columns")} className="cursor-pointer px-3 py-1 border border-gray-500 bg-white flex w-min">
           Add {plusSmIcon}
         </a>
       </div>
@@ -138,8 +134,8 @@ const WidgetBuild = ({ fields, build, updateBuild }) => {
 }
 
 export const Widget = () => {
-  const { data, error } = o2.getWidget(1)
-  const [build, updateBuild] = useImmer({ rows: [], columns: [], values: [] })
+  const { data, error } = api.getWidget(1)
+  const [build, updateBuild] = useImmer({ rows: [], columns: [], values: [] }) // TODO: remove useImmer
 
   useEffect(() => {
     if (!!data) {
@@ -147,7 +143,7 @@ export const Widget = () => {
     }
   }, [!!data])
 
-  if (error) return <p>{'Error: ' + error}</p>
+  if (error) return <p>{"Error: " + error}</p>
   if (!data) return <p>Loading...</p>
 
   const fields = data.dataset.fields.map((field) => field.name)

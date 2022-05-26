@@ -1,0 +1,19 @@
+.o2-html-table-thead th,
+.o2-html-table-thead td,
+.o2-html-table-tbody th,
+.o2-html-table-tbody td {
+  border: 1px solid #ccc;
+  padding: 0.25rem 1rem;
+}
+
+.o2-html-table-tbody th {
+  font-weight: normal;
+}
+.o2-html-table-thead th,
+.o2-html-table-tbody th {
+  text-align: left;
+}
+
+.o2-html-table-tbody td {
+  text-align: right;
+}
