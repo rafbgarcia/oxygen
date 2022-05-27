@@ -8,7 +8,7 @@ export const TextField = ({
   register,
   ...props
 }: Record<any, any>) => {
-  type = type ?? 'text'
+  type = type ?? "text"
 
   return (
     <div {...props}>

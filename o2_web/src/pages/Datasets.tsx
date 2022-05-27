@@ -4,13 +4,13 @@ import { Chip } from "../components/Chip"
 import { Link } from "react-router-dom"
 import { Page } from "./Page"
 import { api } from "../lib/api"
-import { formatDistanceToNowStrict, parseISO, formatRelative } from "date-fns"
+import { parseISO, formatRelative } from "date-fns"
+import { Wait } from "../components/Wait"
 
 export const Datasets = () => {
   const { data, error } = api.getDatasets()
-
-  if (error) return <p>Error {JSON.stringify(error)}</p>
-  if (!data) return <p>Loading...</p>
+  const Waiting = Wait(data, error)
+  if (Waiting) return <Waiting />
 
   return (
     <>

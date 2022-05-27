@@ -10,9 +10,7 @@ const Form = ({ onSubmit, register, handleSubmit, waitingResponse }) => {
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <TextField autoFocus label="Name" className="mb-5" register={register("name", { required: true })} />
-      <Button className="flex items-center" loading={waitingResponse}>
-        Save
-      </Button>
+      <Button loading={waitingResponse}>Save</Button>
     </form>
   )
 }

@@ -8,8 +8,8 @@ import pantab
 import mysql.connector
 import humps
 from django.utils import timezone
-from o2.widgets.pivot import Pivot
-from o2.models import Dashboard, Dataset
+from o2.dataset import map_dtypes_user_types, map_user_types_to_dtypes
+from o2.models import Dataset
 from django.views.decorators.csrf import csrf_exempt
 from powerBi.settings import BASE_DIR
 from contextlib import contextmanager
@@ -39,40 +39,11 @@ class MySQL(object):
         conn.close()
 
 
-def multably_map_dtypes_user_types(dtypes_dict):
-    for key in dtypes_dict:
-        pandas_dtype = dtypes_dict[key].lower()
-        if "object" in pandas_dtype:
-            dtypes_dict[key] = "Text"
-        elif "int" in pandas_dtype:
-            dtypes_dict[key] = "Integer"
-        elif "float" in pandas_dtype:
-            dtypes_dict[key] = "Float"
-        elif "datetime" in pandas_dtype:
-            dtypes_dict[key] = "DateTime"
-        elif "bool" in pandas_dtype:
-            dtypes_dict[key] = "Boolean"
-
-
-def map_user_types_to_dtypes(user_types):
-    copy = {}
-    for key in user_types:
-        type = user_types[key]
-        if "Text" in type:
-            copy[key] = "object"
-        elif "Integer" in type:
-            copy[key] = "int64"
-        elif "Float" in type:
-            copy[key] = "float64"
-        elif "DateTime" in type:
-            copy[key] = "datetime64[ns]"
-        elif "Boolean" in type:
-            copy[key] = "bool"
-    return copy
-
-
 def index(request):
     datasets = [model_to_dict(dataset) for dataset in Dataset.objects.all()]
+    for dataset in datasets:
+        dataset["dtypes"] = map_dtypes_user_types(dataset["dtypes"])
+
     return JsonResponse(humps.camelize({"datasets": datasets}))
 
 
@@ -83,7 +54,7 @@ def preview(request):
         fields = cursor.column_names
         df = pd.DataFrame(cursor.fetchmany(25), columns=fields)
     dtypes = df.dtypes.to_frame("dtypes").reset_index().set_index("index")["dtypes"].astype(str).to_dict()
-    multably_map_dtypes_user_types(dtypes)
+    dtypes = map_dtypes_user_types(dtypes)
 
     return JsonResponse(
         {

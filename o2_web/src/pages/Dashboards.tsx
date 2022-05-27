@@ -1,15 +1,14 @@
 import { Button } from "../components/Button"
 import { DesktopComputerIcon } from "@heroicons/react/outline"
-import { Chip } from "../components/Chip"
 import { Link } from "react-router-dom"
 import { Page } from "./Page"
 import { api } from "../lib/api"
+import { Wait } from "../components/Wait"
 
 export const Dashboards = () => {
   const { data, error } = api.getDashboards()
-
-  if (error) return <p>Error {JSON.stringify(error)}</p>
-  if (!data) return <p>Loading...</p>
+  const Waiting = Wait(data, error)
+  if (Waiting) return <Waiting />
 
   return (
     <>
@@ -32,7 +31,9 @@ export const Dashboards = () => {
                 </p>
               </dt>
               <dd className="mt-2 ml-16 text-base text-gray-500">
-                <Button className="mt-4">Edit</Button>
+                <Link to={`/dashboards/${dashboard.id}/edit`}>
+                  <Button className="mt-4">Edit</Button>
+                </Link>
               </dd>
             </div>
           ))}

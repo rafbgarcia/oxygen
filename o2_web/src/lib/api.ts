@@ -24,8 +24,8 @@ export const api = {
   init: (config: Config) => {
     _config = { ..._config, ...config }
   },
-  getDashboard: (dashboardId: number) => {
-    return useSWR<DashboardJSON>(path(`/dashboards/${dashboardId}`), fetcher)
+  getDashboard: (id) => {
+    return useSWR(path(`/dashboards/${id}`), fetcher)
   },
   getDashboards: () => {
     return useSWR(path(`/dashboards`), fetcher)

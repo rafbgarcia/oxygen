@@ -2,7 +2,7 @@ import json
 from django.forms import model_to_dict
 from django.http import JsonResponse
 import humps
-from o2.models import Dashboard
+from o2.models import Dashboard, DashboardRow, Widget
 from django.views.decorators.csrf import csrf_exempt
 
 
@@ -20,4 +20,15 @@ def create(request):
 
 def show(request, id):
     dashboard = Dashboard.objects.get(pk=id)
-    return JsonResponse(humps.camelize(model_to_dict(dashboard)))
+    rows = DashboardRow.objects.filter(dashboard_id=dashboard.id).order_by("index")
+    widgets = Widget.objects.filter(dashboard_row__in=rows)
+
+    return JsonResponse(
+        humps.camelize(
+            {
+                "dashboard": model_to_dict(dashboard),
+                "rows": list(rows.all().values()),
+                "widgets": list(widgets.all().values()),
+            }
+        )
+    )

@@ -19,32 +19,19 @@ class Dashboard(TimeStampedModel):
     previous_version = models.ForeignKey("self", on_delete=models.SET_NULL, null=True)
 
 
+class DashboardRow(TimeStampedModel):
+    dashboard = models.ForeignKey(Dashboard, on_delete=models.CASCADE)
+    index = models.SmallIntegerField(default=None)
+
+
 class Widget(TimeStampedModel):
+    class Types(models.TextChoices):
+        PIVOT_TABLE = "pivot_table"
+        LINE_CHART = "line_chart"
+        VERTICAL_BAR_CHART = "vertical_bar_chart"
+
     dataset = models.ForeignKey(Dataset, on_delete=models.SET_NULL, default=None, null=True)
-    type = models.CharField(max_length=20)
+    dashboard_row = models.ForeignKey(DashboardRow, on_delete=models.SET_NULL, default=None, null=True)
+    type = models.CharField(max_length=20, choices=Types.choices, default=Types.PIVOT_TABLE)
     build_info = models.JSONField()
     meta = models.JSONField()
-
-
-class DashboardRows(TimeStampedModel):
-    dashboard = models.ForeignKey(Dashboard, on_delete=models.CASCADE)
-    widget = models.ForeignKey(Widget, on_delete=models.CASCADE)
-
-
-# class GridRow(TimeStampedModel):
-#     dashboard = models.ForeignKey(Dashboard, on_delete=models.CASCADE)
-#     dataset = models.ForeignKey(Dataset, on_delete=models.SET_NULL, null=True)
-#     meta = models.JSONField('metadata')
-#     type = models.CharField(max_length=20, choices=Types.choices, default=Types.PIVOT)
-
-
-# class Widget(TimeStampedModel):
-#     class Types(models.TextChoices):
-#         PIVOT = 'pivot'
-#         LINE_CHART = 'line_chart'
-#         VERTICAL_BAR_CHART = 'vertical_bar_chart'
-
-#     dashboard = models.ForeignKey(Dashboard, on_delete=models.CASCADE)
-#     dataset = models.ForeignKey(Dataset, on_delete=models.SET_NULL, null=True)
-#     meta = models.JSONField('metadata')
-#     type = models.CharField(max_length=20, choices=Types.choices, default=Types.PIVOT)

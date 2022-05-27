@@ -6,9 +6,10 @@ import { Widget } from "./pages/Widget"
 import { Layout } from "./pages/Layout"
 import { Datasets } from "./pages/Datasets"
 import { Dashboards } from "./pages/Dashboards"
-import { Dashboard } from "./pages/Dashboard"
 import { Dataset } from "./pages/Dataset"
 import { DashboardNew } from "./pages/DashboardNew"
+import { DashboardEdit } from "./pages/DashboardEdit"
+import { WidgetNew } from "./pages/WidgetNew"
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <div>
@@ -20,12 +21,15 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
+
             <Route path="datasets" element={<Datasets />} />
             <Route path="datasets/new" element={<Dataset />} />
             <Route path="datasets/:id/edit" element={<Dataset />} />
+
             <Route path="dashboards" element={<Dashboards />} />
             <Route path="dashboards/new" element={<DashboardNew />} />
-            <Route path="dashboards/:id/edit" element={<Dashboard />} />
+            <Route path="dashboards/:id/edit" element={<DashboardEdit />} />
+            <Route path="dashboards/:id/widgets/new" element={<WidgetNew />} />
             <Route path="dashboards/:id/widgets/:widget_id" element={<Widget />} />
           </Route>
         </Routes>
