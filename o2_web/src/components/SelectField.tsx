@@ -8,6 +8,7 @@ export const SelectField = ({
   defaultValue,
   type,
   register,
+  allowBlank,
   ...props
 }: Record<any, any>) => {
   return (
@@ -15,7 +16,13 @@ export const SelectField = ({
       <label htmlFor={name} className="block font-medium">
         {label}
       </label>
-      <select className="mt-1" {...register} defaultValue={defaultValue} name={name}>
+      <select
+        className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 mt-1 block w-full border border-gray-300 rounded-md transition-all ease-in-out"
+        name={name}
+        defaultValue={defaultValue}
+        {...register}
+      >
+        {allowBlank && <option value="">{allowBlank === true ? "- Select -" : allowBlank}</option>}
         {map(collection, ({ value, label }) => (
           <option key={value} value={value}>
             {label || value}

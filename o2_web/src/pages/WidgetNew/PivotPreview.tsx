@@ -1,0 +1,192 @@
+import { api } from "../../lib/api"
+import { Pivot } from "../../components/Pivot"
+import { useImmerReducer } from "use-immer"
+import { TrashIcon, PlusSmIcon } from "@heroicons/react/outline"
+import { Modal } from "../../components/Modal"
+import { Button } from "../../components/Button"
+import { map, partial, filter, flow } from "lodash-es"
+import { TextField } from "../../components/TextField"
+import { SelectField } from "../../components/SelectField"
+import { useForm } from "react-hook-form"
+import { useState } from "react"
+
+type State = typeof initialState
+type Props = Record<any, any> & { state: State }
+
+const FUNCTIONS = ["COUNT", "COUNT DISTINCT", "SUM", "CONTRIBUTION"]
+
+const initialState = {
+  show: false,
+  datasetFields: [],
+  buildInfo: {
+    rows: [] as any,
+    columns: [] as any,
+    values: [] as any,
+  },
+}
+
+const actions = {
+  removeField: (draft, { metadataKey, index }) => {
+    draft.buildInfo[metadataKey].splice(index, 1)
+  },
+  addField: (draft, { metadataKey, field }) => {
+    draft.buildInfo[metadataKey].push(field)
+  },
+}
+
+export const PivotPreview = ({ dataset }) => {
+  const [state, dispatch] = useImmerReducer(
+    (draft, action) => {
+      actions[action.type](draft, action)
+    },
+    { ...initialState, datasetFields: dataset.fields }
+  )
+
+  return (
+    <div className="flex">
+      <div className="w-3/12 h-screen px-4 py-8 overflow-y-auto bg-gray-100">
+        <BuildInfoSection isDimension metadataKey="rows" title="Rows" state={state} dispatch={dispatch} />
+        <BuildInfoSection
+          isDimension={false}
+          metadataKey="values"
+          title="Values"
+          state={state}
+          dispatch={dispatch}
+        />
+        <BuildInfoSection
+          isDimension
+          metadataKey="columns"
+          title="Columns"
+          state={state}
+          dispatch={dispatch}
+        />
+        {/* Tab2: Design */}
+      </div>
+      <div className="w-9/12 h-screen px-4 py-8 overflow-y-auto overflow-x-auto shadow-md">
+        {/* <Pivot meta={data.meta} theme={{}} /> */}
+      </div>
+    </div>
+  )
+}
+
+const BuildInfoSection = ({ state, dispatch, isDimension, metadataKey, title }) => {
+  const [open, setOpen] = useState(false)
+  const handleAdd = (field) => {
+    setOpen(false)
+    dispatch({ type: "addField", metadataKey, field })
+  }
+  const handleRemove = (metadataKey, index) => () => dispatch({ type: "removeField", metadataKey, index })
+  const Form = isDimension ? AddDimensionModal : AddMeasureModal
+
+  return (
+    <div className="mb-10">
+      <Form
+        open={open}
+        datasetFields={state.datasetFields}
+        includedFields={map(state.buildInfo[metadataKey], "field")}
+        onSubmit={handleAdd}
+        setShow={setOpen}
+      />
+
+      <div className="mb-5">
+        <header className="flex items-center justify-between">
+          <span className="font-medium">{title}</span>
+
+          <Button onClick={partial(setOpen, true)} className="flex items-center" $iconXs>
+            <PlusSmIcon className="w-4 h-4" />
+          </Button>
+        </header>
+        {state.buildInfo[metadataKey].map((item, index) => (
+          <BuildItem isDimension key={item.field} item={item} onRemove={handleRemove(metadataKey, index)} />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+const BuildItem = ({ isDimension, item, onRemove }) => {
+  return (
+    <div key={item.field} className="flex justify-between items-center shadow-sm bg-white p-2 my-2">
+      {item.alias}
+      <a className="cursor-pointer" onClick={onRemove}>
+        <TrashIcon className="w-4 h-4" />
+      </a>
+    </div>
+  )
+}
+
+const AddDimensionModal = ({ open, datasetFields, onSubmit, setShow, includedFields }) => {
+  const { register, handleSubmit, reset } = useForm()
+  const fieldsCollection = flow([
+    partial(filter, partial.placeholder, (field) => !includedFields.includes(field.name)),
+    partial(map, partial.placeholder, (field) => ({ value: field.name })),
+  ])(datasetFields)
+  const onSubmitFlow = flow([onSubmit, reset])
+
+  return (
+    <Modal show={open} onClose={setShow} $sm>
+      <form onSubmit={handleSubmit(onSubmitFlow)}>
+        <Modal.Body>
+          <Modal.Title>Add Dimension</Modal.Title>
+
+          <SelectField
+            collection={fieldsCollection}
+            label="Field"
+            className="mb-5"
+            register={register("field", { required: true })}
+          />
+          <TextField label="Alias" className="mb-5" register={register("alias", { required: true })} />
+        </Modal.Body>
+        <Modal.Actions>
+          <Button $primary className="ml-2">
+            Save
+          </Button>
+          <Button className="ml-2" onClick={partial(setShow, false)}>
+            Cancel
+          </Button>
+        </Modal.Actions>
+      </form>
+    </Modal>
+  )
+}
+
+const AddMeasureModal = ({ open, datasetFields, onSubmit, setShow, includedFields }) => {
+  const { register, handleSubmit, reset } = useForm()
+  const fieldsCollection = flow([
+    partial(filter, partial.placeholder, (field) => !includedFields.includes(field.name)),
+    partial(map, partial.placeholder, (field) => ({ value: field.name })),
+  ])(datasetFields)
+  const fnsCollection = map(FUNCTIONS, (value) => ({ value }))
+  const onSubmitFlow = flow([onSubmit, reset])
+
+  return (
+    <Modal show={open} onClose={setShow} $sm>
+      <form onSubmit={handleSubmit(onSubmitFlow)}>
+        <Modal.Body>
+          <Modal.Title>Add Measure</Modal.Title>
+          <SelectField
+            collection={fnsCollection}
+            label="Function"
+            className="mb-5"
+            register={register("function", { required: true })}
+          />
+          <SelectField
+            collection={fieldsCollection}
+            label="Field"
+            className="mb-5"
+            register={register("field", { required: true })}
+          />
+          <TextField label="Alias" className="mb-5" register={register("alias", { required: true })} />
+        </Modal.Body>
+        <Modal.Actions>
+          <Button $primary className="ml-2" type="submit">
+            Save
+          </Button>
+          <Button className="ml-2" onClick={partial(setShow, false)}>
+            Cancel
+          </Button>
+        </Modal.Actions>
+      </form>
+    </Modal>
+  )
+}

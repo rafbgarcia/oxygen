@@ -1,15 +1,15 @@
 import { api } from "../lib/api"
 import { Page } from "./Page"
-import { PivotBuild } from "./WidgetNew/PivotBuild"
+import { PivotPreview } from "./WidgetNew/PivotPreview"
 import { useForm } from "react-hook-form"
 import { TextField } from "../components/TextField"
 import { Wait } from "../components/Wait"
 import { SelectField } from "../components/SelectField"
-import { map } from "lodash-es"
+import { map, find } from "lodash-es"
 import { Button } from "../components/Button"
 
 const widgetMapping = {
-  pivot_table: PivotBuild,
+  pivot_table: PivotPreview,
 }
 
 const widgetTypes = [
@@ -19,19 +19,24 @@ const widgetTypes = [
   { id: "vertical_bar_chart", name: "Vertical Bar Chart" },
 ]
 
+const defaultValues = {
+  widget: "pivot_table",
+  datasetId: "19",
+  name: "",
+}
+
 export const WidgetNew = () => {
-  const defaultValues = { widget: "pivot_table", dataset: "", name: "" }
   const { register, handleSubmit, watch } = useForm({ defaultValues })
   const { data, error } = api.getDatasets()
 
   const Waiting = Wait(data, error)
   if (Waiting) return <Waiting />
 
-  const dataset = watch("dataset")
-  const widget = watch("widget")
-  const BuildPage = widgetMapping[widget]
   const datasetCollection = map(data.datasets, ({ id, name }) => ({ value: id, label: name }))
   const widgetsCollection = map(widgetTypes, ({ id, name }) => ({ value: id, label: name }))
+  const dataset = find(data.datasets, { id: parseInt(watch("datasetId")) })
+  const widget = watch("widget")
+  const BuildPage = widgetMapping[widget]
 
   return (
     <>
@@ -42,28 +47,29 @@ export const WidgetNew = () => {
         </Button>
       </Page.Header>
       <Page.Main>
-        <div className="p-4">
+        <div className="p-4 flex items-center justify-start gap-x-4">
           <TextField
             autoFocus
             label="Name"
-            className="mb-5"
+            className="w-80"
             register={register("name", { required: true })}
           />
           <SelectField
             collection={datasetCollection}
+            allowBlank
             label="Dataset"
-            className="mb-5"
-            register={register("dataset", { required: true })}
+            className="w-80"
+            register={register("datasetId", { required: true })}
           />
           <SelectField
             collection={widgetsCollection}
             label="Widget"
-            className="mb-5"
+            className="w-80"
             register={register("widget", { required: true })}
           />
         </div>
 
-        {BuildPage && <BuildPage dataset={dataset} />}
+        {dataset && BuildPage && <BuildPage dataset={dataset} />}
       </Page.Main>
     </>
   )

@@ -42,7 +42,8 @@ class MySQL(object):
 def index(request):
     datasets = [model_to_dict(dataset) for dataset in Dataset.objects.all()]
     for dataset in datasets:
-        dataset["dtypes"] = map_dtypes_user_types(dataset["dtypes"])
+        cols = map_dtypes_user_types(dataset["fields"])
+        dataset["fields"] = [{"name": name, "type": dtype} for (name, dtype) in cols.items()]
 
     return JsonResponse(humps.camelize({"datasets": datasets}))
 
@@ -69,7 +70,9 @@ def create(request):
     params = json.loads(request.body)
     filepath = DATASETS_FOLDER / f"{params['name']}.hyper"
     dtypes = map_user_types_to_dtypes(params["dtypes"])
-    params["count"] = 0
+
+    dataset_params = {"query": params["query"], "name": params["name"]}
+    dataset_params["count"] = 0
 
     start_time = time()
     with MySQL(connection_config).execute(params["query"]) as cursor:
@@ -78,15 +81,15 @@ def create(request):
             if len(rows) == 0:
                 break
 
-            params["count"] += len(rows)
+            dataset_params["count"] += len(rows)
             df = pd.DataFrame(rows, columns=cursor.column_names)
             df = df.astype(dtypes)
-            pantab.frame_to_hyper(df, filepath, table=params["name"], table_mode=TABLE_MODE_APPEND)
+            pantab.frame_to_hyper(df, filepath, table=dataset_params["name"], table_mode=TABLE_MODE_APPEND)
 
-    params["build_duration_seconds"] = time() - start_time
-    params["size_mb"] = os.path.getsize(filepath) / 1e6
-    params["last_built_at"] = timezone.now()
-    params["dtypes"] = dtypes
-    dataset = Dataset.objects.create(**params)
+    dataset_params["build_duration_seconds"] = time() - start_time
+    dataset_params["size_mb"] = os.path.getsize(filepath) / 1e6
+    dataset_params["last_built_at"] = timezone.now()
+    dataset_params["fields"] = dtypes
+    dataset = Dataset.objects.create(**dataset_params)
 
     return JsonResponse(humps.camelize(model_to_dict(dataset)))

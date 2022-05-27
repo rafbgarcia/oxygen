@@ -10,7 +10,7 @@ class Dataset(TimeStampedModel):
     size_mb = models.DecimalField(default=None, max_digits=10, decimal_places=1)
     last_built_at = models.DateTimeField(default=None)
     build_duration_seconds = models.SmallIntegerField(default=None)
-    dtypes = models.JSONField(default=None)
+    fields = models.JSONField(default=None)
     count = models.IntegerField(default=None)
 
 

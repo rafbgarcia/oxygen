@@ -2,6 +2,7 @@
 - Use Celery worker to build datasets
 - Preview is slow for a large number of records. Is there a way to limit it?
 - Support multiple tables within a Dataset
+- Use Popover instead of Modal to add fields
 - Remove immer, use-immer?
 - Remove Lodash?
 
