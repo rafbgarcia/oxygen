@@ -36,6 +36,9 @@ export const api = {
   getWidget: (widgetId: number) => {
     return useSWR(path(`/widgets/${widgetId}`), fetcher)
   },
+  widgetPreview: (buildInfo) => {
+    return post(path(`/widgets/preview`), buildInfo)
+  },
   getDatasets: () => {
     return useSWR(path(`/datasets`), fetcher)
   },

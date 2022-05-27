@@ -14,6 +14,7 @@ dashboard_paths = [
 ]
 
 widget_paths = [
+    path("widgets/preview", widget_views.preview),
     path("widgets/<int:id>", widget_views.widget),
 ]
 

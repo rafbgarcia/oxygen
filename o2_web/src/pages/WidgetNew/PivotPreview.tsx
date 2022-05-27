@@ -4,11 +4,11 @@ import { useImmerReducer } from "use-immer"
 import { TrashIcon, PlusSmIcon } from "@heroicons/react/outline"
 import { Modal } from "../../components/Modal"
 import { Button } from "../../components/Button"
-import { map, partial, filter, flow } from "lodash-es"
+import { map, partial, filter, flow, some } from "lodash-es"
 import { TextField } from "../../components/TextField"
 import { SelectField } from "../../components/SelectField"
 import { useForm } from "react-hook-form"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 type State = typeof initialState
 type Props = Record<any, any> & { state: State }
@@ -16,7 +16,6 @@ type Props = Record<any, any> & { state: State }
 const FUNCTIONS = ["COUNT", "COUNT DISTINCT", "SUM", "CONTRIBUTION"]
 
 const initialState = {
-  show: false,
   datasetFields: [],
   buildInfo: {
     rows: [] as any,
@@ -35,12 +34,26 @@ const actions = {
 }
 
 export const PivotPreview = ({ dataset }) => {
+  const [previewData, setPreviewData] = useState<Record<any, any>>()
   const [state, dispatch] = useImmerReducer(
     (draft, action) => {
       actions[action.type](draft, action)
     },
     { ...initialState, datasetFields: dataset.fields }
   )
+
+  useEffect(() => {
+    const hasNecessaryBuildInfo = some(
+      [state.buildInfo.rows, state.buildInfo.columns],
+      (items) => items.length > 0
+    )
+    if (hasNecessaryBuildInfo) {
+      api
+        .widgetPreview({ buildInfo: state.buildInfo, widgetType: "pivot_table", dataset })
+        .then(setPreviewData)
+        .catch(console.log)
+    }
+  }, [state.buildInfo])
 
   return (
     <div className="flex">
@@ -63,7 +76,7 @@ export const PivotPreview = ({ dataset }) => {
         {/* Tab2: Design */}
       </div>
       <div className="w-9/12 h-screen px-4 py-8 overflow-y-auto overflow-x-auto shadow-md">
-        {/* <Pivot meta={data.meta} theme={{}} /> */}
+        {previewData && <Pivot meta={previewData.meta} theme={{}} />}
       </div>
     </div>
   )

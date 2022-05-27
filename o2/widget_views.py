@@ -1,7 +1,23 @@
+import json
 from django.http import JsonResponse
 import humps
 from o2.widgets.pivot import Pivot
 from o2.models import Dashboard
+from django.views.decorators.csrf import csrf_exempt
+
+widget_mapping = {"pivot_table": Pivot}
+
+
+@csrf_exempt
+def preview(request):
+    params = json.loads(request.body)
+    dataset = params["dataset"]
+    build_info = params["buildInfo"]
+    widget_type = params["widgetType"]
+
+    preview = widget_mapping[widget_type](build_info, dataset).build()
+
+    return JsonResponse({"preview": preview})
 
 
 def widget(request, id):
