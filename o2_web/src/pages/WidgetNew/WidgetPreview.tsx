@@ -9,12 +9,10 @@ import { useForm } from "react-hook-form"
 import { useEffect, useMemo, useState } from "react"
 import { useImmerReducer } from "use-immer"
 
-import { Pivot } from "../../components/Pivot"
-import { VerticalBarChart } from "../../components/VerticalBarChart"
+import { Widget } from "../../components/Widget"
 
 type BuildInfoSection = { metadataKey: string; label: string; dataType: string }
 type BuildInfoMapping = Record<WidgetType, Array<BuildInfoSection>>
-type PreviewMapping = Record<WidgetType, any>
 
 const MEASURE = "Measure"
 const DIMENSION = "Dimension"
@@ -26,14 +24,10 @@ const BUILD_INFO_SECTIONS: BuildInfoMapping = {
     { metadataKey: "columns", label: "Columns", dataType: DIMENSION },
   ],
   vertical_bar_chart: [
-    { metadataKey: "categories", label: "Categories", dataType: DIMENSION },
+    { metadataKey: "rows", label: "Categories", dataType: DIMENSION },
     { metadataKey: "values", label: "Values", dataType: MEASURE },
-    { metadataKey: "breakby", label: "Break by", dataType: DIMENSION },
+    { metadataKey: "columns", label: "Break by", dataType: DIMENSION },
   ],
-}
-const PREVIEW: PreviewMapping = {
-  pivot_table: Pivot,
-  vertical_bar_chart: VerticalBarChart,
 }
 
 const initialBuild = (type: WidgetType): Record<string, []> => {
@@ -65,6 +59,9 @@ export const WidgetPreview = ({
   dataset: any
   onChange: any
 }) => {
+  if (!type || !dataset) {
+    return <></>
+  }
   const initialState = useMemo(
     () => ({
       build: initialBuild(type),
@@ -86,8 +83,6 @@ export const WidgetPreview = ({
     api.widgetPreview({ buildInfo: state, type, dataset }).then(setPreviewData).catch(console.log)
   }, [state.build])
 
-  const PreviewComponent = PREVIEW[type]
-
   return (
     <div className="flex">
       <div className="w-3/12 h-screen px-4 py-8 overflow-y-auto bg-gray-100">
@@ -103,7 +98,7 @@ export const WidgetPreview = ({
         {/* Tab2: Design */}
       </div>
       <div className="w-9/12 h-screen px-4 py-8 overflow-y-auto overflow-x-auto shadow-md">
-        {previewData && <PreviewComponent meta={previewData.meta} theme={{}} />}
+        <Widget type={type} meta={previewData?.meta} theme={{}} />
       </div>
     </div>
   )

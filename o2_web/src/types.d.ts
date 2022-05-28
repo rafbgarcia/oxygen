@@ -2,23 +2,23 @@ declare module "playbook-ui"
 declare module "SWRHook"
 export declare global {
   interface Widget {
-    meta: Record<string, any>
-    theme: Record<string, any>
+    meta?: Record<string, any>
+    theme?: Record<string, any>
   }
 
   interface PivotWidget extends Widget {
-    meta: {
+    meta?: {
       html: string
     }
-    theme: {
+    theme?: {
       table?: ComponentTheme
     }
   }
   interface VerticalBarChartWidget extends Widget {
-    meta: {
+    meta?: {
       html: string
     }
-    theme: {
+    theme?: {
       chart?: ComponentTheme
     }
   }

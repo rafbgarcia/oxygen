@@ -15,10 +15,10 @@ const widgetsCollection: Array<{ value: WidgetType; label: string }> = [
   { value: "vertical_bar_chart", label: "Vertical Bar Chart" },
 ]
 
-const _defaultValuesForTesting_RemoveThisLater = {
+const defaultValues = {
   title: "",
-  datasetId: "19",
-  type: "vertical_bar_chart",
+  datasetId: "",
+  type: "pivot_table" as WidgetType,
   buildInfo: {},
 }
 
@@ -26,9 +26,7 @@ export const WidgetNew = () => {
   const params = useParams()
   const navigate = useNavigate()
   const [saving, setSaving] = useState(false)
-  const { register, getValues, setValue, watch } = useForm({
-    defaultValues: _defaultValuesForTesting_RemoveThisLater,
-  })
+  const { register, getValues, setValue, watch } = useForm({ defaultValues })
   const { data, error } = api.getDatasets()
 
   const Waiting = Wait(data, error)

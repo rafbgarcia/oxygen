@@ -6,7 +6,7 @@ import { api } from "../lib/api"
 import { Page } from "./Page"
 import { PlusSmIcon } from "@heroicons/react/outline"
 import { filter, map } from "lodash-es"
-import { Pivot } from "../components/Pivot"
+import { Widget } from "../components/Widget"
 
 const Placeholder = ({ dashboardId }) => {
   return (
@@ -22,11 +22,11 @@ const Placeholder = ({ dashboardId }) => {
 
 const Row = ({ row, widgets }) => {
   return (
-    <div className="flex items-center justify-evenly gap-x-2">
+    <div className="flex items-start justify-evenly gap-x-2">
       {map(widgets, (widget) => (
         <div key={widget.id} className="w-full bg-white shadow-md p-2">
           <h5 className="font-medium text-lg">{widget.title}</h5>
-          <Pivot meta={widget.meta} theme={{}} />
+          <Widget type={widget.type} meta={widget.meta} theme={{}} />
         </div>
       ))}
     </div>

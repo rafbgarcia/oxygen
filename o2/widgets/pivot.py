@@ -11,24 +11,35 @@ class Pivot:
         self.dataset = dataset
 
     def metadata(self, limit=25, offset=0):
-        return {"html": self.build(limit, offset)}
+        pivot = self.build()
+        pivot = (
+            pivot
+            # .stack(level=0)
+            # .T
+            [offset:limit]
+        )
+        return {"html": pivot.to_html(escape=False, na_rep="-", index_names=False)}
 
-    def build(self, limit=25, offset=0):
+    def build(self):
         query = self.build_sql()
         rows = [field["alias"] for field in self.build_info["rows"]]
         values = [field["alias"] for field in self.build_info["values"]]
         columns = [field["alias"] for field in self.build_info["columns"]]
         df = dataset_execute(self.dataset["name"], query)
-        df = (
-            df.pivot(columns=columns, values=values, index=rows)
-            # .stack(level=0)
-            # .T
-            [offset:limit]
-        )
 
-        return df.to_html(escape=False, na_rep="-", index_names=False)
+        return df.pivot(columns=columns, values=values, index=rows)
 
-    def select_values(self, dataset_table):
+    def build_sql(self):
+        columns = [column(field["name"]) for field in self.dataset["fields"]]
+        dataset_table = table(self.dataset["name"], *columns)
+
+        select_fields = self.__select_columns(dataset_table)
+        group_by = [getattr(dataset_table.c, row["field"]) for row in self.build_info["rows"]]
+        query = select(*select_fields).group_by(*group_by)
+
+        return str(query.compile(dialect=postgresql.dialect()))
+
+    def __select_values(self, dataset_table):
         select_fields = list()
         for value in self.build_info["values"]:
             col = getattr(dataset_table.c, value["field"])
@@ -48,20 +59,10 @@ class Pivot:
 
         return select_fields
 
-    def select_columns(self, dataset_table):
+    def __select_columns(self, dataset_table):
         rows = [column(item["field"]).label(item["alias"]) for item in self.build_info["rows"]]
         columns = [column(item["field"]).label(item["alias"]) for item in self.build_info["columns"]]
-        return rows + columns + self.select_values(dataset_table)
-
-    def build_sql(self):
-        columns = [column(field["name"]) for field in self.dataset["fields"]]
-        dataset_table = table(self.dataset["name"], *columns)
-
-        select_fields = self.select_columns(dataset_table)
-        group_by = [getattr(dataset_table.c, row["field"]) for row in self.build_info["rows"]]
-        query = select(*select_fields).group_by(*group_by)
-
-        return str(query.compile(dialect=postgresql.dialect()))
+        return rows + columns + self.__select_values(dataset_table)
 
     def __sql_for_reference(self):
         sql = """
