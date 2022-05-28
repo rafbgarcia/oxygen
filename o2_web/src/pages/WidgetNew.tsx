@@ -1,58 +1,34 @@
+import { useState } from "react"
+import { map, find } from "lodash-es"
+import { useForm } from "react-hook-form"
 import { api } from "../lib/api"
 import { Page } from "./Page"
-import { PivotBuild } from "./WidgetNew/PivotBuild"
-import { VerticalBarChartBuild } from "./WidgetNew/VerticalBarChartBuild"
-import { useForm } from "react-hook-form"
 import { TextField } from "../components/TextField"
 import { Wait } from "../components/Wait"
 import { SelectField } from "../components/SelectField"
-import { map, find } from "lodash-es"
 import { Button } from "../components/Button"
-import { useImmerReducer } from "use-immer"
 import { useNavigate, useParams } from "react-router-dom"
-import { useState } from "react"
-
-const widgetMapping: Record<WidgetType, any> = {
-  pivot_table: PivotBuild,
-  vertical_bar_chart: VerticalBarChartBuild,
-}
+import { WidgetPreview } from "./WidgetNew/WidgetPreview"
 
 const widgetsCollection: Array<{ value: WidgetType; label: string }> = [
   { value: "pivot_table", label: "Pivot" },
   { value: "vertical_bar_chart", label: "Column Chart" },
 ]
 
-const actions = {
-  initBuildInfo: (draft, { buildInfo }) => {
-    draft.buildInfo = buildInfo
-  },
-  removeField: (draft, { metadataKey, index }) => {
-    draft.buildInfo[metadataKey].splice(index, 1)
-  },
-  addField: (draft, { metadataKey, field }) => {
-    draft.buildInfo[metadataKey].push(field)
-  },
-}
-
 const _defaultValuesForTesting_RemoveThisLater = {
-  title: "My Column Chart",
+  title: "",
   datasetId: "19",
-  type: "pivot_table",
-}
-
-const initialState = {
+  type: "vertical_bar_chart",
   buildInfo: {},
-  // designInfo: {},
 }
 
 export const WidgetNew = () => {
   const params = useParams()
   const navigate = useNavigate()
   const [saving, setSaving] = useState(false)
-  const [state, dispatch] = useImmerReducer((draft, { action, ...payload }) => {
-    actions[action](draft, payload)
-  }, initialState)
-  const { register, getValues, watch } = useForm({ defaultValues: _defaultValuesForTesting_RemoveThisLater })
+  const { register, getValues, setValue, watch } = useForm({
+    defaultValues: _defaultValuesForTesting_RemoveThisLater,
+  })
   const { data, error } = api.getDatasets()
 
   const Waiting = Wait(data, error)
@@ -61,13 +37,11 @@ export const WidgetNew = () => {
   const datasetCollection = map(data.datasets, ({ id, name }) => ({ value: id, label: name }))
   const dataset = find(data.datasets, { id: parseInt(watch("datasetId")) })
   const widgetType = watch("type")
-  const BuildPage = widgetMapping[widgetType]
 
   const handleSave = () => {
-    const data = { ...getValues(), ...state }
     setSaving(true)
     api
-      .widgetCreate(data)
+      .widgetCreate(getValues())
       .then(() => {
         navigate(`/dashboards/${params.dashboardId}/edit`)
         setSaving(false)
@@ -76,6 +50,10 @@ export const WidgetNew = () => {
         console.log(err)
         setSaving(false)
       })
+  }
+
+  const handleChangeBuildInfo = (buildInfo) => {
+    setValue("buildInfo", buildInfo)
   }
 
   return (
@@ -104,8 +82,12 @@ export const WidgetNew = () => {
           />
         </div>
 
-        {dataset && BuildPage && <BuildPage state={state} dispatch={dispatch} dataset={dataset} />}
-        {/* <WidgetBuild type={widgetType} onChange={setValue} /> */}
+        <WidgetPreview
+          key={widgetType}
+          type={widgetType as WidgetType}
+          dataset={dataset}
+          onChange={handleChangeBuildInfo}
+        />
       </Page.Main>
     </>
   )
