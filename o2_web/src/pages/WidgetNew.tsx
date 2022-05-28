@@ -92,12 +92,7 @@ export const WidgetNew = () => {
       </Page.Header>
       <Page.Main>
         <div className="p-4 flex items-center justify-start gap-x-4">
-          <TextField
-            autoFocus
-            label="Name"
-            className="w-80"
-            register={register("title", { required: true })}
-          />
+          <TextField autoFocus label="Title" className="w-80" register={register("title")} />
           <SelectField
             collection={datasetCollection}
             allowBlank

@@ -21,7 +21,7 @@ export const PivotPreview = ({ dataset, state, dispatch }) => {
     )
     if (hasNecessaryBuildInfo) {
       api
-        .widgetPreview({ buildInfo: state.buildInfo, widgetType: "pivot_table", dataset })
+        .widgetPreview({ buildInfo: state.buildInfo, type: "pivot_table", dataset })
         .then(setPreviewData)
         .catch(console.log)
     }

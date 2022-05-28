@@ -1,9 +1,7 @@
-from MySQLdb import Timestamp
 from django.test import SimpleTestCase
 from o2.widgets.pivot import Pivot
 from o2.dataset import append_to_dataset, dataset_exists, dataset_as_df
-from o2.widgets.test_fixture import pandas_df_to_dict
-import pandas as pd
+from o2.widgets._fixtures import pandas_df_to_dict
 
 
 class PivotCase(SimpleTestCase):

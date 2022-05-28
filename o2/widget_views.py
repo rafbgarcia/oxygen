@@ -5,17 +5,18 @@ import humps
 from o2.widgets.pivot import Pivot
 from o2.models import Dashboard, Widget
 from django.views.decorators.csrf import csrf_exempt
-
-widget_mapping = {"pivot_table": Pivot}
+from o2.widget import build_widget
 
 
 @csrf_exempt
 def preview(request):
     params = humps.decamelize(json.loads(request.body))
-    dataset = params["dataset"]
-    build_info = params["build_info"]
-    widget_type = params["widget_type"]
-    metadata = widget_mapping[widget_type](build_info, dataset).metadata()
+    widget = {
+        "dataset": params["dataset"],
+        "build_info": params["build_info"],
+        "type": params["type"],
+    }
+    metadata = build_widget(widget)
 
     return JsonResponse({"meta": metadata})
 
@@ -29,7 +30,6 @@ def create(request):
 
 
 def widget(request, id):
-    Pivot.as_json()
     dash = Dashboard.objects.first()
     widget = dash.grid_rows[0]["widgets"][0]
     widget["dataset"] = {

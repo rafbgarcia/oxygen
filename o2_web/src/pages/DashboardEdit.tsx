@@ -5,7 +5,8 @@ import { Wait } from "../components/Wait"
 import { api } from "../lib/api"
 import { Page } from "./Page"
 import { PlusSmIcon } from "@heroicons/react/outline"
-import { filter } from "lodash-es"
+import { filter, map } from "lodash-es"
+import { Pivot } from "../components/Pivot"
 
 const Placeholder = ({ dashboardId }) => {
   return (
@@ -20,7 +21,16 @@ const Placeholder = ({ dashboardId }) => {
 }
 
 const Row = ({ row, widgets }) => {
-  return <></>
+  return (
+    <div className="flex items-center justify-evenly gap-x-2">
+      {map(widgets, (widget) => (
+        <div key={widget.id} className="w-full bg-white shadow-md p-2">
+          <h5 className="font-medium text-lg">{widget.title}</h5>
+          <Pivot meta={widget.meta} theme={{}} />
+        </div>
+      ))}
+    </div>
+  )
 }
 
 export const DashboardEdit = () => {
@@ -42,10 +52,10 @@ export const DashboardEdit = () => {
       <Page.Header>
         <Page.Title>{data.dashboard.name}</Page.Title>
       </Page.Header>
-      <Page.Main>
+      <Page.Main className="p-2">
         {rows.length == 0 && <Placeholder dashboardId={id} />}
         {rows.map((row) => (
-          <Row key={row.id} row={row} widgets={filter(data.widgets, { dashboardRowId: row.id })} />
+          <Row key={row.id} row={row} widgets={filter(data.widgets, { dashboardRow: row.id })} />
         ))}
 
         <Placeholder dashboardId={id} />

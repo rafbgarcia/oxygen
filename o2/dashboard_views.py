@@ -2,8 +2,10 @@ import json
 from django.forms import model_to_dict
 from django.http import JsonResponse
 import humps
-from o2.models import Dashboard, DashboardRow, Widget
+from o2.models import Dashboard, DashboardRow, Dataset, Widget
 from django.views.decorators.csrf import csrf_exempt
+
+from o2.widget import build_widget
 
 
 def index(request):
@@ -21,14 +23,21 @@ def create(request):
 def show(request, id):
     dashboard = Dashboard.objects.get(pk=id)
     rows = DashboardRow.objects.filter(dashboard_id=dashboard.id).order_by("index")
-    widgets = Widget.objects.filter(dashboard_row__in=rows)
+    widgets = list(Widget.objects.filter(dashboard_row__in=rows).select_related("dataset").all())
+    for (i, widget) in enumerate(widgets):
+        widgets[i] = model_to_dict(widget)
+        widgets[i]["dataset"] = model_to_dict(widget.dataset)
+        widgets[i]["dataset"]["fields"] = [
+            {"name": name, "type": type} for (name, type) in widget.dataset.fields.items()
+        ]
+        widgets[i]["meta"] = build_widget(widgets[i])
 
     return JsonResponse(
         humps.camelize(
             {
                 "dashboard": model_to_dict(dashboard),
                 "rows": list(rows.all().values()),
-                "widgets": list(widgets.all().values()),
+                "widgets": widgets,
             }
         )
     )
