@@ -1,9 +1,8 @@
-from tokenize import String
-import pandas as pd
-import pantab
-from o2.models import Dashboard
-from sqlalchemy import Integer, MetaData, table, column, select, true, Table, Column, func
+from itertools import groupby
+from sqlalchemy import table, column, select, func
 from sqlalchemy.dialects import postgresql
+
+from o2.dataset import dataset_execute
 
 
 class Pivot:
@@ -11,68 +10,53 @@ class Pivot:
         self.build_info = build_info
         self.dataset = dataset
 
-    def build(self):
-        q = Pivot.__build_sql()
-
-        df = pantab.frame_from_hyper_query("/Users/rafa/Downloads/test_follow_ups.hyper", q)
-        df["%"] = df["%"].astype(str) + "%"
-
-        df2 = (
-            df.pivot(columns=[], values=["#", "%"], index=["follow_up_result"])
+    def build(self, limit=25, offset=0):
+        query = self.build_sql()
+        rows = [field["alias"] for field in self.build_info["rows"]]
+        values = [field["alias"] for field in self.build_info["values"]]
+        columns = [field["alias"] for field in self.build_info["columns"]]
+        df = dataset_execute("test", query)
+        df = (
+            df.pivot(columns=columns, values=values, index=rows)
             # .stack(level=0)
             # .T
-            [0:25]
+            [offset:limit]
         )
-        grid_rows = [
-            {
-                "widgets": [
-                    {
-                        "id": 1,
-                        "name": "Follow ups by user",
-                        "dataset": "followups",
-                        "type": "pivot",
-                        "build": {
-                            "rows": [
-                                {"field": "resulted_by", "alias": "User"},
-                                {"field": "follow_up_result", "alias": "Result"},
-                            ],
-                            "values": [
-                                {"fn": "COUNT", "field": "application_id", "distinct": True, "alias": "#"},
-                                {"fn": "PERCENT", "field": "application_id", "distinct": True, "alias": "%"},
-                            ],
-                            "columns": [
-                                {"field": "follow_up_number", "alias": "Follow up number"},
-                            ],
-                        },
-                        "meta": {"html": df2.to_html(escape=False, na_rep="-", index_names=True)},
-                    }
-                ]
-            },
-        ]
-        Dashboard.objects.update(title="Talent Acquisition Follow ups", grid_rows=grid_rows)
+
+        return df.to_html(escape=False, na_rep="-", index_names=True)
+
+    def select_values(self, dataset_table):
+        select_fields = list()
+        for value in self.build_info["values"]:
+            col = getattr(dataset_table.c, value["field"])
+
+            if value["function"] == "COUNT DISTINCT":
+                field = func.count(func.distinct(col)).label(value["alias"])
+            elif value["function"] == "COUNT":
+                field = func.count(col).label(value["alias"])
+            elif value["function"] == "CONTRIBUTION":
+                field = func.count(col).label(value["alias"])
+
+            select_fields.append(field)
+
+        return select_fields
+
+    def select_columns(self, dataset_table):
+        rows = [column(item["field"]).label(item["alias"]) for item in self.build_info["rows"]]
+        columns = [column(item["field"]).label(item["alias"]) for item in self.build_info["columns"]]
+        return rows + columns + self.select_values(dataset_table)
 
     def build_sql(self):
-        rows = self.build_info["rows"]
-        values = self.build_info["values"]
-        columns = self.build_info["columns"]
-        table_name = self.dataset["name"]
-
         columns = [column(field["name"]) for field in self.dataset["fields"]]
-        tabl = table(table_name, *columns)
-        select_fields = list()
-        for value in values:
-            if value["function"] == "COUNT DISTINCT":
-                col = getattr(tabl.c, value["field"])
-                field = func.count(func.distinct(col)).label(value["alias"])
-                select_fields.append(field)
+        dataset_table = table(self.dataset["name"], *columns)
 
-        group_by = [getattr(tabl.c, row["field"]) for row in rows]
+        select_fields = self.select_columns(dataset_table)
+        group_by = [getattr(dataset_table.c, row["field"]) for row in self.build_info["rows"]]
         query = select(*select_fields).group_by(*group_by)
 
         return str(query.compile(dialect=postgresql.dialect()))
 
     def __sql_for_reference(self):
-
         sql = """
         WITH grouped_totals AS (
             SELECT follow_up_result, COUNT(DISTINCT application_id) AS total
