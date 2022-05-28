@@ -28,7 +28,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <Route path="dashboards" element={<Dashboards />} />
             <Route path="dashboards/new" element={<DashboardNew />} />
             <Route path="dashboards/:id/edit" element={<DashboardEdit />} />
-            <Route path="dashboards/:id/widgets/new" element={<WidgetNew />} />
+            <Route path="dashboards/:dashboardId/widgets/new" element={<WidgetNew />} />
           </Route>
         </Routes>
       </BrowserRouter>

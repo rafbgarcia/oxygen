@@ -1,8 +1,9 @@
 import json
+from django.forms import model_to_dict
 from django.http import JsonResponse
 import humps
 from o2.widgets.pivot import Pivot
-from o2.models import Dashboard
+from o2.models import Dashboard, Widget
 from django.views.decorators.csrf import csrf_exempt
 
 widget_mapping = {"pivot_table": Pivot}
@@ -10,14 +11,21 @@ widget_mapping = {"pivot_table": Pivot}
 
 @csrf_exempt
 def preview(request):
-    params = json.loads(request.body)
+    params = humps.decamelize(json.loads(request.body))
     dataset = params["dataset"]
-    build_info = params["buildInfo"]
-    widget_type = params["widgetType"]
+    build_info = params["build_info"]
+    widget_type = params["widget_type"]
+    metadata = widget_mapping[widget_type](build_info, dataset).metadata()
 
-    preview = widget_mapping[widget_type](build_info, dataset).build()
+    return JsonResponse({"meta": metadata})
 
-    return JsonResponse({"preview": preview})
+
+@csrf_exempt
+def create(request):
+    params = humps.decamelize(json.loads(request.body))
+    widget = Widget.objects.create(**params)
+
+    return JsonResponse({"widget": model_to_dict(widget)})
 
 
 def widget(request, id):

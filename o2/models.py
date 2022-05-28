@@ -32,6 +32,6 @@ class Widget(TimeStampedModel):
 
     dataset = models.ForeignKey(Dataset, on_delete=models.SET_NULL, default=None, null=True)
     dashboard_row = models.ForeignKey(DashboardRow, on_delete=models.SET_NULL, default=None, null=True)
+    title = models.CharField(max_length=200, null=True)
     type = models.CharField(max_length=20, choices=Types.choices, default=Types.PIVOT_TABLE)
     build_info = models.JSONField()
-    meta = models.JSONField()

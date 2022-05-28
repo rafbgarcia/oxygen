@@ -39,6 +39,9 @@ export const api = {
   widgetPreview: (buildInfo) => {
     return post(path(`/widgets/preview`), buildInfo)
   },
+  widgetCreate: (data) => {
+    return post(path(`/widgets/create`), data)
+  },
   getDatasets: () => {
     return useSWR(path(`/datasets`), fetcher)
   },

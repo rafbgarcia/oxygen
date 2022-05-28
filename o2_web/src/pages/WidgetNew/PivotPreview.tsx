@@ -1,46 +1,18 @@
 import { api } from "../../lib/api"
 import { Pivot } from "../../components/Pivot"
-import { useImmerReducer } from "use-immer"
 import { TrashIcon, PlusSmIcon } from "@heroicons/react/outline"
 import { Modal } from "../../components/Modal"
 import { Button } from "../../components/Button"
-import { map, partial, filter, flow, some } from "lodash-es"
+import { map, partial, flow, some } from "lodash-es"
 import { TextField } from "../../components/TextField"
 import { SelectField } from "../../components/SelectField"
 import { useForm } from "react-hook-form"
 import { useEffect, useState } from "react"
 
-type State = typeof initialState
-type Props = Record<any, any> & { state: State }
+const FUNCTIONS = ["COUNT", "COUNT DISTINCT", "SUM"]
 
-const FUNCTIONS = ["COUNT", "COUNT DISTINCT", "SUM", "CONTRIBUTION"]
-
-const initialState = {
-  datasetFields: [],
-  buildInfo: {
-    rows: [] as any,
-    columns: [] as any,
-    values: [] as any,
-  },
-}
-
-const actions = {
-  removeField: (draft, { metadataKey, index }) => {
-    draft.buildInfo[metadataKey].splice(index, 1)
-  },
-  addField: (draft, { metadataKey, field }) => {
-    draft.buildInfo[metadataKey].push(field)
-  },
-}
-
-export const PivotPreview = ({ dataset }) => {
+export const PivotPreview = ({ dataset, state, dispatch }) => {
   const [previewData, setPreviewData] = useState<Record<any, any>>()
-  const [state, dispatch] = useImmerReducer(
-    (draft, action) => {
-      actions[action.type](draft, action)
-    },
-    { ...initialState, datasetFields: dataset.fields }
-  )
 
   useEffect(() => {
     const hasNecessaryBuildInfo = some(
@@ -58,12 +30,20 @@ export const PivotPreview = ({ dataset }) => {
   return (
     <div className="flex">
       <div className="w-3/12 h-screen px-4 py-8 overflow-y-auto bg-gray-100">
-        <BuildInfoSection isDimension metadataKey="rows" title="Rows" state={state} dispatch={dispatch} />
+        <BuildInfoSection
+          isDimension
+          metadataKey="rows"
+          title="Rows"
+          state={state}
+          dataset={dataset}
+          dispatch={dispatch}
+        />
         <BuildInfoSection
           isDimension={false}
           metadataKey="values"
           title="Values"
           state={state}
+          dataset={dataset}
           dispatch={dispatch}
         />
         <BuildInfoSection
@@ -71,6 +51,7 @@ export const PivotPreview = ({ dataset }) => {
           metadataKey="columns"
           title="Columns"
           state={state}
+          dataset={dataset}
           dispatch={dispatch}
         />
         {/* Tab2: Design */}
@@ -82,7 +63,7 @@ export const PivotPreview = ({ dataset }) => {
   )
 }
 
-const BuildInfoSection = ({ state, dispatch, isDimension, metadataKey, title }) => {
+const BuildInfoSection = ({ state, dispatch, isDimension, metadataKey, dataset, title }) => {
   const [open, setOpen] = useState(false)
   const handleAdd = (field) => {
     setOpen(false)
@@ -95,7 +76,7 @@ const BuildInfoSection = ({ state, dispatch, isDimension, metadataKey, title }) 
     <div className="mb-10">
       <Form
         open={open}
-        datasetFields={state.datasetFields}
+        datasetFields={dataset.fields}
         includedFields={map(state.buildInfo[metadataKey], "field")}
         onSubmit={handleAdd}
         setShow={setOpen}
@@ -130,10 +111,7 @@ const BuildItem = ({ isDimension, item, onRemove }) => {
 
 const AddDimensionModal = ({ open, datasetFields, onSubmit, setShow, includedFields }) => {
   const { register, handleSubmit, reset } = useForm()
-  const fieldsCollection = flow([
-    partial(filter, partial.placeholder, (field) => !includedFields.includes(field.name)),
-    partial(map, partial.placeholder, (field) => ({ value: field.name })),
-  ])(datasetFields)
+  const fieldsCollection = map(datasetFields, (field) => ({ value: field.name }))
   const onSubmitFlow = flow([onSubmit, reset])
 
   return (
@@ -165,10 +143,7 @@ const AddDimensionModal = ({ open, datasetFields, onSubmit, setShow, includedFie
 
 const AddMeasureModal = ({ open, datasetFields, onSubmit, setShow, includedFields }) => {
   const { register, handleSubmit, reset } = useForm()
-  const fieldsCollection = flow([
-    partial(filter, partial.placeholder, (field) => !includedFields.includes(field.name)),
-    partial(map, partial.placeholder, (field) => ({ value: field.name })),
-  ])(datasetFields)
+  const fieldsCollection = map(datasetFields, (field) => ({ value: field.name }))
   const fnsCollection = map(FUNCTIONS, (value) => ({ value }))
   const onSubmitFlow = flow([onSubmit, reset])
 

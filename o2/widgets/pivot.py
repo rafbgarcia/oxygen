@@ -10,12 +10,15 @@ class Pivot:
         self.build_info = build_info
         self.dataset = dataset
 
+    def metadata(self, limit=25, offset=0):
+        return {"html": self.build(limit, offset)}
+
     def build(self, limit=25, offset=0):
         query = self.build_sql()
         rows = [field["alias"] for field in self.build_info["rows"]]
         values = [field["alias"] for field in self.build_info["values"]]
         columns = [field["alias"] for field in self.build_info["columns"]]
-        df = dataset_execute("test", query)
+        df = dataset_execute(self.dataset["name"], query)
         df = (
             df.pivot(columns=columns, values=values, index=rows)
             # .stack(level=0)
@@ -23,7 +26,7 @@ class Pivot:
             [offset:limit]
         )
 
-        return df.to_html(escape=False, na_rep="-", index_names=True)
+        return df.to_html(escape=False, na_rep="-", index_names=False)
 
     def select_values(self, dataset_table):
         select_fields = list()
@@ -34,8 +37,12 @@ class Pivot:
                 field = func.count(func.distinct(col)).label(value["alias"])
             elif value["function"] == "COUNT":
                 field = func.count(col).label(value["alias"])
-            elif value["function"] == "CONTRIBUTION":
-                field = func.count(col).label(value["alias"])
+            elif value["function"] == "SUM":
+                field = func.sum(col).label(value["alias"])
+            # elif value["function"] == "CONTRIBUTION":
+            #     field = func.count(col).label(value["alias"])
+            else:
+                raise f"Function not supported: {value['function']}"
 
             select_fields.append(field)
 

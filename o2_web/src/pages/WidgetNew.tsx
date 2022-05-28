@@ -7,6 +7,9 @@ import { Wait } from "../components/Wait"
 import { SelectField } from "../components/SelectField"
 import { map, find } from "lodash-es"
 import { Button } from "../components/Button"
+import { useImmerReducer } from "use-immer"
+import { useNavigate, useParams } from "react-router-dom"
+import { useState } from "react"
 
 const widgetMapping = {
   pivot_table: PivotPreview,
@@ -19,14 +22,40 @@ const widgetTypes = [
   { id: "vertical_bar_chart", name: "Vertical Bar Chart" },
 ]
 
+const initialState = {
+  buildInfo: {
+    rows: [] as any,
+    columns: [] as any,
+    values: [] as any,
+  },
+}
+
+const actions = {
+  removeField: (draft, { metadataKey, index }) => {
+    draft.buildInfo[metadataKey].splice(index, 1)
+  },
+  addField: (draft, { metadataKey, field }) => {
+    draft.buildInfo[metadataKey].push(field)
+  },
+}
+
 const defaultValues = {
-  widget: "pivot_table",
+  type: "pivot_table",
   datasetId: "19",
-  name: "",
+  title: "",
 }
 
 export const WidgetNew = () => {
-  const { register, handleSubmit, watch } = useForm({ defaultValues })
+  const params = useParams()
+  const navigate = useNavigate()
+  const [saving, setSaving] = useState(false)
+  const [state, dispatch] = useImmerReducer(
+    (draft, action) => {
+      actions[action.type](draft, action)
+    },
+    { ...initialState }
+  )
+  const { register, getValues, watch } = useForm({ defaultValues })
   const { data, error } = api.getDatasets()
 
   const Waiting = Wait(data, error)
@@ -35,14 +64,29 @@ export const WidgetNew = () => {
   const datasetCollection = map(data.datasets, ({ id, name }) => ({ value: id, label: name }))
   const widgetsCollection = map(widgetTypes, ({ id, name }) => ({ value: id, label: name }))
   const dataset = find(data.datasets, { id: parseInt(watch("datasetId")) })
-  const widget = watch("widget")
-  const BuildPage = widgetMapping[widget]
+  const widgetType = watch("type")
+  const BuildPage = widgetMapping[widgetType]
+
+  const handleSave = () => {
+    const data = { ...getValues(), ...state }
+    setSaving(true)
+    api
+      .widgetCreate(data)
+      .then(() => {
+        navigate(`/dashboards/${params.dashboardId}/edit`)
+        setSaving(false)
+      })
+      .catch((err) => {
+        console.log(err)
+        setSaving(false)
+      })
+  }
 
   return (
     <>
       <Page.Header $flex>
         <Page.Title>New Widget</Page.Title>
-        <Button $primary loading={false}>
+        <Button $primary loading={saving} onClick={handleSave}>
           Save
         </Button>
       </Page.Header>
@@ -52,7 +96,7 @@ export const WidgetNew = () => {
             autoFocus
             label="Name"
             className="w-80"
-            register={register("name", { required: true })}
+            register={register("title", { required: true })}
           />
           <SelectField
             collection={datasetCollection}
@@ -65,11 +109,11 @@ export const WidgetNew = () => {
             collection={widgetsCollection}
             label="Widget"
             className="w-80"
-            register={register("widget", { required: true })}
+            register={register("type", { required: true })}
           />
         </div>
 
-        {dataset && BuildPage && <BuildPage dataset={dataset} />}
+        {dataset && BuildPage && <BuildPage state={state} dispatch={dispatch} dataset={dataset} />}
       </Page.Main>
     </>
   )
