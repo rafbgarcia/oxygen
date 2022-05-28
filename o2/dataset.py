@@ -62,4 +62,5 @@ def dataset_execute(filename, query):
 
 
 def dataset_as_df(filename, table):
+    print(f">>> TABLE {table}")
     return pantab.frame_from_hyper(__filepath(filename), table=table)

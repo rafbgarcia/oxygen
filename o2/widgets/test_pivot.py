@@ -8,7 +8,7 @@ class PivotCase(SimpleTestCase):
     def setUp(self):
         self.maxDiff = None
         self.dataset = {
-            "name": "table name",
+            "name": "test",
             "fields": [
                 {"name": "title_name", "type": "Text"},
                 {"name": "resulted_by", "type": "Text"},
@@ -19,9 +19,9 @@ class PivotCase(SimpleTestCase):
                 {"name": "follow_up_date_string", "type": "Text"},
             ],
         }
-        if not dataset_exists("test"):
+        if not dataset_exists(self.dataset["name"]):
             append_to_dataset(
-                filename="test",
+                filename=self.dataset["name"],
                 table=self.dataset["name"],
                 user_types={field["name"]: field["type"] for field in self.dataset["fields"]},
                 rows=pandas_df_to_dict,
@@ -43,8 +43,8 @@ class PivotCase(SimpleTestCase):
             ],
         }
         expected = """
-SELECT follow_up_result AS "Result", count("table name".application_id) AS "Applications"
-FROM "table name" GROUP BY "table name".follow_up_result
+SELECT follow_up_result AS "Result", count(test.application_id) AS "Applications"
+FROM test GROUP BY test.follow_up_result
 """.strip()
         self.assertEqual(Pivot(build_info, self.dataset).build_sql().replace(" \n", "\n"), expected)
 
@@ -61,8 +61,8 @@ FROM "table name" GROUP BY "table name".follow_up_result
             ],
         }
         expected = """
-SELECT follow_up_result AS "Result", count("table name".application_id) AS "Appls", count(distinct("table name".application_id)) AS "Unique Appls"
-FROM "table name" GROUP BY "table name".follow_up_result
+SELECT follow_up_result AS "Result", count(test.application_id) AS "Appls", count(distinct(test.application_id)) AS "Unique Appls"
+FROM test GROUP BY test.follow_up_result
 """.strip()
         self.assertEqual(Pivot(build_info, self.dataset).build_sql().replace(" \n", "\n"), expected)
 
@@ -86,11 +86,6 @@ FROM "table name" GROUP BY "table name".follow_up_result
       <th></th>
       <th>Appls</th>
       <th>Unique Appls</th>
-    </tr>
-    <tr>
-      <th>follow_up_result</th>
-      <th></th>
-      <th></th>
     </tr>
   </thead>
   <tbody>
@@ -125,6 +120,5 @@ FROM "table name" GROUP BY "table name".follow_up_result
       <td>1</td>
     </tr>
   </tbody>
-</table>
-""".strip()
+</table>""".strip()
         self.assertEqual(Pivot(build_info, self.dataset).build(), expected)

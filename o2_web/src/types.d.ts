@@ -14,6 +14,14 @@ export declare global {
       table?: ComponentTheme
     }
   }
+  interface VerticalBarChartWidget extends Widget {
+    meta: {
+      html: string
+    }
+    theme: {
+      chart?: ComponentTheme
+    }
+  }
 
   type ComponentTheme = ({ children }: { children: ReactNode }) => JSX.Element
 
@@ -21,6 +29,9 @@ export declare global {
     title?: ComponentTheme
     widgets?: {
       pivot?: {
+        table?: ComponentTheme
+      }
+      verticalBarChart?: {
         table?: ComponentTheme
       }
     }

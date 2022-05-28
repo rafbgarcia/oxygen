@@ -12,7 +12,7 @@ import { WidgetPreview } from "./WidgetNew/WidgetPreview"
 
 const widgetsCollection: Array<{ value: WidgetType; label: string }> = [
   { value: "pivot_table", label: "Pivot" },
-  { value: "vertical_bar_chart", label: "Column Chart" },
+  { value: "vertical_bar_chart", label: "Vertical Bar Chart" },
 ]
 
 const _defaultValuesForTesting_RemoveThisLater = {
