@@ -1,4 +1,14 @@
+import { Table } from "playbook-ui"
 import "./Pivot.css"
+
+interface PivotWidget extends Widget {
+  meta?: {
+    html: string
+  }
+  theme?: {
+    table?: ComponentTheme
+  }
+}
 
 const tableHtmlComponent = (content: string) => {
   let template = document.createElement("template")
@@ -7,16 +17,27 @@ const tableHtmlComponent = (content: string) => {
 }
 
 const DefaultTable = ({ children }: any) => (
-  <table className="o2-default-pivot-widget w-full text-sm table-auto border-collapse">{children}</table>
+  <Table sticky dataTable className="o2-default-pivot-widget">
+    {children}
+  </Table>
 )
 
+const adaptHtml = (html) => {
+  const newHtml = html.replace("")
+}
+
 export const Pivot = ({ meta, theme }: PivotWidget) => {
+  if (!meta?.html) {
+    return <></>
+  }
   const table = tableHtmlComponent(meta.html)
-  const TableComponent = theme.table || DefaultTable
+  const theadHTML = table?.children[0]?.innerHTML.replace(/\<td/g, "<td class='data-cell'")
+  const tbodyHTML = table?.children[1]?.innerHTML.replace(/\<th/g, "<td class='header-cell'")
+  const TableComponent = theme?.table || DefaultTable
   return (
     <TableComponent>
-      <thead dangerouslySetInnerHTML={{ __html: table?.children[0]?.innerHTML }}></thead>
-      <tbody dangerouslySetInnerHTML={{ __html: table?.children[1]?.innerHTML }}></tbody>
+      <thead dangerouslySetInnerHTML={{ __html: theadHTML }}></thead>
+      <tbody dangerouslySetInnerHTML={{ __html: tbodyHTML }}></tbody>
     </TableComponent>
   )
 }

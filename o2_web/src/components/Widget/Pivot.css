@@ -1,16 +1,6 @@
-.o2-default-pivot-widget td,
-.o2-default-pivot-widget th {
-  border: 1px solid #ccc;
-  padding: 4px 8px;
-}
-
-.o2-default-pivot-widget tbody th {
-  font-weight: normal;
-}
-.o2-default-pivot-widget th {
+.o2-default-pivot-widget .table-header {
   text-align: left;
 }
-
-.o2-default-pivot-widget td {
+.o2-default-pivot-widget .table-data {
   text-align: right;
 }

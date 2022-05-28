@@ -1,5 +1,6 @@
 import { Pivot } from "./Pivot"
 import { VerticalBarChart } from "./VerticalBarChart"
+import "../../../node_modules/playbook-ui/dist/playbook.css"
 
 type PreviewMapping = Record<WidgetType, any>
 type Props = Widget & { type: WidgetType }

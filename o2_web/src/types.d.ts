@@ -6,24 +6,7 @@ export declare global {
     theme?: Record<string, any>
   }
 
-  interface PivotWidget extends Widget {
-    meta?: {
-      html: string
-    }
-    theme?: {
-      table?: ComponentTheme
-    }
-  }
-  interface VerticalBarChartWidget extends Widget {
-    meta?: {
-      html: string
-    }
-    theme?: {
-      chart?: ComponentTheme
-    }
-  }
-
-  type ComponentTheme = ({ children }: { children: ReactNode }) => JSX.Element
+  type ComponentTheme = (any) => JSX.Element
 
   type DashboardTheme = {
     title?: ComponentTheme

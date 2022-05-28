@@ -1,6 +1,6 @@
 import { BarGraph } from "playbook-ui"
 
-type VerticalBarChartProps = {
+type Meta = {
   axisTitle: string
   dark?: Boolean
   xAxisCategories: Array<string>
@@ -22,12 +22,18 @@ type VerticalBarChartProps = {
   colors: Array<string>
 }
 
-const Default = ({ extraProps, ...props }) => {
-  const allProps = { ...{ ...props, ...extraProps } }
-  return <BarGraph {...allProps} />
+interface VerticalBarChartWidget extends Widget {
+  meta?: Meta
+  theme?: {
+    chart?: ComponentTheme
+  }
 }
 
-export const VerticalBarChart = ({ meta: props, theme }: { meta: VerticalBarChartProps; theme: any }) => {
-  const Component = theme?.verticalBarChart?.chart || Default
+const Default = ({ ...props }) => {
+  return <BarGraph {...props} />
+}
+
+export const VerticalBarChart = ({ meta: props, theme }: VerticalBarChartWidget) => {
+  const Component = theme?.chart || Default
   return <Component {...props} />
 }
