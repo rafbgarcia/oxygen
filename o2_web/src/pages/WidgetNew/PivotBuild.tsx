@@ -3,29 +3,36 @@ import { Pivot } from "../../components/Pivot"
 import { TrashIcon, PlusSmIcon } from "@heroicons/react/outline"
 import { Modal } from "../../components/Modal"
 import { Button } from "../../components/Button"
-import { map, partial, flow, some } from "lodash-es"
+import { isEmpty, map, partial, flow, every } from "lodash-es"
 import { TextField } from "../../components/TextField"
 import { SelectField } from "../../components/SelectField"
 import { useForm } from "react-hook-form"
 import { useEffect, useState } from "react"
+import { componentDidMount } from "./helpers"
 
 const FUNCTIONS = ["COUNT", "COUNT DISTINCT", "SUM"]
+const TYPE: WidgetType = "pivot_table"
+const BUILD_INFO = { rows: [], values: [], columns: [] }
 
-export const PivotPreview = ({ dataset, state, dispatch }) => {
+export const PivotBuild = ({ dataset, state, dispatch }) => {
   const [previewData, setPreviewData] = useState<Record<any, any>>()
 
+  componentDidMount(() => {
+    dispatch({ action: "initBuildInfo", buildInfo: BUILD_INFO })
+  })
   useEffect(() => {
-    const hasNecessaryBuildInfo = some(
-      [state.buildInfo.rows, state.buildInfo.columns],
-      (items) => items.length > 0
-    )
-    if (hasNecessaryBuildInfo) {
-      api
-        .widgetPreview({ buildInfo: state.buildInfo, type: "pivot_table", dataset })
-        .then(setPreviewData)
-        .catch(console.log)
+    if (every([state.buildInfo?.rows, state.buildInfo?.columns], isEmpty)) {
+      return
     }
+    api
+      .widgetPreview({ buildInfo: state.buildInfo, type: TYPE, dataset })
+      .then(setPreviewData)
+      .catch(console.log)
   }, [state.buildInfo])
+
+  if (isEmpty(state.buildInfo)) {
+    return
+  }
 
   return (
     <div className="flex">
@@ -67,9 +74,9 @@ const BuildInfoSection = ({ state, dispatch, isDimension, metadataKey, dataset, 
   const [open, setOpen] = useState(false)
   const handleAdd = (field) => {
     setOpen(false)
-    dispatch({ type: "addField", metadataKey, field })
+    dispatch({ action: "addField", metadataKey, field })
   }
-  const handleRemove = (metadataKey, index) => () => dispatch({ type: "removeField", metadataKey, index })
+  const handleRemove = (metadataKey, index) => () => dispatch({ action: "removeField", metadataKey, index })
   const Form = isDimension ? AddDimensionModal : AddMeasureModal
 
   return (

@@ -1,6 +1,7 @@
 import { api } from "../lib/api"
 import { Page } from "./Page"
-import { PivotPreview } from "./WidgetNew/PivotPreview"
+import { PivotBuild } from "./WidgetNew/PivotBuild"
+import { VerticalBarChartBuild } from "./WidgetNew/VerticalBarChartBuild"
 import { useForm } from "react-hook-form"
 import { TextField } from "../components/TextField"
 import { Wait } from "../components/Wait"
@@ -11,26 +12,20 @@ import { useImmerReducer } from "use-immer"
 import { useNavigate, useParams } from "react-router-dom"
 import { useState } from "react"
 
-const widgetMapping = {
-  pivot_table: PivotPreview,
+const widgetMapping: Record<WidgetType, any> = {
+  pivot_table: PivotBuild,
+  vertical_bar_chart: VerticalBarChartBuild,
 }
 
-const widgetTypes = [
-  { id: "indicator", name: "Indicator" },
-  { id: "pivot_table", name: "Pivot" },
-  { id: "line_chart", name: "Line Chart" },
-  { id: "vertical_bar_chart", name: "Vertical Bar Chart" },
+const widgetsCollection: Array<{ value: WidgetType; label: string }> = [
+  { value: "pivot_table", label: "Pivot" },
+  { value: "vertical_bar_chart", label: "Column Chart" },
 ]
 
-const initialState = {
-  buildInfo: {
-    rows: [] as any,
-    columns: [] as any,
-    values: [] as any,
-  },
-}
-
 const actions = {
+  initBuildInfo: (draft, { buildInfo }) => {
+    draft.buildInfo = buildInfo
+  },
   removeField: (draft, { metadataKey, index }) => {
     draft.buildInfo[metadataKey].splice(index, 1)
   },
@@ -39,30 +34,31 @@ const actions = {
   },
 }
 
-const defaultValues = {
-  type: "pivot_table",
+const _defaultValuesForTesting_RemoveThisLater = {
+  title: "My Column Chart",
   datasetId: "19",
-  title: "",
+  type: "pivot_table",
+}
+
+const initialState = {
+  buildInfo: {},
+  // designInfo: {},
 }
 
 export const WidgetNew = () => {
   const params = useParams()
   const navigate = useNavigate()
   const [saving, setSaving] = useState(false)
-  const [state, dispatch] = useImmerReducer(
-    (draft, action) => {
-      actions[action.type](draft, action)
-    },
-    { ...initialState }
-  )
-  const { register, getValues, watch } = useForm({ defaultValues })
+  const [state, dispatch] = useImmerReducer((draft, { action, ...payload }) => {
+    actions[action](draft, payload)
+  }, initialState)
+  const { register, getValues, watch } = useForm({ defaultValues: _defaultValuesForTesting_RemoveThisLater })
   const { data, error } = api.getDatasets()
 
   const Waiting = Wait(data, error)
   if (Waiting) return <Waiting />
 
   const datasetCollection = map(data.datasets, ({ id, name }) => ({ value: id, label: name }))
-  const widgetsCollection = map(widgetTypes, ({ id, name }) => ({ value: id, label: name }))
   const dataset = find(data.datasets, { id: parseInt(watch("datasetId")) })
   const widgetType = watch("type")
   const BuildPage = widgetMapping[widgetType]
@@ -109,6 +105,7 @@ export const WidgetNew = () => {
         </div>
 
         {dataset && BuildPage && <BuildPage state={state} dispatch={dispatch} dataset={dataset} />}
+        {/* <WidgetBuild type={widgetType} onChange={setValue} /> */}
       </Page.Main>
     </>
   )

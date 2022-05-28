@@ -1,5 +1,5 @@
-declare module 'playbook-ui'
-declare module 'SWRHook'
+declare module "playbook-ui"
+declare module "SWRHook"
 export declare global {
   interface Widget {
     meta: Record<string, any>
@@ -46,6 +46,7 @@ export declare global {
   /**
    * Widget
    */
+  type WidgetType = "pivot_table" | "vertical_bar_chart"
 
   type WidgetJSON = {
     id: number
@@ -53,7 +54,6 @@ export declare global {
     meta: PivotMeta
     build: PivotBuild
   }
-  type WidgetType = 'pivot' | 'vertical_bar_chart'
   type PivotMeta = {
     html: string
   }
