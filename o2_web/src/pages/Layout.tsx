@@ -26,12 +26,6 @@ const ActiveLink = ({ children, to, ...props }: LinkProps) => {
   )
 }
 
-const navigation = [
-  <ActiveLink to="/">Home</ActiveLink>,
-  <ActiveLink to="/datasets">Datasets</ActiveLink>,
-  <ActiveLink to="/dashboards">Dashboards</ActiveLink>,
-]
-
 const Nav = () => {
   return (
     <Disclosure as="nav" className="bg-gray-800">
@@ -128,9 +122,9 @@ const Nav = () => {
 
 export const Layout = () => {
   return (
-    <>
+    <div className="text-gray-700 bg-gray-100">
       <Nav />
       <Outlet />
-    </>
+    </div>
   )
 }

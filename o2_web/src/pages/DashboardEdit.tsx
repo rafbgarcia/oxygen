@@ -24,9 +24,9 @@ const Row = ({ row, widgets }) => {
   return (
     <div className="flex items-start justify-evenly gap-x-2 overflow-hidden">
       {map(widgets, (widget) => (
-        <div key={widget.id} className="w-full bg-white shadow-md p-2 h-96 overflow-auto">
+        <div key={widget.id} className="w-full bg-white shadow-md p-2 h-[500] overflow-auto">
           <h5 className="font-medium text-lg">{widget.title}</h5>
-          <Widget type={widget.type} meta={{ ...widget.meta, height: 336 }} theme={{}} />
+          <Widget type={widget.type} meta={{ ...widget.meta, height: 500 }} theme={{}} />
         </div>
       ))}
     </div>
