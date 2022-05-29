@@ -30,7 +30,7 @@ class PivotCase(SimpleTestCase):
 
     #
     #
-    def _test_build_sql_count(self):
+    def test_build_sql_count(self):
         build_info = {
             "rows": [{"name": "follow_up_result", "alias": "Result"}],
             "columns": [],
@@ -39,14 +39,15 @@ class PivotCase(SimpleTestCase):
             ],
         }
         expected = """
-          SELECT follow_up_result AS "Result", count(test.application_id) AS "Applications"
-          FROM test GROUP BY test.follow_up_result
+          SELECT test.follow_up_result AS "Result", count(test.application_id) AS "Applications"
+          FROM test
+          GROUP BY test.follow_up_result
         """
         self.assertHTMLEqual(Pivot(build_info, self.dataset).build_sql(), expected)
 
     #
     #
-    def _test_build_sql_count_countdistinct(self):
+    def test_build_sql_count_countdistinct(self):
         build_info = {
             "rows": [{"name": "follow_up_result", "alias": "Result"}],
             "columns": [],
@@ -56,7 +57,7 @@ class PivotCase(SimpleTestCase):
             ],
         }
         expected = """
-          SELECT follow_up_result AS "Result", count(test.application_id) AS "Appls", count(distinct(test.application_id)) AS "Unique Appls"
+          SELECT test.follow_up_result AS "Result", count(test.application_id) AS "Appls", count(distinct(test.application_id)) AS "Unique Appls"
           FROM test
           GROUP BY test.follow_up_result
         """
@@ -64,7 +65,47 @@ class PivotCase(SimpleTestCase):
 
     #
     #
-    def test_build_sql_contribution(self):
+    def test_build_sql_2_rows(self):
+        build_info = {
+            "rows": [
+                {"name": "follow_up_result", "alias": "Result"},
+                {"name": "resulted_by", "alias": "User"},
+            ],
+            "columns": [],
+            "values": [
+                {"agg": "COUNT DISTINCT", "name": "application_id", "alias": "Unique Appls"},
+            ],
+        }
+        expected = """
+           SELECT test.follow_up_result AS "Result", test.resulted_by AS "User", count(distinct(test.application_id)) AS "Unique Appls"
+           FROM test
+           GROUP BY test.follow_up_result, test.resulted_by
+        """
+        self.assertHTMLEqual(Pivot(build_info, self.dataset).build_sql(), expected)
+
+    #
+    #
+    def test_build_contribution_percent_sign_label_doubles(self):
+        build_info = {
+            "rows": [{"name": "follow_up_result", "alias": "Result"}],
+            "columns": [],
+            "values": [
+                {
+                    "agg": "COUNT DISTINCT",
+                    "name": "application_id",
+                    "alias": "%",
+                    "function": "CONTRIBUTION",
+                },
+            ],
+        }
+        self.assertRaises(
+            KeyError,
+            Pivot(build_info, self.dataset).build,
+        )
+
+    #
+    #
+    def test_build_sql_contribution_1_row(self):
         build_info = {
             "rows": [{"name": "follow_up_result", "alias": "Result"}],
             "columns": [],
@@ -79,27 +120,147 @@ class PivotCase(SimpleTestCase):
             ],
         }
         expected = """
+            WITH anon_2 AS
+            (SELECT test.follow_up_result AS follow_up_result, count(distinct(test.application_id)) AS "CONTRIBUTION_application_id"
+            FROM test GROUP BY test.follow_up_result),
+            anon_1 AS
+            (SELECT CAST(sum(anon_2."CONTRIBUTION_application_id") AS FLOAT) AS "CONTRIBUTION_application_id"
+            FROM anon_2)
+            SELECT test.follow_up_result AS "Result", count(distinct(test.application_id)) AS "Unique Appls", count(distinct(test.application_id)) / max(anon_1."CONTRIBUTION_application_id") AS "%%"
+            FROM test, anon_1 GROUP BY test.follow_up_result
         """
-        self.assertEqual(Pivot(build_info, self.dataset).build_sql(), expected)
+        self.assertHTMLEqual(Pivot(build_info, self.dataset).build_sql(), expected)
 
     #
     #
-    def _test_metadata_with_function(self):
+    def test_build_sql_contribution_2_rows(self):
         build_info = {
-            "rows": [{"name": "follow_up_result", "alias": "follow_up_result"}],
+            "rows": [
+                {"name": "follow_up_result", "alias": "Result"},
+                {"name": "resulted_by", "alias": "User"},
+            ],
             "columns": [],
             "values": [
-                {"agg": "COUNT", "name": "application_id", "alias": "Appls"},
                 {"agg": "COUNT DISTINCT", "name": "application_id", "alias": "Unique Appls"},
+                {
+                    "agg": "COUNT DISTINCT",
+                    "name": "application_id",
+                    "alias": "Perc",
+                    "function": "CONTRIBUTION",
+                },
+            ],
+        }
+        expected = """
+            WITH anon_2 AS
+            (SELECT test.follow_up_result AS follow_up_result, test.resulted_by AS resulted_by, count(distinct(test.application_id)) AS "CONTRIBUTION_application_id"
+            FROM test GROUP BY test.follow_up_result, test.resulted_by),
+            anon_1 AS
+            (SELECT anon_2.follow_up_result AS follow_up_result, CAST(sum(anon_2."CONTRIBUTION_application_id") AS FLOAT) AS "CONTRIBUTION_application_id"
+            FROM anon_2 GROUP BY anon_2.follow_up_result)
+             SELECT test.follow_up_result AS "Result", test.resulted_by AS "User", count(distinct(test.application_id)) AS "Unique Appls", count(distinct(test.application_id)) / max(anon_1."CONTRIBUTION_application_id") AS "Perc"
+            FROM test, anon_1
+            GROUP BY test.follow_up_result, test.resulted_by
+        """
+        self.assertHTMLEqual(Pivot(build_info, self.dataset).build_sql(), expected)
+
+    #
+    #
+    def test_build_sql_contribution_1_row_1_column(self):
+        build_info = {
+            "rows": [{"name": "follow_up_result", "alias": "Result"}],
+            "columns": [{"name": "follow_up_number", "alias": "Follow up"}],
+            "values": [
+                {"agg": "COUNT DISTINCT", "name": "application_id", "alias": "Unique Appls"},
+                {
+                    "agg": "COUNT DISTINCT",
+                    "name": "application_id",
+                    "alias": "Perc",
+                    "function": "CONTRIBUTION",
+                },
+            ],
+        }
+        expected = """
+            WITH anon_2 AS
+            (SELECT test.follow_up_result AS follow_up_result, count(distinct(test.application_id)) AS "CONTRIBUTION_application_id"
+            FROM test GROUP BY test.follow_up_result),
+            anon_1 AS
+            (SELECT CAST(sum(anon_2."CONTRIBUTION_application_id") AS FLOAT) AS "CONTRIBUTION_application_id"
+            FROM anon_2)
+             SELECT test.follow_up_result AS "Result", test.follow_up_number AS "Follow up", count(distinct(test.application_id)) AS "Unique Appls", count(distinct(test.application_id)) / max(anon_1."CONTRIBUTION_application_id") AS "Perc"
+            FROM test, anon_1 GROUP BY test.follow_up_result, test.follow_up_number
+        """
+        self.assertHTMLEqual(Pivot(build_info, self.dataset).build_sql(), expected)
+
+    #
+    #
+    def test_metadata_with_function(self):
+        build_info = {
+            "rows": [{"name": "follow_up_result", "alias": "Result"}],
+            "columns": [],
+            "values": [
+                {"agg": "COUNT DISTINCT", "name": "application_id", "alias": "Unique Appls"},
+                {
+                    "agg": "COUNT DISTINCT",
+                    "name": "application_id",
+                    "alias": "Perc",
+                    "function": "CONTRIBUTION",
+                },
             ],
         }
 
-        expected = """"""
+        expected = """
+            <table border="1" class="dataframe">
+              <thead>
+                <tr style="text-align: right;">
+                  <th></th>
+                  <th>Unique Appls</th>
+                  <th>Perc</th>
+                </tr>
+                <tr>
+                  <th>Result</th>
+                  <th></th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th>candidate_not_interested</th>
+                  <td>2</td>
+                  <td>0.133333</td>
+                </tr>
+                <tr>
+                  <th>sent_email_no_call</th>
+                  <td>1</td>
+                  <td>0.066667</td>
+                </tr>
+                <tr>
+                  <th>power_not_interested</th>
+                  <td>1</td>
+                  <td>0.066667</td>
+                </tr>
+                <tr>
+                  <th>callback</th>
+                  <td>1</td>
+                  <td>0.066667</td>
+                </tr>
+                <tr>
+                  <th>answering_machine_left_via_voicemail</th>
+                  <td>9</td>
+                  <td>0.600000</td>
+                </tr>
+                <tr>
+                  <th>no_answer</th>
+                  <td>1</td>
+                  <td>0.066667</td>
+                </tr>
+              </tbody>
+            </table>
+        """
         result = Pivot(build_info, self.dataset).metadata()
 
         self.assertHTMLEqual(result["html"], expected)
 
-    def _test_metadata(self):
+    def test_metadata(self):
         build_info = {
             "rows": [{"name": "follow_up_result", "alias": "follow_up_result"}],
             "columns": [],
@@ -110,49 +271,53 @@ class PivotCase(SimpleTestCase):
         }
 
         expected = """
-          <table border="1" class="dataframe">
-            <thead>
-              <tr style="text-align: right;">
-                <th></th>
-                <th>Appls</th>
-                <th>Unique Appls</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th>candidate_not_interested</th>
-                <td>2</td>
-                <td>2</td>
-              </tr>
-              <tr>
-                <th>sent_email_no_call</th>
-                <td>1</td>
-                <td>1</td>
-              </tr>
-              <tr>
-                <th>power_not_interested</th>
-                <td>1</td>
-                <td>1</td>
-              </tr>
-              <tr>
-                <th>callback</th>
-                <td>1</td>
-                <td>1</td>
-              </tr>
-              <tr>
-                <th>answering_machine_left_via_voicemail</th>
-                <td>16</td>
-                <td>9</td>
-              </tr>
-              <tr>
-                <th>no_answer</th>
-                <td>4</td>
-                <td>1</td>
-              </tr>
-            </tbody>
-          </table>
+            <table border="1" class="dataframe">
+              <thead>
+                <tr style="text-align: right;">
+                  <th></th>
+                  <th>Appls</th>
+                  <th>Unique Appls</th>
+                </tr>
+                <tr>
+                  <th>follow_up_result</th>
+                  <th></th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th>candidate_not_interested</th>
+                  <td>2</td>
+                  <td>2</td>
+                </tr>
+                <tr>
+                  <th>sent_email_no_call</th>
+                  <td>1</td>
+                  <td>1</td>
+                </tr>
+                <tr>
+                  <th>power_not_interested</th>
+                  <td>1</td>
+                  <td>1</td>
+                </tr>
+                <tr>
+                  <th>callback</th>
+                  <td>1</td>
+                  <td>1</td>
+                </tr>
+                <tr>
+                  <th>answering_machine_left_via_voicemail</th>
+                  <td>16</td>
+                  <td>9</td>
+                </tr>
+                <tr>
+                  <th>no_answer</th>
+                  <td>4</td>
+                  <td>1</td>
+                </tr>
+              </tbody>
+            </table>
         """
         result = Pivot(build_info, self.dataset).metadata()
 
-        self.assertIn("html", result)
         self.assertHTMLEqual(result["html"], expected)

@@ -18,8 +18,8 @@ class Pivot:
         self.column_fields = build_info["columns"]
         self.rows = self.__as_columns(build_info["rows"])
         self.columns = self.__as_columns(build_info["columns"])
-        self.values = self.__build_measure_columns(
-            [field for field in build_info["values"] if not hasattr(field, "function")]
+        self.aggregations = self.__build_measure_columns(
+            [field for field in build_info["values"] if not "function" in field]
         )
         self.contribution_fields = [
             field for field in build_info["values"] if field.get("function") == CONTRIBUTION
@@ -27,13 +27,10 @@ class Pivot:
 
     def metadata(self, limit=25, offset=0):
         pivot = self.build()
-        pivot = (
-            pivot
-            # .stack(level=0)
-            # .T
-            [offset:limit]
-        )
-        return {"html": pivot.to_html(escape=False, na_rep="-", index_names=False)}
+        if len(self.columns) > 0:
+            pivot = pivot.swaplevel(0, len(self.columns), axis="columns").sort_index(axis="columns")
+
+        return {"html": pivot.to_html(escape=False, na_rep="-", index_names=True)}
 
     def build(self):
         query = self.build_sql()
@@ -50,15 +47,18 @@ class Pivot:
             getattr(self.table.c, field["name"]).label(field["alias"])
             for field in self.row_fields + self.column_fields
         ]
+        select_fields += self.aggregations
+        groupby = self.rows
         if len(self.contribution_fields) > 0:
             cte = self.__totals_cte()
+            groupby += self.columns
             for field in self.contribution_fields:
                 col = self.__build_measure_column(field)
                 select_fields.append(
                     (col / func.max(getattr(cte.c, self.__fn_field_label(field)))).label(field["alias"])
                 )
 
-        query = select(*select_fields).select_from(cte).group_by(*self.rows, *self.columns)
+        query = select(*select_fields).group_by(*groupby)
 
         return str(query.compile(dialect=postgresql.dialect()))
 
