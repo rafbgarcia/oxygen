@@ -22,7 +22,7 @@ export const SelectField = ({
         defaultValue={defaultValue}
         {...register}
       >
-        {allowBlank && <option value="">{allowBlank === true ? "- Select -" : allowBlank}</option>}
+        {allowBlank && <option value="">{allowBlank === true ? "" : allowBlank}</option>}
         {map(collection, ({ value, label }) => (
           <option key={value} value={value}>
             {label || value}

@@ -16,7 +16,8 @@ type BuildInfoMapping = Record<WidgetType, Array<BuildInfoSection>>
 
 const MEASURE = "Measure"
 const DIMENSION = "Dimension"
-const FUNCTIONS = ["COUNT", "COUNT DISTINCT", "SUM"]
+const AGGREGATIONS = ["COUNT", "COUNT DISTINCT", "SUM"]
+const FUNCTIONS = ["CONTRIBUTION"]
 const BUILD_INFO_SECTIONS: BuildInfoMapping = {
   pivot_table: [
     { metadataKey: "rows", label: "Rows", dataType: DIMENSION },
@@ -59,9 +60,6 @@ export const WidgetPreview = ({
   dataset: any
   onChange: any
 }) => {
-  if (!type || !dataset) {
-    return <></>
-  }
   const initialState = useMemo(
     () => ({
       build: initialBuild(type),
@@ -82,6 +80,10 @@ export const WidgetPreview = ({
     onChange(state)
     api.widgetPreview({ buildInfo: state, type, dataset }).then(setPreviewData).catch(console.log)
   }, [state.build])
+
+  if (!type || !dataset) {
+    return <></>
+  }
 
   return (
     <div className="flex">
@@ -136,7 +138,11 @@ const BuildInfoSection = ({
           </Button>
         </header>
         {build[section.metadataKey].map((item, index) => (
-          <BuildItem key={item.field} item={item} onRemove={handleRemove(section.metadataKey, index)} />
+          <BuildItem
+            key={item.function + item.agg + item.name + item.alias}
+            item={item}
+            onRemove={handleRemove(section.metadataKey, index)}
+          />
         ))}
       </div>
     </div>
@@ -145,7 +151,7 @@ const BuildInfoSection = ({
 
 const BuildItem = ({ item, onRemove }) => {
   return (
-    <div key={item.field} className="flex justify-between items-center shadow-sm bg-white p-2 my-2">
+    <div className="flex justify-between items-center shadow-sm bg-white p-2 my-2">
       {item.alias}
       <a className="cursor-pointer" onClick={onRemove}>
         <TrashIcon className="w-4 h-4" />
@@ -169,7 +175,7 @@ const AddDimensionModal = ({ open, dataset, onSubmit, setShow }) => {
             collection={fieldsCollection}
             label="Field"
             className="mb-5"
-            register={register("field", { required: true })}
+            register={register("name", { required: true })}
           />
           <TextField label="Alias" className="mb-5" register={register("alias", { required: true })} />
         </Modal.Body>
@@ -189,6 +195,7 @@ const AddDimensionModal = ({ open, dataset, onSubmit, setShow }) => {
 const AddMeasureModal = ({ open, dataset, onSubmit, setShow }) => {
   const { register, handleSubmit, reset } = useForm()
   const fieldsCollection = map(dataset.fields, (field) => ({ value: field.name }))
+  const aggCollection = map(AGGREGATIONS, (value) => ({ value }))
   const fnsCollection = map(FUNCTIONS, (value) => ({ value }))
   const onSubmitFlow = flow([onSubmit, reset])
 
@@ -198,16 +205,23 @@ const AddMeasureModal = ({ open, dataset, onSubmit, setShow }) => {
         <Modal.Body>
           <Modal.Title>Add Measure</Modal.Title>
           <SelectField
-            collection={fnsCollection}
-            label="Function"
+            collection={aggCollection}
+            label="Aggregation"
             className="mb-5"
-            register={register("function", { required: true })}
+            register={register("agg", { required: true })}
           />
           <SelectField
             collection={fieldsCollection}
             label="Field"
             className="mb-5"
-            register={register("field", { required: true })}
+            register={register("name", { required: true })}
+          />
+          <SelectField
+            collection={fnsCollection}
+            allowBlank
+            label="Function"
+            className="mb-5"
+            register={register("function", { required: false })}
           />
           <TextField label="Alias" className="mb-5" register={register("alias", { required: true })} />
         </Modal.Body>

@@ -5,6 +5,7 @@ from sqlalchemy.dialects import postgresql
 from o2.dataset import dataset_execute
 
 CONTRIBUTION = "CONTRIBUTION"
+FUNCTIONS = [CONTRIBUTION]
 
 
 class Pivot:
@@ -19,7 +20,11 @@ class Pivot:
         self.rows = self.__as_columns(build_info["rows"])
         self.columns = self.__as_columns(build_info["columns"])
         self.aggregations = self.__build_measure_columns(
-            [field for field in build_info["values"] if not "function" in field]
+            [
+                field
+                for field in build_info["values"]
+                if "function" not in field or field["function"] not in FUNCTIONS
+            ]
         )
         self.contribution_fields = [
             field for field in build_info["values"] if field.get("function") == CONTRIBUTION
@@ -30,7 +35,7 @@ class Pivot:
         if len(self.columns) > 0:
             pivot = pivot.swaplevel(0, len(self.columns), axis="columns").sort_index(axis="columns")
 
-        return {"html": pivot.to_html(escape=False, na_rep="-", index_names=True)}
+        return {"html": pivot[offset:limit].to_html(escape=False, na_rep="-", index_names=True)}
 
     def build(self):
         query = self.build_sql()
@@ -58,21 +63,11 @@ class Pivot:
                     (col / func.max(getattr(cte.c, self.__fn_field_label(field)))).label(field["alias"])
                 )
 
-        query = select(*select_fields).group_by(*groupby)
+        query = select(*select_fields).group_by(*groupby).order_by(*groupby)
 
         return str(query.compile(dialect=postgresql.dialect()))
 
     def __totals_cte(self):
-        # WITH grouped_totals AS (
-        #     SELECT follow_up_result, resulted_by, COUNT(DISTINCT application_id) AS total
-        #     FROM {table}
-        #     GROUP BY follow_up_result, resulted_by
-        # ),
-        # totals AS (
-        #     SELECT follow_up_result, SUM(total) as total FROM grouped_totals
-        #     GROUP BY follow_up_result
-        # )
-
         contribs = [
             self.__build_measure_column(field).label(self.__fn_field_label(field))
             for field in self.contribution_fields

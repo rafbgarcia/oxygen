@@ -33,7 +33,8 @@ export const WidgetNew = () => {
   if (Waiting) return <Waiting />
 
   const datasetCollection = map(data.datasets, ({ id, name }) => ({ value: id, label: name }))
-  const dataset = find(data.datasets, { id: parseInt(watch("datasetId")) })
+  const datasetId = watch("datasetId")
+  const dataset = find(data.datasets, { id: parseInt(datasetId) })
   const widgetType = watch("type")
 
   const handleSave = () => {
@@ -81,7 +82,7 @@ export const WidgetNew = () => {
         </div>
 
         <WidgetPreview
-          key={widgetType}
+          key={widgetType + datasetId}
           type={widgetType as WidgetType}
           dataset={dataset}
           onChange={handleChangeBuildInfo}
