@@ -35,5 +35,11 @@ const Default = ({ ...props }) => {
 
 export const VerticalBarChart = ({ meta: props, theme }: VerticalBarChartWidget) => {
   const Component = theme?.chart || Default
-  return <Component {...props} />
+  const height = props?.height || 400
+
+  return (
+    <div className={`overflow-hidden h-[${height}px]`}>
+      <Component {...props} />
+    </div>
+  )
 }
