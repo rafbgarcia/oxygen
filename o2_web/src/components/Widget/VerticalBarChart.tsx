@@ -37,9 +37,24 @@ export const VerticalBarChart = ({ meta: props, theme }: VerticalBarChartWidget)
   const Component = theme?.chart || Default
   const height = props?.height || 400
 
+  const types = ["column", "bar", "line"]
+  // const a = {
+  //   chartData: [
+  //     { name: "#", data: [1, 255, 1, 8511, 1] },
+  //     { name: "%", data: [0.0, 0.04, 0.0, 1.39, 0.0] },
+  //   ],
+  //   xAxisCategories: [
+  //     ["answering_machine_left_via_voicemail"],
+  //     ["wrong_number"],
+  //     ["interview_scheduled"],
+  //     ["answering_machine_left_via_voicemail"],
+  //     ["candidate_not_interested"],
+  //   ],
+  // }
+
   return (
     <div className={`overflow-hidden h-[${height}px]`}>
-      <Component {...props} />
+      <Component {...props} type={"bar"} />
     </div>
   )
 }

@@ -16,7 +16,7 @@ export const DashboardEdit = () => {
   return (
     <>
       <Page.Header className="flex items-center gap-x-2">
-        <Link to={`/dashboards/${id}/widgets/new`}>
+        <Link to={`/dashboards/${id}/rows/new`}>
           <Button className="flex items-center">
             Rows
             <ViewListIcon className="h-4 w-4" />

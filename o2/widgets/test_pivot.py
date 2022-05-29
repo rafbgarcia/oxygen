@@ -28,97 +28,131 @@ class PivotCase(SimpleTestCase):
             )
         return super().setUp()
 
-    def tearDown(self):
-        return super().tearDown()
-
-    ##
-    # Test building SQL with COUNT
-    ##
-    def test_build_sql_count(self):
+    #
+    #
+    def _test_build_sql_count(self):
         build_info = {
-            "rows": [{"field": "follow_up_result", "alias": "Result"}],
+            "rows": [{"name": "follow_up_result", "alias": "Result"}],
             "columns": [],
             "values": [
-                {"function": "COUNT", "field": "application_id", "alias": "Applications"},
+                {"agg": "COUNT", "name": "application_id", "alias": "Applications"},
             ],
         }
         expected = """
-SELECT follow_up_result AS "Result", count(test.application_id) AS "Applications"
-FROM test GROUP BY test.follow_up_result
-""".strip()
-        self.assertEqual(Pivot(build_info, self.dataset).build_sql().replace(" \n", "\n"), expected)
+          SELECT follow_up_result AS "Result", count(test.application_id) AS "Applications"
+          FROM test GROUP BY test.follow_up_result
+        """
+        self.assertHTMLEqual(Pivot(build_info, self.dataset).build_sql(), expected)
 
-    ##
-    # Test building SQL with COUNT and DISTINCT COUNT
-    ##
-    def test_build_sql_count_countdistinct(self):
+    #
+    #
+    def _test_build_sql_count_countdistinct(self):
         build_info = {
-            "rows": [{"field": "follow_up_result", "alias": "Result"}],
+            "rows": [{"name": "follow_up_result", "alias": "Result"}],
             "columns": [],
             "values": [
-                {"function": "COUNT", "field": "application_id", "alias": "Appls"},
-                {"function": "COUNT DISTINCT", "field": "application_id", "alias": "Unique Appls"},
+                {"agg": "COUNT", "name": "application_id", "alias": "Appls"},
+                {"agg": "COUNT DISTINCT", "name": "application_id", "alias": "Unique Appls"},
             ],
         }
         expected = """
-SELECT follow_up_result AS "Result", count(test.application_id) AS "Appls", count(distinct(test.application_id)) AS "Unique Appls"
-FROM test GROUP BY test.follow_up_result
-""".strip()
-        self.assertEqual(Pivot(build_info, self.dataset).build_sql().replace(" \n", "\n"), expected)
+          SELECT follow_up_result AS "Result", count(test.application_id) AS "Appls", count(distinct(test.application_id)) AS "Unique Appls"
+          FROM test
+          GROUP BY test.follow_up_result
+        """
+        self.assertHTMLEqual(Pivot(build_info, self.dataset).build_sql(), expected)
 
-    ##
-    # Test building table as HTML with COUNT and DISTINCT COUNT
-    ##
-    def test_build(self):
+    #
+    #
+    def test_build_sql_contribution(self):
         build_info = {
-            "rows": [{"field": "follow_up_result", "alias": "follow_up_result"}],
+            "rows": [{"name": "follow_up_result", "alias": "Result"}],
             "columns": [],
             "values": [
-                {"function": "COUNT", "field": "application_id", "alias": "Appls"},
-                {"function": "COUNT DISTINCT", "field": "application_id", "alias": "Unique Appls"},
+                {"agg": "COUNT DISTINCT", "name": "application_id", "alias": "Unique Appls"},
+                {
+                    "agg": "COUNT DISTINCT",
+                    "name": "application_id",
+                    "alias": "%",
+                    "function": "CONTRIBUTION",
+                },
+            ],
+        }
+        expected = """
+        """
+        self.assertEqual(Pivot(build_info, self.dataset).build_sql(), expected)
+
+    #
+    #
+    def _test_metadata_with_function(self):
+        build_info = {
+            "rows": [{"name": "follow_up_result", "alias": "follow_up_result"}],
+            "columns": [],
+            "values": [
+                {"agg": "COUNT", "name": "application_id", "alias": "Appls"},
+                {"agg": "COUNT DISTINCT", "name": "application_id", "alias": "Unique Appls"},
+            ],
+        }
+
+        expected = """"""
+        result = Pivot(build_info, self.dataset).metadata()
+
+        self.assertHTMLEqual(result["html"], expected)
+
+    def _test_metadata(self):
+        build_info = {
+            "rows": [{"name": "follow_up_result", "alias": "follow_up_result"}],
+            "columns": [],
+            "values": [
+                {"agg": "COUNT", "name": "application_id", "alias": "Appls"},
+                {"agg": "COUNT DISTINCT", "name": "application_id", "alias": "Unique Appls"},
             ],
         }
 
         expected = """
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Appls</th>
-      <th>Unique Appls</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>candidate_not_interested</th>
-      <td>2</td>
-      <td>2</td>
-    </tr>
-    <tr>
-      <th>sent_email_no_call</th>
-      <td>1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>power_not_interested</th>
-      <td>1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>callback</th>
-      <td>1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>answering_machine_left_via_voicemail</th>
-      <td>16</td>
-      <td>9</td>
-    </tr>
-    <tr>
-      <th>no_answer</th>
-      <td>4</td>
-      <td>1</td>
-    </tr>
-  </tbody>
-</table>""".strip()
-        self.assertEqual(Pivot(build_info, self.dataset).build(), expected)
+          <table border="1" class="dataframe">
+            <thead>
+              <tr style="text-align: right;">
+                <th></th>
+                <th>Appls</th>
+                <th>Unique Appls</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th>candidate_not_interested</th>
+                <td>2</td>
+                <td>2</td>
+              </tr>
+              <tr>
+                <th>sent_email_no_call</th>
+                <td>1</td>
+                <td>1</td>
+              </tr>
+              <tr>
+                <th>power_not_interested</th>
+                <td>1</td>
+                <td>1</td>
+              </tr>
+              <tr>
+                <th>callback</th>
+                <td>1</td>
+                <td>1</td>
+              </tr>
+              <tr>
+                <th>answering_machine_left_via_voicemail</th>
+                <td>16</td>
+                <td>9</td>
+              </tr>
+              <tr>
+                <th>no_answer</th>
+                <td>4</td>
+                <td>1</td>
+              </tr>
+            </tbody>
+          </table>
+        """
+        result = Pivot(build_info, self.dataset).metadata()
+
+        self.assertIn("html", result)
+        self.assertHTMLEqual(result["html"], expected)
