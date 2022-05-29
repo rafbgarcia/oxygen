@@ -22,11 +22,11 @@ const Placeholder = ({ dashboardId }) => {
 
 const Row = ({ row, widgets }) => {
   return (
-    <div className="flex items-start justify-evenly gap-x-2 overflow-hidden">
+    <div className="flex items-start justify-evenly gap-x-2 overflow-hidden w-full">
       {map(widgets, (widget) => (
-        <div key={widget.id} className="w-full bg-white shadow-md p-2 h-[500] overflow-auto">
+        <div key={widget.id} className="w-full p-2 h-[400px] overflow-auto">
           <h5 className="font-medium text-lg">{widget.title}</h5>
-          <Widget type={widget.type} meta={{ ...widget.meta, height: 500 }} theme={{}} />
+          <Widget type={widget.type} meta={{ ...widget.meta, height: 400 }} theme={{}} />
         </div>
       ))}
     </div>
@@ -52,7 +52,7 @@ export const DashboardEdit = () => {
       <Page.Header>
         <Page.Title>{data.dashboard.name}</Page.Title>
       </Page.Header>
-      <Page.Main className="p-2">
+      <Page.Main className="p-2 flex flex-col items-start gap-y-2">
         {rows.length == 0 && <Placeholder dashboardId={id} />}
         {rows.map((row) => (
           <Row key={row.id} row={row} widgets={filter(data.widgets, { dashboardRow: row.id })} />

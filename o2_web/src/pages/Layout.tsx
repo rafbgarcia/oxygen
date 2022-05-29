@@ -122,7 +122,7 @@ const Nav = () => {
 
 export const Layout = () => {
   return (
-    <div className="text-gray-700 bg-gray-100">
+    <div className="text-gray-700 bg-gray-100 h-full min-h-screen">
       <Nav />
       <Outlet />
     </div>

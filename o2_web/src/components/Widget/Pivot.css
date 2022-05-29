@@ -1,6 +1,6 @@
-.o2-default-pivot-widget .table-header {
+.o2-default-pivot-widget .header-cell {
   text-align: left;
 }
-.o2-default-pivot-widget .table-data {
+.o2-default-pivot-widget .data-cell {
   text-align: right;
 }

@@ -22,17 +22,15 @@ const DefaultTable = ({ children }: any) => (
   </Table>
 )
 
-const adaptHtml = (html) => {
-  const newHtml = html.replace("")
-}
-
 export const Pivot = ({ meta, theme }: PivotWidget) => {
   if (!meta?.html) {
     return <></>
   }
   const table = tableHtmlComponent(meta.html)
-  const theadHTML = table?.children[0]?.innerHTML.replace(/\<td/g, "<td class='data-cell'")
-  const tbodyHTML = table?.children[1]?.innerHTML.replace(/\<th/g, "<td class='header-cell'")
+  const theadHTML = table?.children[0]?.innerHTML
+  const tbodyHTML = table?.children[1]?.innerHTML
+    .replace(/\<td/g, "<td class='data-cell'")
+    .replace(/\<th/g, "<td class='header-cell'")
   const TableComponent = theme?.table || DefaultTable
   return (
     <TableComponent>
