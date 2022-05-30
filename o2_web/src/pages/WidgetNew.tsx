@@ -55,7 +55,7 @@ export const WidgetNew = () => {
         </div>
 
         <WidgetPreview
-          key={String(["pivot_table", "vertical_bar_chart"].includes(widgetType))}
+          key={widgetType}
           type={widgetType as WidgetType}
           dataset={dataset}
           onChange={handleChangeBuildInfo}
