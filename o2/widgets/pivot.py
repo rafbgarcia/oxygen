@@ -1,9 +1,29 @@
 from sqlalchemy import table, column, select, func, cast, Float
 from sqlalchemy.dialects import postgresql
+from o2.errors import ValueNotSupported
 
 
-def contribution():
-    pass
+class Pivot:
+    @classmethod
+    def metadata(klass, dataset, build_info, limit=25, offset=0):
+        columns = build_info["columns"]
+        pivot = Pivot.build(dataset, build_info)
+        if len(columns) > 0:
+            pivot = pivot.swaplevel(0, len(columns), axis="columns").sort_index(axis="columns")
+
+        return {"html": pivot[offset:limit].to_html(escape=False, na_rep="-", index_names=True)}
+
+    @classmethod
+    def build(klass, dataset, build_info):
+        query = build_sql(dataset, build_info)
+        rows = [field["alias"] for field in build_info["rows"]]
+        values = [field["alias"] for field in build_info["values"]]
+        columns = [field["alias"] for field in build_info["columns"]]
+
+        df = dataset.execute(query)
+        pivot = df.pivot(columns=columns, values=values, index=rows).fillna("-")
+
+        return pivot
 
 
 CONTRIBUTION = "CONTRIBUTION"
@@ -13,7 +33,6 @@ AGG_FN = {
     "COUNT": lambda col: func.count(col),
     "SUM": lambda col: func.sum(col),
 }
-FUNCTION_FN = {"CONTRIBUTION": contribution}
 
 
 def define_table(dataset):
@@ -39,12 +58,6 @@ def table_col(table, field):
 
 def cte_field_alias(field):
     return field["agg"] + "_" + field["function"] + "_" + field["alias"]
-
-
-def cte_groupby_cols(table, build_info):
-    cte_fields = [field for field in build_info["values"] if need_cte(field)]
-    columns = build_info["columns"]
-    return table_cols(table, columns) if len(cte_fields) > 0 else []
 
 
 def build_agg(table, field):
@@ -103,56 +116,18 @@ def build_sql(dataset, build_info):
         """
         return build_ctes(table, build_info)
 
-    def get_col_for_select(ctes):
+    def select_cols(ctes):
         rows_cols = [aliased_col(table, field) for field in rows]
         columns_cols = [aliased_col(table, field) for field in columns]
         agg_without_function_cols = [build_agg(table, field) for field in values if not need_cte(field)]
         agg_with_function_cols = cte_select_cols(table, ctes, build_info)
         return rows_cols + columns_cols + agg_without_function_cols + agg_with_function_cols
 
-    def get_cols_to_group_by():
-        cte_groupby = cte_groupby_cols(table, build_info)
+    def group_by_cols():
         rows_groupby = table_cols(table, rows)
-        return rows_groupby + cte_groupby
+        columns_groupby = table_cols(table, columns)
+        return rows_groupby + columns_groupby
 
-    groupby_cols = get_cols_to_group_by()
-    query = select(*get_col_for_select(ctes())).group_by(*groupby_cols).order_by(*groupby_cols)
+    groupby_cols = group_by_cols()
+    query = select(*select_cols(ctes())).group_by(*groupby_cols).order_by(*groupby_cols)
     return str(query.compile(dialect=postgresql.dialect()))
-
-
-class Pivot:
-    @classmethod
-    def metadata(klass, dataset, build_info, limit=25, offset=0):
-        columns = build_info["columns"]
-        pivot = Pivot.build(dataset, build_info)
-        if len(columns) > 0:
-            pivot = pivot.swaplevel(0, len(columns), axis="columns").sort_index(axis="columns")
-
-        return {"html": pivot[offset:limit].to_html(escape=False, na_rep="-", index_names=True)}
-
-    @classmethod
-    def build(klass, dataset, build_info):
-        query = build_sql(dataset, build_info)
-        rows = [field["alias"] for field in build_info["rows"]]
-        values = [field["alias"] for field in build_info["values"]]
-        columns = [field["alias"] for field in build_info["columns"]]
-
-        df = dataset.execute(query)
-        pivot = df.pivot(columns=columns, values=values, index=rows).fillna("-")
-
-        return pivot
-
-
-class ValueNotSupported(Exception):
-    def __init__(self, type, value):
-        self.type = type
-        self.value = value
-
-    def __str__(self):
-        return f"{self.type} {self.value}"
-
-
-def debug(arg):
-    print("-------------------")
-    print(arg)
-    print("-------------------")

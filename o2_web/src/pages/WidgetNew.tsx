@@ -51,8 +51,8 @@ export const WidgetNew = () => {
       })
   }
 
-  const handleChangeBuildInfo = (buildInfo) => {
-    setValue("buildInfo", buildInfo)
+  const handleChangeBuildInfo = (state) => {
+    setValue("buildInfo", state.buildInfo)
   }
 
   return (

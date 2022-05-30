@@ -33,12 +33,7 @@ class PivotCase(SimpleTestCase):
                 {"agg": "COUNT", "name": "application_id", "alias": "Applications"},
             ],
         }
-        expected = """
-          SELECT test.follow_up_result AS "Result", count(test.application_id) AS "Applications"
-          FROM test
-          GROUP BY test.follow_up_result
-          ORDER BY test.follow_up_result
-        """
+        expected = 'SELECT test.follow_up_result AS "Result", count(test.application_id) AS "Applications" FROM test GROUP BY test.follow_up_result ORDER BY test.follow_up_result'
         self.assertHTMLEqual(build_sql(self.dataset, build_info), expected)
 
     #
@@ -52,12 +47,7 @@ class PivotCase(SimpleTestCase):
                 {"agg": "COUNT DISTINCT", "name": "application_id", "alias": "Unique Appls"},
             ],
         }
-        expected = """
-          SELECT test.follow_up_result AS "Result", count(test.application_id) AS "Appls", count(distinct(test.application_id)) AS "Unique Appls"
-          FROM test
-          GROUP BY test.follow_up_result
-          ORDER BY test.follow_up_result
-        """
+        expected = 'SELECT test.follow_up_result AS "Result", count(test.application_id) AS "Appls", count(distinct(test.application_id)) AS "Unique Appls" FROM test GROUP BY test.follow_up_result ORDER BY test.follow_up_result'
         self.assertHTMLEqual(build_sql(self.dataset, build_info), expected)
 
     #
@@ -73,12 +63,7 @@ class PivotCase(SimpleTestCase):
                 {"agg": "COUNT DISTINCT", "name": "application_id", "alias": "Unique Appls"},
             ],
         }
-        expected = """
-           SELECT test.follow_up_result AS "Result", test.resulted_by AS "User", count(distinct(test.application_id)) AS "Unique Appls"
-           FROM test
-           GROUP BY test.follow_up_result, test.resulted_by
-           ORDER BY test.follow_up_result, test.resulted_by
-        """
+        expected = 'SELECT test.follow_up_result AS "Result", test.resulted_by AS "User", count(distinct(test.application_id)) AS "Unique Appls" FROM test GROUP BY test.follow_up_result, test.resulted_by ORDER BY test.follow_up_result, test.resulted_by'
         self.assertHTMLEqual(build_sql(self.dataset, build_info), expected)
 
     #
@@ -114,9 +99,8 @@ class PivotCase(SimpleTestCase):
                 },
             ],
         }
-        expected = """
-        """
-        self.assertEqual(build_sql(self.dataset, build_info), expected)
+        expected = 'WITH anon_2 AS (SELECT test.follow_up_result AS follow_up_result, count(distinct(test.application_id)) AS "COUNT DISTINCT_CONTRIBUTION_%%" FROM test GROUP BY test.follow_up_result), anon_1 AS (SELECT CAST(sum(anon_2."COUNT DISTINCT_CONTRIBUTION_%%") AS FLOAT) AS "COUNT DISTINCT_CONTRIBUTION_%%" FROM anon_2) SELECT test.follow_up_result AS "Result", count(distinct(test.application_id)) AS "Unique Appls", count(distinct(test.application_id)) / max(anon_1."COUNT DISTINCT_CONTRIBUTION_%%") AS "%%" FROM test, anon_1 GROUP BY test.follow_up_result ORDER BY test.follow_up_result'
+        self.assertHTMLEqual(build_sql(self.dataset, build_info), expected)
 
     #
     #
@@ -137,9 +121,8 @@ class PivotCase(SimpleTestCase):
                 },
             ],
         }
-        expected = """
-        """
-        self.assertEqual(build_sql(self.dataset, build_info), expected)
+        expected = 'WITH anon_2 AS (SELECT test.follow_up_result AS follow_up_result, test.resulted_by AS resulted_by, count(distinct(test.application_id)) AS "COUNT DISTINCT_CONTRIBUTION_Perc" FROM test GROUP BY test.follow_up_result, test.resulted_by), anon_1 AS (SELECT anon_2.follow_up_result AS follow_up_result, CAST(sum(anon_2."COUNT DISTINCT_CONTRIBUTION_Perc") AS FLOAT) AS "COUNT DISTINCT_CONTRIBUTION_Perc" FROM anon_2 GROUP BY anon_2.follow_up_result) SELECT test.follow_up_result AS "Result", test.resulted_by AS "User", count(distinct(test.application_id)) AS "Unique Appls", count(distinct(test.application_id)) / max(anon_1."COUNT DISTINCT_CONTRIBUTION_Perc") AS "Perc" FROM test, anon_1 GROUP BY test.follow_up_result, test.resulted_by ORDER BY test.follow_up_result, test.resulted_by'
+        self.assertHTMLEqual(build_sql(self.dataset, build_info), expected)
 
     #
     #
@@ -157,9 +140,8 @@ class PivotCase(SimpleTestCase):
                 },
             ],
         }
-        expected = """
-        """
-        self.assertEqual(build_sql(self.dataset, build_info), expected)
+        expected = 'WITH anon_2 AS (SELECT test.follow_up_result AS follow_up_result, count(distinct(test.application_id)) AS "COUNT DISTINCT_CONTRIBUTION_Perc" FROM test GROUP BY test.follow_up_result), anon_1 AS (SELECT CAST(sum(anon_2."COUNT DISTINCT_CONTRIBUTION_Perc") AS FLOAT) AS "COUNT DISTINCT_CONTRIBUTION_Perc" FROM anon_2) SELECT test.follow_up_result AS "Result", test.follow_up_number AS "Follow up", count(distinct(test.application_id)) AS "Unique Appls", count(distinct(test.application_id)) / max(anon_1."COUNT DISTINCT_CONTRIBUTION_Perc") AS "Perc" FROM test, anon_1 GROUP BY test.follow_up_result, test.follow_up_number ORDER BY test.follow_up_result, test.follow_up_number'
+        self.assertHTMLEqual(build_sql(self.dataset, build_info), expected)
 
     #
     #

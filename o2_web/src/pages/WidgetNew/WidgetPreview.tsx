@@ -31,7 +31,7 @@ const BUILD_INFO_SECTIONS: BuildInfoMapping = {
   ],
 }
 
-const initialBuild = (type: WidgetType): Record<string, []> => {
+const initialBuildInfo = (type: WidgetType): Record<string, []> => {
   return reduce(
     BUILD_INFO_SECTIONS[type],
     (result, section) => {
@@ -44,10 +44,10 @@ const initialBuild = (type: WidgetType): Record<string, []> => {
 
 const actions = {
   removeField: (draft, { metadataKey, index }) => {
-    draft.build[metadataKey].splice(index, 1)
+    draft.buildInfo[metadataKey].splice(index, 1)
   },
   addField: (draft, { metadataKey, field }) => {
-    draft.build[metadataKey].push(field)
+    draft.buildInfo[metadataKey].push(field)
   },
 }
 
@@ -62,8 +62,8 @@ export const WidgetPreview = ({
 }) => {
   const initialState = useMemo(
     () => ({
-      build: initialBuild(type),
-      // design: {}
+      buildInfo: initialBuildInfo(type),
+      // designInfo: {}
     }),
     []
   )
@@ -73,13 +73,13 @@ export const WidgetPreview = ({
   }, initialState)
 
   useEffect(() => {
-    const lessThanTwoSections = filter(state.build, (section) => !isEmpty(section)).length < 2
+    const lessThanTwoSections = filter(state.buildInfo, (section) => !isEmpty(section)).length < 2
     if (lessThanTwoSections) {
       return
     }
     onChange(state)
-    api.widgetPreview({ buildInfo: state, type, dataset }).then(setPreviewData).catch(console.log)
-  }, [state.build])
+    api.widgetPreview({ buildInfo: state.buildInfo, type, dataset }).then(setPreviewData).catch(console.log)
+  }, [state.buildInfo])
 
   if (!type || !dataset) {
     return <></>
@@ -92,7 +92,7 @@ export const WidgetPreview = ({
           <BuildInfoSection
             key={section.metadataKey}
             section={section}
-            build={state.build}
+            buildInfo={state.buildInfo}
             dataset={dataset}
             dispatch={dispatch}
           />
@@ -107,12 +107,12 @@ export const WidgetPreview = ({
 }
 
 const BuildInfoSection = ({
-  build,
+  buildInfo,
   section,
   dispatch,
   dataset,
 }: {
-  build: any
+  buildInfo: any
   section: BuildInfoSection
   dispatch: any
   dataset: any
@@ -137,7 +137,7 @@ const BuildInfoSection = ({
             <PlusSmIcon className="w-4 h-4" />
           </Button>
         </header>
-        {build[section.metadataKey].map((item, index) => (
+        {buildInfo[section.metadataKey].map((item, index) => (
           <BuildItem
             key={item.function + item.agg + item.name + item.alias}
             item={item}

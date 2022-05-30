@@ -70,4 +70,4 @@ class Widget(TimeStampedModel):
         return self.WIDGET[self.type]
 
     def metadata(self):
-        return self.builder().metadata(self.dataset, self.build_info["build"])
+        return self.builder().metadata(self.dataset, self.build_info)
