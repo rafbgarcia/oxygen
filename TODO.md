@@ -7,7 +7,6 @@ MVP Roadmap:
 
 Tech debt:
 
-- Index build info and rename columns on pandas to support "%"
 - Use GraphQL - https://docs.graphene-python.org/projects/django/en/latest/tutorial-plain/
 - Use Celery worker to build datasets
 - Preview is slow for a large number of records. Is there a way to limit it?
