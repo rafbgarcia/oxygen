@@ -2,42 +2,22 @@ import json
 from django.forms import model_to_dict
 from django.http import JsonResponse
 import humps
-from o2.models import Dashboard, Dataset, Widget
+from o2.models import Dataset, Widget
 from django.views.decorators.csrf import csrf_exempt
 
 
 @csrf_exempt
-def preview(request):
+def preview(request, dashboard_id):
     params = humps.decamelize(json.loads(request.body))
-    widget = Widget(
-        dataset=Dataset.objects.get(pk=params["dataset"]["id"]),
-        build_info=params["build_info"],
-        type=params["type"],
-    )
+    widget = Widget(build_info=params["build_info"], type=params["type"])
+    dataset = Dataset.objects.get(pk=params["dataset"]["id"])
 
-    return JsonResponse({"meta": widget.metadata()})
+    return JsonResponse({"meta": widget.metadata(dataset)})
 
 
 @csrf_exempt
-def create(request):
+def create(request, dashboard_id):
     params = humps.decamelize(json.loads(request.body))
-    widget = Widget.objects.create(**params)
+    widget = Widget.objects.create(**params, dashboard_id=dashboard_id)
 
     return JsonResponse({"widget": model_to_dict(widget)})
-
-
-def widget(request, id):
-    dash = Dashboard.objects.first()
-    widget = dash.grid_rows[0]["widgets"][0]
-    widget["dataset"] = {
-        "fields": [
-            {"name": "application_id", "type": "number"},
-            {"name": "follow_up_number", "type": "number"},
-            {"name": "follow_up_date", "type": "datetime"},
-            {"name": "follow_up_date_string", "type": "string"},
-            {"name": "follow_up_result", "type": "string"},
-            {"name": "resulted_by", "type": "string"},
-            {"name": "title_name", "type": "string"},
-        ]
-    }
-    return JsonResponse(humps.camelize(widget))

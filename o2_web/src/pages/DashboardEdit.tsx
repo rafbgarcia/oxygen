@@ -22,7 +22,7 @@ export const DashboardEdit = () => {
             <ViewListIcon className="h-4 w-4" />
           </Button>
         </Link>
-        <Link to={`/dashboards/${id}/widgets/new`}>
+        <Link to={`/dashboards/${id}/widgets/new`} state={{ dataset: data.dataset }}>
           <Button className="flex items-center">
             Add Widget
             <PlusSmIcon className="h-4 w-4" />

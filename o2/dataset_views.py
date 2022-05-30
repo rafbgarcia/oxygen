@@ -66,7 +66,7 @@ def preview(request):
 def create(request):
     params = json.loads(request.body)
     dataset = Dataset(**params)
-    dataset.count = 0
+    dataset.totalRecords = 0
 
     start_time = time()
     with MySQL(connection_config).execute(dataset.query) as cursor:
@@ -75,7 +75,7 @@ def create(request):
             if len(rows) == 0:
                 break
 
-            dataset.count += len(rows)
+            dataset.totalRecords += len(rows)
             dataset.append(rows)
 
     dataset.build_duration_seconds = time() - start_time

@@ -10,6 +10,7 @@ import { useEffect, useMemo, useState } from "react"
 import { useImmerReducer } from "use-immer"
 
 import { Widget } from "../../components/Widget"
+import { useParams } from "react-router-dom"
 
 type BuildInfoSection = { metadataKey: string; label: string; dataType: string }
 type BuildInfoMapping = Record<WidgetType, Array<BuildInfoSection>>
@@ -57,9 +58,10 @@ export const WidgetPreview = ({
   onChange,
 }: {
   type: WidgetType
-  dataset: any
+  dataset: Dataset
   onChange: any
 }) => {
+  const { dashboardId } = useParams()
   const initialState = useMemo(
     () => ({
       buildInfo: initialBuildInfo(type),
@@ -78,7 +80,8 @@ export const WidgetPreview = ({
       return
     }
     onChange(state)
-    api.widgetPreview({ buildInfo: state.buildInfo, type, dataset }).then(setPreviewData).catch(console.log)
+    const data = { buildInfo: state.buildInfo, type, dataset }
+    api.widgetPreview(dashboardId, data).then(setPreviewData).catch(console.log)
   }, [state.buildInfo])
 
   if (!type || !dataset) {

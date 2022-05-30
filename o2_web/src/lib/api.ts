@@ -1,5 +1,7 @@
-import useSWR from "swr"
+import { useState } from "react"
+import useSWR, { SWRResponse } from "swr"
 import fetch from "unfetch"
+import { Wait } from "../components/Wait"
 
 type Config = {
   host: string
@@ -20,30 +22,15 @@ const post = (url, data) =>
     headers: { "Content-Type": "application/json" },
   }).then((res) => res.json())
 
-export const api = {
-  init: (config: Config) => {
-    _config = { ..._config, ...config }
-  },
-  getDashboard: (id) => {
-    return useSWR(path(`/dashboards/${id}`), fetcher)
-  },
-  getDashboards: () => {
-    return useSWR(path(`/dashboards`), fetcher)
-  },
+const MUTATIONS = {
   createDashboard: (data) => {
     return post(path(`/dashboards/create`), data)
   },
-  getWidget: (widgetId: number) => {
-    return useSWR(path(`/widgets/${widgetId}`), fetcher)
+  widgetPreview: (dashboardId, buildInfo) => {
+    return post(path(`/dashboards/${dashboardId}/widgets/preview`), buildInfo)
   },
-  widgetPreview: (buildInfo) => {
-    return post(path(`/widgets/preview`), buildInfo)
-  },
-  widgetCreate: (data) => {
-    return post(path(`/widgets/create`), data)
-  },
-  getDatasets: () => {
-    return useSWR(path(`/datasets`), fetcher)
+  widgetCreate: (dashboardId, data) => {
+    return post(path(`/dashboards/${dashboardId}/widgets/create`), data)
   },
   createDataset: (data) => {
     return post(path(`/datasets/create`), data)
@@ -51,4 +38,58 @@ export const api = {
   previewDataset: (data) => {
     return post(path(`/datasets/preview`), data)
   },
+}
+const QUERIES = {
+  getDashboard: (id) => {
+    return useSWR(path(`/dashboards/${id}`), fetcher)
+  },
+  getDashboards: () => {
+    return useSWR(path(`/dashboards`), fetcher)
+  },
+  getDatasets: () => {
+    return useSWR(path(`/datasets`), fetcher)
+  },
+}
+
+export const api = {
+  init: (config: Config) => {
+    _config = { ..._config, ...config }
+  },
+  ...QUERIES,
+  ...MUTATIONS,
+}
+
+type Mutations = keyof typeof MUTATIONS
+type MutationTypes = typeof MUTATIONS[keyof typeof MUTATIONS]
+
+export const useMutation = (action: Mutations): [MutationTypes, boolean] => {
+  const [loading, setLoading] = useState(false)
+  const fn: MutationTypes = (...arg) => {
+    setLoading(true)
+
+    return new Promise((resolve, reject) => {
+      const fn = MUTATIONS[action] as unknown as (...any) => Promise<any>
+      return fn(...arg)
+        .then((arg) => {
+          setLoading(false)
+          resolve(arg)
+        })
+        .catch((error) => {
+          setLoading(false)
+          console.log(">>>", action, error)
+          reject(error)
+        })
+    })
+  }
+  return [fn, loading]
+}
+
+type Queries = keyof typeof QUERIES
+
+export const useQuery = (action: Queries, ...args) => {
+  const fn = QUERIES[action] as (...any) => SWRResponse<any, any>
+  const { data, error } = fn(...args)
+  const Waiting = Wait(data, error)
+
+  return { data, error, Waiting }
 }

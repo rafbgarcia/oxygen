@@ -1,6 +1,18 @@
 declare module "playbook-ui"
 declare module "SWRHook"
 export declare global {
+  interface Dataset {
+    id: number
+    buildDurationSeconds: number
+    totalRecords: number
+    fields: Array<{ name: string; type: string }>
+    isBuilding: boolean
+    lastBuiltAt: string
+    name: string
+    query: string
+    sizeMb: string
+  }
+
   interface Widget {
     meta?: Record<string, any>
     theme?: Record<string, any>

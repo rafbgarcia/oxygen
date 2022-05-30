@@ -13,25 +13,23 @@ def index(request):
 
 @csrf_exempt
 def create(request):
-    params = json.loads(request.body)
+    params = humps.decamelize(json.loads(request.body))
     dashboard = Dashboard.objects.create(**params)
     return JsonResponse(model_to_dict(dashboard))
 
 
 def show(request, id):
-    dashboard = Dashboard.objects.get(pk=id)
-    rows = DashboardRow.objects.filter(dashboard_id=dashboard.id).order_by("index")
-    widgets = list(Widget.objects.filter(dashboard_row__in=rows).select_related("dataset").all())
+    dashboard = Dashboard.objects.select_related("dataset").get(pk=id)
+    widgets = list(Widget.objects.filter(dashboard=dashboard).all())
     for (i, widget) in enumerate(widgets):
         widgets[i] = model_to_dict(widget)
-        widgets[i]["dataset"] = model_to_dict(widget.dataset)
-        widgets[i]["meta"] = widget.metadata()
+        widgets[i]["meta"] = widget.metadata(dashboard.dataset)
 
     return JsonResponse(
         humps.camelize(
             {
                 "dashboard": model_to_dict(dashboard),
-                "rows": list(rows.all().values()),
+                "dataset": model_to_dict(dashboard.dataset),
                 "widgets": widgets,
             }
         )

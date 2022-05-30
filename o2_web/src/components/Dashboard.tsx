@@ -23,9 +23,9 @@ export const Dashboard = ({ data }) => {
         <Title>{data.dashboard.name}</Title>
       </header>
       <main className="flex flex-col items-start gap-y-4">
-        {data.rows.map((row) => (
+        {/* {data.rows.map((row) => (
           <Row key={row.id} row={{ height: 400 }} widgets={filter(data.widgets, { dashboardRow: row.id })} />
-        ))}
+        ))} */}
       </main>
     </>
   )

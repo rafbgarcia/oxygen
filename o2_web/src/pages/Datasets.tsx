@@ -40,7 +40,7 @@ export const Datasets = () => {
                   Last built {formatRelative(parseISO(dataset.lastBuiltAt), new Date())}
                   <span className="ml-1">(took {dataset.buildDurationSeconds}s)</span>
                 </p>
-                <p>{dataset.count} records</p>
+                <p>{dataset.totalRecords} records</p>
                 <p>Builds every 1 hour</p>
                 <p className="flex items-center">Created by Rafael Garcia</p>
                 <Button className="mt-4">Edit</Button>

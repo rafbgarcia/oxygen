@@ -1,6 +1,6 @@
 import { Spinner } from "./Spinner"
 
-export const Wait = (data, error) => {
+export const Wait = (data, error): false | (() => JSX.Element) => {
   if (error) return () => <p>Error {JSON.stringify(error)}</p>
   if (!data)
     return () => (
