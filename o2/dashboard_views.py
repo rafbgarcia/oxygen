@@ -2,7 +2,7 @@ import json
 from django.forms import model_to_dict
 from django.http import JsonResponse
 import humps
-from o2.models import Dashboard, DashboardRow, Dataset, Widget
+from o2.models import Dashboard, Widget
 from django.views.decorators.csrf import csrf_exempt
 
 

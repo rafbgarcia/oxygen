@@ -15,11 +15,11 @@ class Dataset(TimeStampedModel):
     name = models.CharField(max_length=100, unique=True)
     query = models.TextField()
     is_building = models.BooleanField(default=False)
-    size_mb = models.DecimalField(default=None, max_digits=10, decimal_places=1)
-    last_built_at = models.DateTimeField(default=None)
-    build_duration_seconds = models.SmallIntegerField(default=None)
-    fields = models.JSONField(default=None)
-    total_records = models.IntegerField(default=None)
+    size_mb = models.DecimalField(max_digits=10, decimal_places=1)
+    last_built_at = models.DateTimeField()
+    build_duration_seconds = models.SmallIntegerField()
+    fields = models.JSONField()
+    total_records = models.IntegerField()
 
     def file_path(self):
         return BASE_DIR / f"{self.name}.hyper"
@@ -45,12 +45,8 @@ class Dataset(TimeStampedModel):
 class Dashboard(TimeStampedModel):
     name = models.CharField(max_length=100)
     previous_version = models.ForeignKey("self", on_delete=models.SET_NULL, null=True)
-    dataset = models.ForeignKey(Dataset, on_delete=models.SET_NULL, default=None, null=True)
-
-
-class DashboardRow(TimeStampedModel):
-    dashboard = models.ForeignKey(Dashboard, on_delete=models.CASCADE)
-    index = models.SmallIntegerField(default=None)
+    dataset = models.ForeignKey(Dataset, on_delete=models.SET_NULL, null=True)
+    grid_rows = models.JSONField()
 
 
 class Widget(TimeStampedModel):
@@ -59,10 +55,11 @@ class Widget(TimeStampedModel):
         LINE_CHART = "line_chart"
         VERTICAL_BAR_CHART = "vertical_bar_chart"
 
-    dashboard = models.ForeignKey(Dashboard, on_delete=models.SET_NULL, default=None, null=True)
+    dashboard = models.ForeignKey(Dashboard, on_delete=models.SET_NULL, null=True)
     title = models.CharField(max_length=200, null=True)
-    type = models.CharField(max_length=20, choices=Types.choices, default=Types.PIVOT_TABLE)
+    type = models.CharField(max_length=20, choices=Types.choices)
     build_info = models.JSONField()
+    grid_row_index = models.SmallIntegerField()
 
     WIDGET = {"pivot_table": Pivot, "vertical_bar_chart": VerticalBarChart}
 
