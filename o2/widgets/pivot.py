@@ -40,11 +40,54 @@ def table_col(table, field):
     return getattr(table.c, field["name"])
 
 
+def cte_field_alias(field):
+    return field["function"] + "_" + field["name"]
+
+
 def build_agg(table, field):
     if field["agg"] not in AGG_FN:
         raise ValueNotSupported("Aggregation", field["agg"])
 
     return AGG_FN[field["agg"]](table_col(table, field)).label(field["alias"])
+
+
+def __totals_cte(self):
+    contribs = [
+        self.__build_measure_column(field).label(self.__fn_field_label(field)) for field in self.cte_fields
+    ]
+    cte = select(*self.rows, *contribs).group_by(*self.rows).cte()
+
+    rows = [getattr(cte.c, field["name"]) for field in self.row_fields[0:-1]]
+    contribs2 = [
+        cast(func.sum(getattr(cte.c, self.__fn_field_label(field))), Float).label(
+            self.__fn_field_label(field)
+        )
+        for field in self.cte_fields
+    ]
+    c = select(*rows, *contribs2).group_by(*rows).cte()
+    return c
+
+
+def build_cte(table, build_info):
+    cte_fields = [field for field in build_info["values"] if need_cte(field)]
+    rows = build_info["rows"]
+
+    def grouped_totals_cte():
+        rows_cols = table_cols(table, rows)
+        fn_cols = [build_agg(table, field).label(cte_field_alias(field)) for field in cte_fields]
+        return select(*rows_cols, *fn_cols).group_by(*rows_cols).cte()
+
+    def summed_totals_cte(grouped_totals_cte):
+        fn_cols = []
+        for field in cte_fields:
+            col = getattr(grouped_totals_cte.c, cte_field_alias(field))
+            col = cast(func.sum(col), Float).label(cte_field_alias(field))
+            fn_cols.append(col)
+
+        rows_minus_last = table_cols(grouped_totals_cte, rows[0:-1])
+        return select(*rows_minus_last, *fn_cols).group_by(*rows_minus_last).cte()
+
+    return summed_totals_cte(grouped_totals_cte())
 
 
 class Pivot:
@@ -60,7 +103,7 @@ class Pivot:
         self.column_fields = build_info["columns"]
         self.rows = self.__as_columns(build_info["rows"])
         self.columns = self.__as_columns(build_info["columns"])
-        self.function_fields = [field for field in build_info["values"] if need_cte(field)]
+        self.cte_fields = [field for field in build_info["values"] if need_cte(field)]
 
     def metadata(self, limit=25, offset=0):
         pivot = self.build()
@@ -87,14 +130,14 @@ class Pivot:
         ] + non_function_cols
 
         groupby = table_cols(self.table, self.row_fields)
-        if len(self.function_fields) > 0:
-            cte = self.__totals_cte()
+        if len(self.cte_fields) > 0:
+            cte = build_cte(self.table, self.build_info)
             groupby += table_cols(self.table, self.column_fields)
 
-            for field in self.function_fields:
-                col = self.__build_measure_column(field)
+            for field in self.cte_fields:
+                col = build_agg(self.table, field)
                 select_fields.append(
-                    (col / func.max(getattr(cte.c, self.__fn_field_label(field)))).label(field["alias"])
+                    (col / func.max(getattr(cte.c, cte_field_alias(field)))).label(field["alias"])
                 )
 
         query = select(*select_fields).group_by(*groupby).order_by(*groupby)
@@ -104,7 +147,7 @@ class Pivot:
     def __totals_cte(self):
         contribs = [
             self.__build_measure_column(field).label(self.__fn_field_label(field))
-            for field in self.function_fields
+            for field in self.cte_fields
         ]
         cte = select(*self.rows, *contribs).group_by(*self.rows).cte()
 
@@ -113,7 +156,7 @@ class Pivot:
             cast(func.sum(getattr(cte.c, self.__fn_field_label(field))), Float).label(
                 self.__fn_field_label(field)
             )
-            for field in self.function_fields
+            for field in self.cte_fields
         ]
         c = select(*rows, *contribs2).group_by(*rows).cte()
         return c
