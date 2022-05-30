@@ -68,23 +68,6 @@ class PivotCase(SimpleTestCase):
 
     #
     #
-    def test_build_contribution_percent_sign_label_doubles(self):
-        build_info = {
-            "rows": [{"name": "follow_up_result", "alias": "Result"}],
-            "columns": [],
-            "values": [
-                {
-                    "agg": "COUNT DISTINCT",
-                    "name": "application_id",
-                    "alias": "%",
-                    "function": "CONTRIBUTION",
-                },
-            ],
-        }
-        self.assertRaises(KeyError, Pivot.build, self.dataset, build_info)
-
-    #
-    #
     def test_build_sql_contribution_1_row(self):
         build_info = {
             "rows": [{"name": "follow_up_result", "alias": "Result"}],
@@ -99,7 +82,7 @@ class PivotCase(SimpleTestCase):
                 },
             ],
         }
-        expected = 'WITH anon_2 AS (SELECT test.follow_up_result AS follow_up_result, count(distinct(test.application_id)) AS "COUNT DISTINCT_CONTRIBUTION_%%" FROM test GROUP BY test.follow_up_result), anon_1 AS (SELECT CAST(sum(anon_2."COUNT DISTINCT_CONTRIBUTION_%%") AS FLOAT) AS "COUNT DISTINCT_CONTRIBUTION_%%" FROM anon_2) SELECT test.follow_up_result AS "Result", count(distinct(test.application_id)) AS "Unique Appls", count(distinct(test.application_id)) / max(anon_1."COUNT DISTINCT_CONTRIBUTION_%%") AS "%%" FROM test, anon_1 GROUP BY test.follow_up_result ORDER BY test.follow_up_result'
+        expected = 'WITH anon_2 AS (SELECT test.follow_up_result AS follow_up_result, count(distinct(test.application_id)) AS "COUNT DISTINCT_CONTRIBUTION_%" FROM test GROUP BY test.follow_up_result), anon_1 AS (SELECT CAST(sum(anon_2."COUNT DISTINCT_CONTRIBUTION_%") AS FLOAT) AS "COUNT DISTINCT_CONTRIBUTION_%" FROM anon_2) SELECT test.follow_up_result AS "Result", count(distinct(test.application_id)) AS "Unique Appls", count(distinct(test.application_id)) / max(anon_1."COUNT DISTINCT_CONTRIBUTION_%") AS "%" FROM test, anon_1 GROUP BY test.follow_up_result ORDER BY test.follow_up_result'
         self.assertHTMLEqual(build_sql(self.dataset, build_info), expected)
 
     #

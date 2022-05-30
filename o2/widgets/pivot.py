@@ -9,6 +9,7 @@ class Pivot:
         columns = build_info["columns"]
         pivot = Pivot.build(dataset, build_info)
         if len(columns) > 0:
+            # Swap the first column with the values table row
             pivot = pivot.swaplevel(0, len(columns), axis="columns").sort_index(axis="columns")
 
         return {"html": pivot[offset:limit].to_html(escape=False, na_rep="-", index_names=True)}
@@ -130,4 +131,5 @@ def build_sql(dataset, build_info):
 
     groupby_cols = group_by_cols()
     query = select(*select_cols(ctes())).group_by(*groupby_cols).order_by(*groupby_cols)
-    return str(query.compile(dialect=postgresql.dialect()))
+    # return str(query.compile(dialect=postgresql.dialect()))
+    return str(query.compile())
