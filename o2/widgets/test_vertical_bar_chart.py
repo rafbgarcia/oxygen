@@ -28,19 +28,16 @@ class VerticalBarChartCase(SimpleTestCase):
             )
         return super().setUp()
 
-    ##
-    # Test building table as HTML with COUNT and DISTINCT COUNT
-    ##
-    def _test_metadata(self):
+    def test_metadata(self):
         build_info = {
-            "rows": [{"field": "follow_up_result", "alias": "Result"}],
+            "rows": [{"name": "follow_up_result", "alias": "Result"}],
             "columns": [],
             "values": [
-                {"agg": "COUNT DISTINCT", "field": "application_id", "alias": "Applications"},
+                {"agg": "COUNT DISTINCT", "name": "application_id", "alias": "Applications"},
             ],
         }
 
-        result = VerticalBarChart(build_info, self.dataset).metadata()
+        result = VerticalBarChart.metadata(self.dataset, build_info)
         self.assertIn("id", result)
         self.assertIn("chartData", result)
         self.assertIn("xAxisCategories", result)

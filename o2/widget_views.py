@@ -2,7 +2,6 @@ import json
 from django.forms import model_to_dict
 from django.http import JsonResponse
 import humps
-from o2.widgets.pivot import Pivot
 from o2.models import Dashboard, Widget
 from django.views.decorators.csrf import csrf_exempt
 from o2.widget import build_widget
