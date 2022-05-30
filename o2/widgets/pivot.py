@@ -4,8 +4,47 @@ from sqlalchemy.dialects import postgresql
 
 from o2.dataset import dataset_execute
 
+
+def contribution():
+    pass
+
+
 CONTRIBUTION = "CONTRIBUTION"
-FUNCTIONS = [CONTRIBUTION]
+NEED_CTE_FUNCTIONS = [CONTRIBUTION]
+AGG_FN = {
+    "COUNT DISTINCT": lambda col: func.count(func.distinct(col)),
+    "COUNT": lambda col: func.count(col),
+    "SUM": lambda col: func.sum(col),
+}
+FUNCTION_FN = {"CONTRIBUTION": contribution}
+
+
+def define_table(dataset):
+    columns = [column(field["name"]) for field in dataset["fields"]]
+    return table(dataset["name"], *columns)
+
+
+def need_cte(field):
+    return "function" in field and field["function"] in NEED_CTE_FUNCTIONS
+
+
+def aliased_col(table, field):
+    return getattr(table.c, field["name"]).label(field["alias"])
+
+
+def table_cols(table, fields):
+    return [table_col(table, field) for field in fields]
+
+
+def table_col(table, field):
+    return getattr(table.c, field["name"])
+
+
+def build_agg(table, field):
+    if field["agg"] not in AGG_FN:
+        raise ValueNotSupported("Aggregation", field["agg"])
+
+    return AGG_FN[field["agg"]](table_col(table, field)).label(field["alias"])
 
 
 class Pivot:
@@ -13,22 +52,15 @@ class Pivot:
         self.build_info = build_info
         self.dataset = dataset
 
-        columns = [column(field["name"]) for field in self.dataset["fields"]]
-        self.table = table(self.dataset["name"], *columns)
+        self.table = define_table(dataset)
+        self.values = build_info["values"]
+        #
+        #
         self.row_fields = build_info["rows"]
         self.column_fields = build_info["columns"]
         self.rows = self.__as_columns(build_info["rows"])
         self.columns = self.__as_columns(build_info["columns"])
-        self.aggregations = self.__build_measure_columns(
-            [
-                field
-                for field in build_info["values"]
-                if "function" not in field or field["function"] not in FUNCTIONS
-            ]
-        )
-        self.contribution_fields = [
-            field for field in build_info["values"] if field.get("function") == CONTRIBUTION
-        ]
+        self.function_fields = [field for field in build_info["values"] if need_cte(field)]
 
     def metadata(self, limit=25, offset=0):
         pivot = self.build()
@@ -48,16 +80,18 @@ class Pivot:
         return pivot
 
     def build_sql(self):
+        non_function_cols = [build_agg(self.table, field) for field in self.values if not need_cte(field)]
+        # function_cols =
         select_fields = [
-            getattr(self.table.c, field["name"]).label(field["alias"])
-            for field in self.row_fields + self.column_fields
-        ]
-        select_fields += self.aggregations
-        groupby = self.rows
-        if len(self.contribution_fields) > 0:
+            aliased_col(self.table, field) for field in self.row_fields + self.column_fields
+        ] + non_function_cols
+
+        groupby = table_cols(self.table, self.row_fields)
+        if len(self.function_fields) > 0:
             cte = self.__totals_cte()
-            groupby += self.columns
-            for field in self.contribution_fields:
+            groupby += table_cols(self.table, self.column_fields)
+
+            for field in self.function_fields:
                 col = self.__build_measure_column(field)
                 select_fields.append(
                     (col / func.max(getattr(cte.c, self.__fn_field_label(field)))).label(field["alias"])
@@ -70,7 +104,7 @@ class Pivot:
     def __totals_cte(self):
         contribs = [
             self.__build_measure_column(field).label(self.__fn_field_label(field))
-            for field in self.contribution_fields
+            for field in self.function_fields
         ]
         cte = select(*self.rows, *contribs).group_by(*self.rows).cte()
 
@@ -79,7 +113,7 @@ class Pivot:
             cast(func.sum(getattr(cte.c, self.__fn_field_label(field))), Float).label(
                 self.__fn_field_label(field)
             )
-            for field in self.contribution_fields
+            for field in self.function_fields
         ]
         c = select(*rows, *contribs2).group_by(*rows).cte()
         return c
