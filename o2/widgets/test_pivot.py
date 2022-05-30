@@ -1,5 +1,5 @@
 from django.test import SimpleTestCase
-from o2.widgets.pivot import Pivot
+from o2.widgets.pivot import Pivot, build_sql
 from o2.dataset import append_to_dataset, dataset_exists, dataset_as_df
 from o2.widgets._fixtures import pandas_df_to_dict
 
@@ -44,7 +44,7 @@ class PivotCase(SimpleTestCase):
           GROUP BY test.follow_up_result
           ORDER BY test.follow_up_result
         """
-        self.assertHTMLEqual(Pivot(build_info, self.dataset).build_sql(), expected)
+        self.assertHTMLEqual(build_sql(self.dataset, build_info), expected)
 
     #
     #
@@ -63,7 +63,7 @@ class PivotCase(SimpleTestCase):
           GROUP BY test.follow_up_result
           ORDER BY test.follow_up_result
         """
-        self.assertHTMLEqual(Pivot(build_info, self.dataset).build_sql(), expected)
+        self.assertHTMLEqual(build_sql(self.dataset, build_info), expected)
 
     #
     #
@@ -84,7 +84,7 @@ class PivotCase(SimpleTestCase):
            GROUP BY test.follow_up_result, test.resulted_by
            ORDER BY test.follow_up_result, test.resulted_by
         """
-        self.assertHTMLEqual(Pivot(build_info, self.dataset).build_sql(), expected)
+        self.assertHTMLEqual(build_sql(self.dataset, build_info), expected)
 
     #
     #
@@ -101,10 +101,7 @@ class PivotCase(SimpleTestCase):
                 },
             ],
         }
-        self.assertRaises(
-            KeyError,
-            Pivot(build_info, self.dataset).build,
-        )
+        self.assertRaises(KeyError, Pivot.build, self.dataset, build_info)
 
     #
     #
@@ -134,7 +131,7 @@ class PivotCase(SimpleTestCase):
             GROUP BY test.follow_up_result
             ORDER BY test.follow_up_result
         """
-        self.assertHTMLEqual(Pivot(build_info, self.dataset).build_sql(), expected)
+        self.assertHTMLEqual(build_sql(self.dataset, build_info), expected)
 
     #
     #
@@ -167,7 +164,7 @@ class PivotCase(SimpleTestCase):
             GROUP BY test.follow_up_result, test.resulted_by
             ORDER BY test.follow_up_result, test.resulted_by
         """
-        self.assertHTMLEqual(Pivot(build_info, self.dataset).build_sql(), expected)
+        self.assertHTMLEqual(build_sql(self.dataset, build_info), expected)
 
     #
     #
@@ -197,4 +194,21 @@ class PivotCase(SimpleTestCase):
             GROUP BY test.follow_up_result, test.follow_up_number
             ORDER BY test.follow_up_result, test.follow_up_number
         """
-        self.assertHTMLEqual(Pivot(build_info, self.dataset).build_sql(), expected)
+        self.assertHTMLEqual(build_sql(self.dataset, build_info), expected)
+
+    #
+    #
+    def test_metadata(self):
+        build_info = {
+            "rows": [{"name": "follow_up_result", "alias": "Result"}],
+            "columns": [],
+            "values": [
+                {
+                    "agg": "COUNT DISTINCT",
+                    "name": "application_id",
+                    "alias": "Perc",
+                    "function": "CONTRIBUTION",
+                },
+            ],
+        }
+        self.assertIn("html", Pivot.metadata(self.dataset, build_info))

@@ -44,6 +44,12 @@ def cte_field_alias(field):
     return field["function"] + "_" + field["name"]
 
 
+def cte_groupby_cols(table, build_info):
+    cte_fields = [field for field in build_info["values"] if need_cte(field)]
+    columns = build_info["columns"]
+    return table_cols(table, columns) if len(cte_fields) > 0 else []
+
+
 def build_agg(table, field):
     if field["agg"] not in AGG_FN:
         raise ValueNotSupported("Aggregation", field["agg"])
@@ -51,24 +57,20 @@ def build_agg(table, field):
     return AGG_FN[field["agg"]](table_col(table, field)).label(field["alias"])
 
 
-def __totals_cte(self):
-    contribs = [
-        self.__build_measure_column(field).label(self.__fn_field_label(field)) for field in self.cte_fields
-    ]
-    cte = select(*self.rows, *contribs).group_by(*self.rows).cte()
+def cte_select_cols(table, ctes, build_info):
+    cte_fields = [field for field in build_info["values"] if need_cte(field)]
 
-    rows = [getattr(cte.c, field["name"]) for field in self.row_fields[0:-1]]
-    contribs2 = [
-        cast(func.sum(getattr(cte.c, self.__fn_field_label(field))), Float).label(
-            self.__fn_field_label(field)
-        )
-        for field in self.cte_fields
-    ]
-    c = select(*rows, *contribs2).group_by(*rows).cte()
-    return c
+    cte_cols = []
+    for field in cte_fields:
+        cte = ctes[cte_field_alias(field)]
+        col = build_agg(table, field)
+        cte_col = getattr(cte.c, cte_field_alias(field))
+        derived_col = col / func.max(cte_col)
+        cte_cols.append(derived_col.label(field["alias"]))
+    return cte_cols
 
 
-def build_cte(table, build_info):
+def build_ctes(table, build_info):
     cte_fields = [field for field in build_info["values"] if need_cte(field)]
     rows = build_info["rows"]
 
@@ -87,150 +89,61 @@ def build_cte(table, build_info):
         rows_minus_last = table_cols(grouped_totals_cte, rows[0:-1])
         return select(*rows_minus_last, *fn_cols).group_by(*rows_minus_last).cte()
 
-    return summed_totals_cte(grouped_totals_cte())
+    cte = summed_totals_cte(grouped_totals_cte())
+    return {cte_field_alias(field): cte for field in cte_fields}
+
+
+def build_sql(dataset, build_info):
+    table = define_table(dataset)
+    rows = build_info["rows"]
+    values = build_info["values"]
+    columns = build_info["columns"]
+
+    def ctes():
+        """
+        Common Table Expressions are used to:
+        - Calculate percentages for CONTRIBUTION fields
+        """
+        return build_ctes(table, build_info)
+
+    def get_col_for_select(ctes):
+        rows_cols = [aliased_col(table, field) for field in rows]
+        columns_cols = [aliased_col(table, field) for field in columns]
+        agg_without_function_cols = [build_agg(table, field) for field in values if not need_cte(field)]
+        agg_with_function_cols = cte_select_cols(table, ctes, build_info)
+        return rows_cols + columns_cols + agg_without_function_cols + agg_with_function_cols
+
+    def get_cols_to_group_by():
+        cte_groupby = cte_groupby_cols(table, build_info)
+        rows_groupby = table_cols(table, rows)
+        return rows_groupby + cte_groupby
+
+    groupby_cols = get_cols_to_group_by()
+    query = select(*get_col_for_select(ctes())).group_by(*groupby_cols).order_by(*groupby_cols)
+    return str(query.compile(dialect=postgresql.dialect()))
 
 
 class Pivot:
-    def __init__(self, build_info, dataset):
-        self.build_info = build_info
-        self.dataset = dataset
-
-        self.table = define_table(dataset)
-        self.values = build_info["values"]
-        #
-        #
-        self.row_fields = build_info["rows"]
-        self.column_fields = build_info["columns"]
-        self.rows = self.__as_columns(build_info["rows"])
-        self.columns = self.__as_columns(build_info["columns"])
-        self.cte_fields = [field for field in build_info["values"] if need_cte(field)]
-
-    def metadata(self, limit=25, offset=0):
-        pivot = self.build()
-        if len(self.columns) > 0:
-            pivot = pivot.swaplevel(0, len(self.columns), axis="columns").sort_index(axis="columns")
+    @classmethod
+    def metadata(klass, dataset, build_info, limit=25, offset=0):
+        columns = build_info["columns"]
+        pivot = Pivot.build(dataset, build_info)
+        if len(columns) > 0:
+            pivot = pivot.swaplevel(0, len(columns), axis="columns").sort_index(axis="columns")
 
         return {"html": pivot[offset:limit].to_html(escape=False, na_rep="-", index_names=True)}
 
-    def build(self):
-        query = self.build_sql()
-        rows = [field["alias"] for field in self.build_info["rows"]]
-        values = [field["alias"] for field in self.build_info["values"]]
-        columns = [field["alias"] for field in self.build_info["columns"]]
-        df = dataset_execute(self.dataset["name"], query)
+    @classmethod
+    def build(klass, dataset, build_info):
+        query = build_sql(dataset, build_info)
+        rows = [field["alias"] for field in build_info["rows"]]
+        values = [field["alias"] for field in build_info["values"]]
+        columns = [field["alias"] for field in build_info["columns"]]
+
+        df = dataset_execute(dataset["name"], query)
         pivot = df.pivot(columns=columns, values=values, index=rows).fillna("-")
 
         return pivot
-
-    def build_sql(self):
-        non_function_cols = [build_agg(self.table, field) for field in self.values if not need_cte(field)]
-        # function_cols =
-        select_fields = [
-            aliased_col(self.table, field) for field in self.row_fields + self.column_fields
-        ] + non_function_cols
-
-        groupby = table_cols(self.table, self.row_fields)
-        if len(self.cte_fields) > 0:
-            cte = build_cte(self.table, self.build_info)
-            groupby += table_cols(self.table, self.column_fields)
-
-            for field in self.cte_fields:
-                col = build_agg(self.table, field)
-                select_fields.append(
-                    (col / func.max(getattr(cte.c, cte_field_alias(field)))).label(field["alias"])
-                )
-
-        query = select(*select_fields).group_by(*groupby).order_by(*groupby)
-
-        return str(query.compile(dialect=postgresql.dialect()))
-
-    def __totals_cte(self):
-        contribs = [
-            self.__build_measure_column(field).label(self.__fn_field_label(field))
-            for field in self.cte_fields
-        ]
-        cte = select(*self.rows, *contribs).group_by(*self.rows).cte()
-
-        rows = [getattr(cte.c, field["name"]) for field in self.row_fields[0:-1]]
-        contribs2 = [
-            cast(func.sum(getattr(cte.c, self.__fn_field_label(field))), Float).label(
-                self.__fn_field_label(field)
-            )
-            for field in self.cte_fields
-        ]
-        c = select(*rows, *contribs2).group_by(*rows).cte()
-        return c
-
-    def __build_measure_column(self, field):
-        column = self.__get_table_column(field)
-        agg = field["agg"]
-        alias = field["alias"]
-
-        if agg == "COUNT DISTINCT":
-            return func.count(func.distinct(column)).label(alias)
-        elif agg == "COUNT":
-            return func.count(column).label(alias)
-        elif agg == "SUM":
-            return func.sum(column).label(alias)
-        else:
-            raise ValueNotSupported("Aggregation", agg)
-
-    def __select_values(self):
-        select_fields = list()
-        for value in self.build_info["values"]:
-            column = self.__build_measure_columns(value)
-            if not has_key(value, "function"):
-                pass
-            elif value["function"] == "CONTRIBUTION":
-                # ROUND(COUNT(DISTINCT application_id) / CAST(MAX(t.total) AS FLOAT) * 100, 2) as "%"
-                pass
-            else:
-                raise ValueNotSupported("Function", value["function"])
-
-            select_fields.append(column)
-
-        return select_fields
-
-    def __fn_field_label(self, field):
-        return field["function"] + "_" + field["name"]
-
-    def __select_columns(self):
-        rows = [column(item["field"]).label(item["alias"]) for item in self.build_info["rows"]]
-        columns = [column(item["field"]).label(item["alias"]) for item in self.build_info["columns"]]
-        return rows + columns + self.__select_values()
-
-    def __get_table_column(self, field):
-        return getattr(self.table.c, field["name"])
-
-    def __as_columns(self, fields):
-        return [self.__get_table_column(field) for field in fields]
-
-    def __build_measure_columns(self, fields):
-        return [self.__build_measure_column(field) for field in fields]
-
-    def __sql_for_reference(self):
-        sql = """
-        WITH grouped_totals AS (
-            SELECT follow_up_result, COUNT(DISTINCT application_id) AS total
-            FROM followups
-            WHERE follow_up_date >= '2022-01-01'
-            GROUP BY follow_up_result
-        ),
-
-        totals AS (
-            SELECT SUM(total) as total FROM grouped_totals
-        )
-
-        SELECT
-            f.follow_up_result,
-            COUNT(DISTINCT application_id) AS "#",
-            MAX(t.total),
-            ROUND(COUNT(DISTINCT application_id) / CAST(MAX(t.total) AS FLOAT) * 100, 2) as "%"
-        FROM followups f
-        LEFT JOIN totals t ON 1 = 1
-        WHERE f.follow_up_date >= '2022-01-01'
-        GROUP BY follow_up_result
-        """
 
 
 class ValueNotSupported(Exception):
