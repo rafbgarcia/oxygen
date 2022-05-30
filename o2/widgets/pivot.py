@@ -1,8 +1,5 @@
-from curses import has_key
 from sqlalchemy import table, column, select, func, cast, Float
 from sqlalchemy.dialects import postgresql
-
-from o2.dataset import dataset_execute
 
 
 def contribution():
@@ -20,8 +17,8 @@ FUNCTION_FN = {"CONTRIBUTION": contribution}
 
 
 def define_table(dataset):
-    columns = [column(field["name"]) for field in dataset["fields"]]
-    return table(dataset["name"], *columns)
+    columns = [column(field["name"]) for field in dataset.fields]
+    return table(dataset.name, *columns)
 
 
 def need_cte(field):
@@ -41,7 +38,7 @@ def table_col(table, field):
 
 
 def cte_field_alias(field):
-    return field["function"] + "_" + field["name"]
+    return field["agg"] + "_" + field["function"] + "_" + field["alias"]
 
 
 def cte_groupby_cols(table, build_info):
@@ -140,7 +137,7 @@ class Pivot:
         values = [field["alias"] for field in build_info["values"]]
         columns = [field["alias"] for field in build_info["columns"]]
 
-        df = dataset_execute(dataset["name"], query)
+        df = dataset.execute(query)
         pivot = df.pivot(columns=columns, values=values, index=rows).fillna("-")
 
         return pivot

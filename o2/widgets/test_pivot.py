@@ -1,15 +1,15 @@
 from django.test import SimpleTestCase
+from o2.models import Dataset
 from o2.widgets.pivot import Pivot, build_sql
-from o2.dataset import append_to_dataset, dataset_exists, dataset_as_df
 from o2.widgets._fixtures import pandas_df_to_dict
 
 
 class PivotCase(SimpleTestCase):
     def setUp(self):
         self.maxDiff = None
-        self.dataset = {
-            "name": "test",
-            "fields": [
+        self.dataset = Dataset(
+            name="test",
+            fields=[
                 {"name": "title_name", "type": "Text"},
                 {"name": "resulted_by", "type": "Text"},
                 {"name": "application_id", "type": "Integer"},
@@ -18,14 +18,9 @@ class PivotCase(SimpleTestCase):
                 {"name": "follow_up_result", "type": "Text"},
                 {"name": "follow_up_date_string", "type": "Text"},
             ],
-        }
-        if not dataset_exists(self.dataset["name"]):
-            append_to_dataset(
-                filename=self.dataset["name"],
-                table=self.dataset["name"],
-                user_types={field["name"]: field["type"] for field in self.dataset["fields"]},
-                rows=pandas_df_to_dict,
-            )
+        )
+        if not self.dataset.exists():
+            self.dataset.append(pandas_df_to_dict)
         return super().setUp()
 
     #
@@ -120,18 +115,8 @@ class PivotCase(SimpleTestCase):
             ],
         }
         expected = """
-            WITH anon_2 AS
-            (SELECT test.follow_up_result AS follow_up_result, count(distinct(test.application_id)) AS "CONTRIBUTION_application_id"
-            FROM test GROUP BY test.follow_up_result),
-            anon_1 AS
-            (SELECT CAST(sum(anon_2."CONTRIBUTION_application_id") AS FLOAT) AS "CONTRIBUTION_application_id"
-            FROM anon_2)
-            SELECT test.follow_up_result AS "Result", count(distinct(test.application_id)) AS "Unique Appls", count(distinct(test.application_id)) / max(anon_1."CONTRIBUTION_application_id") AS "%%"
-            FROM test, anon_1
-            GROUP BY test.follow_up_result
-            ORDER BY test.follow_up_result
         """
-        self.assertHTMLEqual(build_sql(self.dataset, build_info), expected)
+        self.assertEqual(build_sql(self.dataset, build_info), expected)
 
     #
     #
@@ -153,18 +138,8 @@ class PivotCase(SimpleTestCase):
             ],
         }
         expected = """
-            WITH anon_2 AS
-            (SELECT test.follow_up_result AS follow_up_result, test.resulted_by AS resulted_by, count(distinct(test.application_id)) AS "CONTRIBUTION_application_id"
-            FROM test GROUP BY test.follow_up_result, test.resulted_by),
-            anon_1 AS
-            (SELECT anon_2.follow_up_result AS follow_up_result, CAST(sum(anon_2."CONTRIBUTION_application_id") AS FLOAT) AS "CONTRIBUTION_application_id"
-            FROM anon_2 GROUP BY anon_2.follow_up_result)
-             SELECT test.follow_up_result AS "Result", test.resulted_by AS "User", count(distinct(test.application_id)) AS "Unique Appls", count(distinct(test.application_id)) / max(anon_1."CONTRIBUTION_application_id") AS "Perc"
-            FROM test, anon_1
-            GROUP BY test.follow_up_result, test.resulted_by
-            ORDER BY test.follow_up_result, test.resulted_by
         """
-        self.assertHTMLEqual(build_sql(self.dataset, build_info), expected)
+        self.assertEqual(build_sql(self.dataset, build_info), expected)
 
     #
     #
@@ -183,18 +158,8 @@ class PivotCase(SimpleTestCase):
             ],
         }
         expected = """
-            WITH anon_2 AS
-            (SELECT test.follow_up_result AS follow_up_result, count(distinct(test.application_id)) AS "CONTRIBUTION_application_id"
-            FROM test GROUP BY test.follow_up_result),
-            anon_1 AS
-            (SELECT CAST(sum(anon_2."CONTRIBUTION_application_id") AS FLOAT) AS "CONTRIBUTION_application_id"
-            FROM anon_2)
-             SELECT test.follow_up_result AS "Result", test.follow_up_number AS "Follow up", count(distinct(test.application_id)) AS "Unique Appls", count(distinct(test.application_id)) / max(anon_1."CONTRIBUTION_application_id") AS "Perc"
-            FROM test, anon_1
-            GROUP BY test.follow_up_result, test.follow_up_number
-            ORDER BY test.follow_up_result, test.follow_up_number
         """
-        self.assertHTMLEqual(build_sql(self.dataset, build_info), expected)
+        self.assertEqual(build_sql(self.dataset, build_info), expected)
 
     #
     #

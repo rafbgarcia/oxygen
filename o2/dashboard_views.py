@@ -5,8 +5,6 @@ import humps
 from o2.models import Dashboard, DashboardRow, Dataset, Widget
 from django.views.decorators.csrf import csrf_exempt
 
-from o2.widget import build_widget
-
 
 def index(request):
     dashboards = [model_to_dict(dash) for dash in Dashboard.objects.all()]
@@ -27,10 +25,7 @@ def show(request, id):
     for (i, widget) in enumerate(widgets):
         widgets[i] = model_to_dict(widget)
         widgets[i]["dataset"] = model_to_dict(widget.dataset)
-        widgets[i]["dataset"]["fields"] = [
-            {"name": name, "type": type} for (name, type) in widget.dataset.fields.items()
-        ]
-        widgets[i]["meta"] = build_widget(widgets[i])
+        widgets[i]["meta"] = widget.metadata()
 
     return JsonResponse(
         humps.camelize(

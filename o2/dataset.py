@@ -1,66 +1,36 @@
-import pandas as pd
-import pantab
-from powerBi.settings import BASE_DIR
-from os.path import exists
+class DatasetHelper:
+    @classmethod
+    def pandas_dtypes_to_fields(klass, dict):
+        return [{"name": name, "type": convert_to_user_type(dtype)} for (name, dtype) in dict.items()]
 
-DATASETS_FOLDER = BASE_DIR
-TABLE_MODE_APPEND = "a"
-
-
-def map_dtypes_user_types(dtypes_dict):
-    dtypes = {}
-    for key in dtypes_dict:
-        dtype = dtypes_dict[key].lower()
-        if "object" in dtype:
-            dtypes[key] = "Text"
-        elif "int" in dtype:
-            dtypes[key] = "Integer"
-        elif "float" in dtype:
-            dtypes[key] = "Float"
-        elif "datetime" in dtype:
-            dtypes[key] = "DateTime"
-        elif "bool" in dtype:
-            dtypes[key] = "Boolean"
-    return dtypes
+    @classmethod
+    def fields_to_pandas_dtype(klass, fields):
+        return {field["name"]: convert_to_pandas_dtype(field["type"]) for field in fields}
 
 
-def map_user_types_to_dtypes(user_types):
-    dtypes = {}
-    for key in user_types:
-        type = user_types[key]
-        if "Text" in type:
-            dtypes[key] = "object"
-        elif "Integer" in type:
-            dtypes[key] = "int64"
-        elif "Float" in type:
-            dtypes[key] = "float64"
-        elif "DateTime" in type:
-            dtypes[key] = "datetime64[ns]"
-        elif "Boolean" in type:
-            dtypes[key] = "bool"
-    return dtypes
+def convert_to_user_type(dtype):
+    dtype = dtype.lower()
+
+    if "object" in dtype:
+        return "Text"
+    elif "int" in dtype:
+        return "Integer"
+    elif "float" in dtype:
+        return "Float"
+    elif "datetime" in dtype:
+        return "DateTime"
+    elif "bool" in dtype:
+        return "Boolean"
 
 
-def __filepath(filename):
-    return DATASETS_FOLDER / f"{filename}.hyper"
-
-
-def append_to_dataset(filename, table, user_types, rows):
-    dtypes = map_user_types_to_dtypes(user_types)
-
-    df = pd.DataFrame(rows, columns=list(dtypes.keys()))
-    df = df.astype(dtypes)
-    pantab.frame_to_hyper(df, __filepath(filename), table=table, table_mode=TABLE_MODE_APPEND)
-
-
-def dataset_exists(filename):
-    return exists(__filepath(filename))
-
-
-def dataset_execute(filename, query):
-    return pantab.frame_from_hyper_query(__filepath(filename), query)
-
-
-def dataset_as_df(filename, table):
-    print(f">>> TABLE {table}")
-    return pantab.frame_from_hyper(__filepath(filename), table=table)
+def convert_to_pandas_dtype(type):
+    if "Text" in type:
+        return "string"
+    elif "Integer" in type:
+        return "int64"
+    elif "Float" in type:
+        return "float64"
+    elif "DateTime" in type:
+        return "datetime64[ns]"
+    elif "Boolean" in type:
+        return "bool"

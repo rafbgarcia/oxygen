@@ -9,9 +9,9 @@ import { Page } from "./Page"
 import { map } from "lodash-es"
 import { useNavigate } from "react-router-dom"
 
-const Form = ({ onSubmit, register, handleSubmit, waitingResponse }) => {
+const Form = ({ handlePreview, register, handleSubmit, waitingResponse }) => {
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(handlePreview)}>
       <TextField
         autoFocus
         label="Dataset Name"
@@ -34,7 +34,7 @@ const Form = ({ onSubmit, register, handleSubmit, waitingResponse }) => {
 }
 
 const Fields = ({ fields }) => {
-  const items = map(fields, (type, name) => (
+  const items = map(fields, ({ type, name }) => (
     <tr key={name}>
       <Table.th>{name}</Table.th>
       <Table.td>
@@ -76,7 +76,7 @@ export const Dataset = () => {
   const [waiting, setWaiting] = useState({ preview: false, save: false })
   const [preview, setDataset] = useState<Record<any, any>>()
   const [error, setError] = useState()
-  const onSubmit = (data) => {
+  const handlePreview = (data) => {
     setWaiting({ preview: true, save: false })
     api
       .previewDataset(data)
@@ -89,10 +89,12 @@ export const Dataset = () => {
         setError(err)
       })
   }
-  const save = () => {
+  const handleSave = () => {
+    if (!preview) return
+
     setWaiting({ preview: false, save: true })
     api
-      .createDataset({ ...getValues(), dtypes: preview?.fields })
+      .createDataset({ ...getValues(), fields: preview.fields })
       .then(() => {
         setWaiting({ preview: false, save: false })
         navigate("/datasets")
@@ -107,14 +109,14 @@ export const Dataset = () => {
     <>
       <Page.Header $flex>
         <Page.Title>New Dataset</Page.Title>
-        <Button $primary onClick={save} disabled={!preview} loading={waiting.save}>
+        <Button $primary onClick={handleSave} disabled={!preview} loading={waiting.save}>
           Save
         </Button>
       </Page.Header>
       <Page.Main>
         <div className="container max-w-4xl m-auto p-4">
           <Form
-            onSubmit={onSubmit}
+            handlePreview={handlePreview}
             register={register}
             handleSubmit={handleSubmit}
             waitingResponse={waiting.preview}

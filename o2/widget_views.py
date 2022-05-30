@@ -2,22 +2,20 @@ import json
 from django.forms import model_to_dict
 from django.http import JsonResponse
 import humps
-from o2.models import Dashboard, Widget
+from o2.models import Dashboard, Dataset, Widget
 from django.views.decorators.csrf import csrf_exempt
-from o2.widget import build_widget
 
 
 @csrf_exempt
 def preview(request):
     params = humps.decamelize(json.loads(request.body))
-    widget = {
-        "dataset": params["dataset"],
-        "build_info": params["build_info"],
-        "type": params["type"],
-    }
-    metadata = build_widget(widget)
+    widget = Widget(
+        dataset=Dataset.objects.get(pk=params["dataset"]["id"]),
+        build_info=params["build_info"],
+        type=params["type"],
+    )
 
-    return JsonResponse({"meta": metadata})
+    return JsonResponse({"meta": widget.metadata()})
 
 
 @csrf_exempt
