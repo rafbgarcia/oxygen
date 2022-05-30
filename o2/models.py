@@ -19,7 +19,7 @@ class Dataset(TimeStampedModel):
     last_built_at = models.DateTimeField(default=None)
     build_duration_seconds = models.SmallIntegerField(default=None)
     fields = models.JSONField(default=None)
-    totalRecords = models.IntegerField(default=None)
+    total_records = models.IntegerField(default=None)
 
     def file_path(self):
         return BASE_DIR / f"{self.name}.hyper"
