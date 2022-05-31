@@ -22,8 +22,6 @@ def convert_to_user_type(dtype):
         return "Float"
     elif "datetime" in dtype:
         return "DateTime"
-    elif "bool" in dtype:
-        return "Boolean"
     else:
         raise ValueNotSupported("Pandas dtype not mapped", dtype)
 
@@ -37,7 +35,5 @@ def convert_to_pandas_dtype(type):
         return "float64"
     elif "DateTime" in type:
         return "datetime64[ns]"
-    elif "Boolean" in type:
-        return "bool"
     else:
         raise ValueNotSupported("Field type not mapped", type)

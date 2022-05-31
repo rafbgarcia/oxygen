@@ -1,16 +1,13 @@
 import { api } from "../../lib/api"
 import { TrashIcon, PlusSmIcon } from "@heroicons/react/outline"
-import { Modal } from "../../components/Modal"
 import { Button } from "../../components/Button"
-import { reduce, map, partial, flow, filter, isEmpty } from "lodash-es"
-import { TextField } from "../../components/TextField"
-import { SelectField } from "../../components/SelectField"
-import { useForm } from "react-hook-form"
+import { reduce, map, flow, filter, isEmpty } from "lodash-es"
 import { useEffect, useMemo, useState } from "react"
 import { useImmerReducer } from "use-immer"
-
+import { Popover } from "../../components/Popover"
 import { Widget } from "../../components/Widget"
 import { useParams } from "react-router-dom"
+import { Title } from "playbook-ui"
 
 type BuildInfoSection = { metadataKey: string; label: string; dataType: string }
 type BuildInfoMapping = Record<WidgetType, Array<BuildInfoSection>>
@@ -84,13 +81,9 @@ export const WidgetPreview = ({
     api.widgetPreview(dashboardId, data).then(setPreviewData).catch(console.log)
   }, [state.buildInfo])
 
-  if (!type || !dataset) {
-    return <></>
-  }
-
   return (
     <div className="flex">
-      <div className="w-3/12 h-screen px-4 py-8 overflow-y-auto bg-gray-100">
+      <div className="w-3/12 h-screen px-4 py-8 bg-gray-100">
         {BUILD_INFO_SECTIONS[type].map((section) => (
           <BuildInfoSection
             key={section.metadataKey}
@@ -120,26 +113,34 @@ const BuildInfoSection = ({
   dispatch: any
   dataset: any
 }) => {
-  const [open, setOpen] = useState(false)
+  const tables = dataset.tables
+  const fieldsCollection = map(dataset.fields, (field) => ({ value: field.name }))
   const handleAdd = (formData) => {
-    setOpen(false)
     dispatch({ action: "addField", metadataKey: section.metadataKey, field: formData })
   }
   const handleRemove = (metadataKey, index) => () => dispatch({ action: "removeField", metadataKey, index })
-  const Form = section.dataType == DIMENSION ? AddDimensionModal : AddMeasureModal
 
   return (
     <div className="mb-10">
-      <Form open={open} dataset={dataset} onSubmit={handleAdd} setShow={setOpen} />
-
       <div className="mb-5">
         <header className="flex items-center justify-between">
           <span className="font-medium">{section.label}</span>
 
-          <Button onClick={partial(setOpen, true)} className="flex items-center" $iconXs>
-            <PlusSmIcon className="w-4 h-4" />
-          </Button>
+          <Popover
+            Button={
+              <Button className="flex items-center" $iconXs>
+                <PlusSmIcon className="w-4 h-4" />
+              </Button>
+            }
+          >
+            <div className="flex flex-col gap-y-8 max-h-96">
+              {tables.map((table) => (
+                <TableFields dataType={section.dataType} table={table} />
+              ))}
+            </div>
+          </Popover>
         </header>
+
         {buildInfo[section.metadataKey].map((item, index) => (
           <BuildItem
             key={item.function + item.agg + item.name + item.alias}
@@ -163,80 +164,34 @@ const BuildItem = ({ item, onRemove }) => {
   )
 }
 
-const AddDimensionModal = ({ open, dataset, onSubmit, setShow }) => {
-  const { register, handleSubmit, reset } = useForm()
-  const fieldsCollection = map(dataset.fields, (field) => ({ value: field.name }))
-  const onSubmitFlow = flow([onSubmit, reset])
-
-  return (
-    <Modal show={open} onClose={setShow} $sm>
-      <form onSubmit={handleSubmit(onSubmitFlow)}>
-        <Modal.Body>
-          <Modal.Title>Add Dimension</Modal.Title>
-
-          <SelectField
-            collection={fieldsCollection}
-            label="Field"
-            className="mb-5"
-            register={register("name", { required: true })}
-          />
-          <TextField label="Alias" className="mb-5" register={register("alias", { required: true })} />
-        </Modal.Body>
-        <Modal.Actions>
-          <Button $primary className="ml-2">
-            Save
-          </Button>
-          <Button className="ml-2" onClick={partial(setShow, false)}>
-            Cancel
-          </Button>
-        </Modal.Actions>
-      </form>
-    </Modal>
-  )
+const MAP = {
+  [DIMENSION]: {
+    Text: "All values",
+    Integer: "Sum",
+    Float: "Sum",
+    DateTime: "# of years",
+  },
+  [MEASURE]: {
+    Text: "All Items",
+    Integer: "All Items",
+    Float: "All Items",
+    DateTime: "All Items",
+  },
 }
-
-const AddMeasureModal = ({ open, dataset, onSubmit, setShow }) => {
-  const { register, handleSubmit, reset } = useForm()
-  const fieldsCollection = map(dataset.fields, (field) => ({ value: field.name }))
-  const aggCollection = map(AGGREGATIONS, (value) => ({ value }))
-  const fnsCollection = map(FUNCTIONS, (value) => ({ value }))
-  const onSubmitFlow = flow([onSubmit, reset])
-
+const TableFields = ({ table, dataType }) => {
   return (
-    <Modal show={open} onClose={setShow} $sm>
-      <form onSubmit={handleSubmit(onSubmitFlow)}>
-        <Modal.Body>
-          <Modal.Title>Add Measure</Modal.Title>
-          <SelectField
-            collection={aggCollection}
-            label="Aggregation"
-            className="mb-5"
-            register={register("agg", { required: true })}
-          />
-          <SelectField
-            collection={fieldsCollection}
-            label="Field"
-            className="mb-5"
-            register={register("name", { required: true })}
-          />
-          <SelectField
-            collection={fnsCollection}
-            allowBlank
-            label="Function"
-            className="mb-5"
-            register={register("function", { required: false })}
-          />
-          <TextField label="Alias" className="mb-5" register={register("alias", { required: true })} />
-        </Modal.Body>
-        <Modal.Actions>
-          <Button $primary className="ml-2" type="submit">
-            Save
-          </Button>
-          <Button className="ml-2" onClick={partial(setShow, false)}>
-            Cancel
-          </Button>
-        </Modal.Actions>
-      </form>
-    </Modal>
+    <div>
+      <Title size={4}>{table.name}</Title>
+      <ul>
+        {table.fields.map((field) => (
+          <li className="p-2 group flex items-center gap-x-3 cursor-pointer">
+            {field.name}
+            <div className="invisible group-hover:visible text-gray-300 text-sm">
+              {MAP[dataType][field.type]}
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
   )
 }
