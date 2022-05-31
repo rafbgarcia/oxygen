@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { map, find } from "lodash-es"
 import { useForm } from "react-hook-form"
-import { api, useMutation, useWaitingQuery } from "../lib/api"
+import { api, useLoadingMutation, useWaitingQuery } from "../lib/api"
 import { Page } from "./Page"
 import { TextField } from "../components/TextField"
 import { Wait } from "../components/Wait"
@@ -26,7 +26,7 @@ export const WidgetNew = () => {
   const { dashboardId } = useParams()
   const { dataset } = useLocation().state as { dataset: Dataset }
   const { register, getValues, setValue, watch } = useForm({ defaultValues })
-  const [createWidget, saving] = useMutation("widgetCreate")
+  const [createWidget, saving] = useLoadingMutation("widgetCreate")
   const handleSave = () => {
     createWidget(dashboardId, getValues()).then(() => navigate(`/dashboards/${dashboardId}/edit`))
   }

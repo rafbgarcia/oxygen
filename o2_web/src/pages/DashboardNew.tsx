@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form"
 import { Button } from "../components/Button"
 import { TextField } from "../components/TextField"
-import { useMutation, useWaitingQuery } from "../lib/api"
+import { useLoadingMutation, useWaitingQuery } from "../lib/api"
 import { Page } from "./Page"
 import { useNavigate } from "react-router-dom"
 import { SelectField } from "../components/SelectField"
@@ -11,7 +11,7 @@ export const DashboardNew = () => {
   const navigate = useNavigate()
   const { register, handleSubmit } = useForm()
   const { data, Waiting } = useWaitingQuery("getDatasets")
-  const [createDashboard, saving] = useMutation("createDashboard")
+  const [createDashboard, saving] = useLoadingMutation("createDashboard")
 
   if (Waiting) return <Waiting />
 

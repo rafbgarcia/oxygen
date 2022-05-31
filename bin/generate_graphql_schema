@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# @see https://docs.graphene-python.org/projects/django/en/latest/introspection/
+
+# Pass `--watch` flag to watch for file changes and update the .graphql file
+python3.9 manage.py graphql_schema --schema o2.schema.schema --out o2_web/src/@types/schema.graphql $1

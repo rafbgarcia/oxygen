@@ -1,24 +1,22 @@
-declare module "playbook-ui"
-declare module "SWRHook"
 export declare global {
-  interface Dataset {
-    id: number
-    name: string
-    buildDurationSeconds: number
-    isBuilding: boolean
-    lastBuiltAt: string
-    sizeMb: string
-    tables: Array<DatasetTable>
-  }
+  // interface Dataset {
+  //   id: number
+  //   name: string
+  //   buildDurationSeconds: number
+  //   isBuilding: boolean
+  //   lastBuiltAt: string
+  //   sizeMb: string
+  //   tables: Array<DatasetTable>
+  // }
 
-  interface DatasetTable {
-    fields: Array<{ name: string; type: string }>
-    name: string
-    query: string
-    htmlPreview: string
-    totalRecords: number
-    query: string
-  }
+  // interface DatasetTable {
+  //   fields: Array<{ name: string; type: string }>
+  //   name: string
+  //   query: string
+  //   htmlPreview: string
+  //   totalRecords: number
+  //   query: string
+  // }
   interface Widget {
     meta?: Record<string, any>
     theme?: Record<string, any>

@@ -1,8 +1,20 @@
-import { Fragment } from "react"
+import { Fragment, useState } from "react"
 import { Dialog, Transition } from "@headlessui/react"
 import { tw } from "../lib/tw"
 import { classnames } from "../lib/classnames"
 import { every } from "lodash-es"
+
+export const useModal = () => {
+  const [show, setShow] = useState(false)
+  const showModal = () => setShow(true)
+  const hideModal = () => setShow(false)
+  const Component = ({ children, ...props }) => (
+    <Modal show={show} onClose={setShow} $sm {...props}>
+      {children({ showModal, hideModal, Modal: Modal })}
+    </Modal>
+  )
+  return { showModal, hideModal, Modal: Component }
+}
 
 export const Modal = ({ children, show, onClose, initialFocus, $xs, $sm, $md, $lg }: Record<any, any>) => {
   const size = classnames({
@@ -13,7 +25,7 @@ export const Modal = ({ children, show, onClose, initialFocus, $xs, $sm, $md, $l
   })
   return (
     <Transition.Root show={show} as={Fragment}>
-      <Dialog as="div" className="relative z-10" onClose={onClose} initialFocus={initialFocus}>
+      <Dialog unmount as="div" className="relative z-10" onClose={onClose} initialFocus={initialFocus}>
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"

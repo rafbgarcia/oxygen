@@ -64,6 +64,13 @@ def preview(request):
 def create(request):
     params = humps.decamelize(json.loads(request.body))
     dataset = Dataset.objects.create(name=params["name"])
+    return JsonResponse(humps.camelize(model_to_dict(dataset)))
+
+
+@csrf_exempt
+def _back_create(request):
+    params = humps.decamelize(json.loads(request.body))
+    dataset = Dataset.objects.create(name=params["name"])
     tables = params["tables"]
 
     start_time = time()
