@@ -8,7 +8,7 @@ import mysql.connector
 import humps
 from django.utils import timezone
 from o2.dataset import DatasetHelper
-from o2.models import Dataset
+from o2.models import Dataset, DatasetTable
 from django.views.decorators.csrf import csrf_exempt
 from powerBi.settings import BASE_DIR
 from contextlib import contextmanager
@@ -52,31 +52,41 @@ def preview(request):
         df = pd.DataFrame(cursor.fetchmany(25), columns=fields)
 
     dtypes = df.dtypes.to_frame("dtypes").reset_index().set_index("index")["dtypes"].astype(str).to_dict()
-    fields = DatasetHelper.pandas_dtypes_to_fields(dtypes)
+    data = {
+        "fields": DatasetHelper.pandas_dtypes_to_fields(dtypes),
+        "html_preview": df.to_html(index=False, na_rep="", escape=False),
+    }
 
-    return JsonResponse(
-        {
-            "fields": fields,
-            "html": df.to_html(index=False, na_rep="", escape=False),
-        }
-    )
+    return JsonResponse(humps.camelize(data))
 
 
 @csrf_exempt
 def create(request):
-    params = json.loads(request.body)
-    dataset = Dataset(**params)
-    dataset.total_records = 0
+    params = humps.decamelize(json.loads(request.body))
+    dataset = Dataset.objects.create(name=params["name"])
+    tables = params["tables"]
 
     start_time = time()
-    with MySQL(connection_config).execute(dataset.query) as cursor:
-        while True:
-            rows = cursor.fetchmany(ROWS_COUNT)
-            if len(rows) == 0:
-                break
+    for table in tables:
+        table = DatasetTable(
+            dataset=dataset,
+            name=table["name"],
+            query=table["query"],
+            fields=table["fields"],
+            html_preview=table["html_preview"],
+        )
+        table.total_records = 0
 
-            dataset.total_records += len(rows)
-            dataset.append(rows)
+        with MySQL(connection_config).execute(table.query) as cursor:
+            while True:
+                rows = cursor.fetchmany(ROWS_COUNT)
+                if len(rows) == 0:
+                    break
+
+                table.total_records += len(rows)
+                dataset.append(table, rows)
+
+        table.save()
 
     dataset.build_duration_seconds = time() - start_time
     dataset.size_mb = os.path.getsize(dataset.file_path()) / 1e6

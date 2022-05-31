@@ -3,16 +3,22 @@ declare module "SWRHook"
 export declare global {
   interface Dataset {
     id: number
+    name: string
     buildDurationSeconds: number
-    totalRecords: number
-    fields: Array<{ name: string; type: string }>
     isBuilding: boolean
     lastBuiltAt: string
-    name: string
-    query: string
     sizeMb: string
+    tables: Array<DatasetTable>
   }
 
+  interface DatasetTable {
+    fields: Array<{ name: string; type: string }>
+    name: string
+    query: string
+    htmlPreview: string
+    totalRecords: number
+    query: string
+  }
   interface Widget {
     meta?: Record<string, any>
     theme?: Record<string, any>

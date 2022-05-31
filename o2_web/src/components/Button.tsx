@@ -21,7 +21,7 @@ const sizes = {
   $iconSm: "p-2",
 }
 const TWButton = tw.button<TWButtonProps>`
-  inline-flex justify-center rounded-md border shadow-sm px-4 py-2 text-sm font-medium
+  inline-block justify-center rounded-md border shadow-sm px-4 py-2 text-sm font-medium
   focus:outline-none focus:ring-2 focus:ring-offset-2
   disabled:opacity-50 disabled:pointer-events-none disabled:select-none
   ${(p) =>

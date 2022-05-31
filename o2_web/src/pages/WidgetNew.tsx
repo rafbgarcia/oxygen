@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { map, find } from "lodash-es"
 import { useForm } from "react-hook-form"
-import { api, useMutation, useQuery } from "../lib/api"
+import { api, useMutation, useWaitingQuery } from "../lib/api"
 import { Page } from "./Page"
 import { TextField } from "../components/TextField"
 import { Wait } from "../components/Wait"

@@ -13,13 +13,10 @@ TABLE_MODE_APPEND = "a"
 
 class Dataset(TimeStampedModel):
     name = models.CharField(max_length=100, unique=True)
-    query = models.TextField()
-    is_building = models.BooleanField(default=False)
-    size_mb = models.DecimalField(max_digits=10, decimal_places=1)
-    last_built_at = models.DateTimeField()
-    build_duration_seconds = models.SmallIntegerField()
-    fields = models.JSONField()
-    total_records = models.IntegerField()
+    is_building = models.BooleanField(default=False, null=True)
+    size_mb = models.DecimalField(max_digits=10, decimal_places=1, null=True)
+    last_built_at = models.DateTimeField(null=True)
+    build_duration_seconds = models.SmallIntegerField(null=True)
 
     def file_path(self):
         return BASE_DIR / f"{self.name}.hyper"
@@ -27,19 +24,30 @@ class Dataset(TimeStampedModel):
     def exists(self):
         return exists(self.file_path())
 
-    def append(self, rows):
-        dtypes = DatasetHelper.fields_to_pandas_dtype(self.fields)
-        field_names = [field["name"] for field in self.fields]
-
-        df = pd.DataFrame(rows, columns=field_names)
-        df = df.astype(dtypes, errors="ignore")
-        pantab.frame_to_hyper(df, self.file_path(), table=self.name, table_mode=TABLE_MODE_APPEND)
-
-    def dtypes(self):
-        return {field["name"]: DatasetHelper.convert_to_pandas_dtype(field["type"]) for field in self.fields}
+    def append(self, table, rows):
+        df = pd.DataFrame(rows, columns=table.field_names())
+        df = df.astype(table.dtypes(), errors="ignore")
+        pantab.frame_to_hyper(df, self.file_path(), table=table.name, table_mode=TABLE_MODE_APPEND)
 
     def execute(self, sql):
         return pantab.frame_from_hyper_query(self.file_path(), sql)
+
+
+class DatasetTable(models.Model):
+    dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE)
+    name = models.CharField(max_length=50)
+    query = models.TextField()
+    fields = models.JSONField()
+    total_records = models.IntegerField()
+    html_preview = models.TextField()
+
+    models.UniqueConstraint(fields=[dataset, name], name="unique_dataset_table_name")
+
+    def dtypes(self):
+        return DatasetHelper.fields_to_pandas_dtype(self.fields)
+
+    def field_names(self):
+        return [field["name"] for field in self.fields]
 
 
 class Dashboard(TimeStampedModel):

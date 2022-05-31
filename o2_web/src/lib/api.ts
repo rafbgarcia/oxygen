@@ -59,18 +59,18 @@ export const api = {
   ...MUTATIONS,
 }
 
-type Mutations = keyof typeof MUTATIONS
+type MutationKeys = keyof typeof MUTATIONS
 type MutationTypes = typeof MUTATIONS[keyof typeof MUTATIONS]
 
-export const useMutation = (action: Mutations): [MutationTypes, boolean] => {
+export const useMutation = (action: MutationKeys): [(...arg: any[]) => Promise<any>, boolean] => {
   const [loading, setLoading] = useState(false)
-  const fn: MutationTypes = (...arg) => {
+  const fn = (...arg) => {
     setLoading(true)
 
     return new Promise((resolve, reject) => {
-      const fn = MUTATIONS[action] as unknown as (...any) => Promise<any>
+      const fn = MUTATIONS[action] as (...arg: any[]) => Promise<any>
       return fn(...arg)
-        .then((arg) => {
+        .then((arg: any) => {
           setLoading(false)
           resolve(arg)
         })
@@ -86,7 +86,7 @@ export const useMutation = (action: Mutations): [MutationTypes, boolean] => {
 
 type Queries = keyof typeof QUERIES
 
-export const useQuery = (action: Queries, ...args) => {
+export const useWaitingQuery = (action: Queries, ...args) => {
   const fn = QUERIES[action] as (...any) => SWRResponse<any, any>
   const { data, error } = fn(...args)
   const Waiting = Wait(data, error)
