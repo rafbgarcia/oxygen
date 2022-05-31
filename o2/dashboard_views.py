@@ -20,6 +20,8 @@ def create(request):
 
 def show(request, id):
     dashboard = Dashboard.objects.select_related("dataset").get(pk=id)
+    tables = [model_to_dict(table) for table in list(dashboard.dataset.tables.all())]
+    dataset = {**model_to_dict(dashboard.dataset), **{"tables": tables}}
     widgets = list(Widget.objects.filter(dashboard=dashboard).all())
     for (i, widget) in enumerate(widgets):
         widgets[i] = model_to_dict(widget)
@@ -29,7 +31,7 @@ def show(request, id):
         humps.camelize(
             {
                 "dashboard": model_to_dict(dashboard),
-                "dataset": model_to_dict(dashboard.dataset),
+                "dataset": dataset,
                 "widgets": widgets,
             }
         )
