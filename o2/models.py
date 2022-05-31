@@ -54,7 +54,7 @@ class Dashboard(TimeStampedModel):
     name = models.CharField(max_length=100)
     previous_version = models.ForeignKey("self", on_delete=models.SET_NULL, null=True)
     dataset = models.ForeignKey(Dataset, on_delete=models.SET_NULL, null=True)
-    grid_rows = models.JSONField()
+    grid_rows = models.JSONField(null=True)
 
 
 class Widget(TimeStampedModel):
