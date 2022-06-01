@@ -7,7 +7,7 @@ import pandas as pd
 import mysql.connector
 import humps
 from django.utils import timezone
-from o2.dataset import DatasetHelper
+from o2.dataset_helpers import DatasetHelper
 from o2.models import Dataset, DatasetTable
 from django.views.decorators.csrf import csrf_exempt
 from powerBi.settings import BASE_DIR

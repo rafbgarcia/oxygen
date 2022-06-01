@@ -14,7 +14,6 @@ export type Scalars = {
   Int: number;
   Float: number;
   DateTime: any;
-  JSONString: any;
 };
 
 export type CreateDatasetTableMutationHandler = {
@@ -37,12 +36,19 @@ export type Dataset = {
 
 export type DatasetTable = {
   __typename?: 'DatasetTable';
-  fields?: Maybe<Scalars['JSONString']>;
-  htmlPreview?: Maybe<Scalars['String']>;
+  dataset: Dataset;
+  fields: Array<DatasetTableFields>;
+  htmlPreview: Scalars['String'];
   id: Scalars['ID'];
   name: Scalars['String'];
   query: Scalars['String'];
   totalRecords?: Maybe<Scalars['Int']>;
+};
+
+export type DatasetTableFields = {
+  __typename?: 'DatasetTableFields';
+  name: Scalars['String'];
+  type: Scalars['String'];
 };
 
 export type Mutation = {
@@ -74,14 +80,18 @@ export type QueryDatasetArgs = {
   id: Scalars['ID'];
 };
 
-export type DatasetFieldsFragment = { __typename?: 'Dataset', id: string, name: string, sizeMb?: number | null, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string }> };
+export type DatasetPartsFragment = { __typename?: 'Dataset', id: string, name: string, sizeMb?: number | null, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview: string, fields: Array<{ __typename?: 'DatasetTableFields', name: string, type: string }> }> };
+
+export type DatasetTablePartsFragment = { __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview: string, fields: Array<{ __typename?: 'DatasetTableFields', name: string, type: string }> };
+
+export type DatasetTableFieldsPartsFragment = { __typename?: 'DatasetTableFields', name: string, type: string };
 
 export type CreateDatasetMutationVariables = Exact<{
   name: Scalars['String'];
 }>;
 
 
-export type CreateDatasetMutation = { __typename?: 'Mutation', createDataset: { __typename?: 'Dataset', id: string, name: string, sizeMb?: number | null, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string }> } };
+export type CreateDatasetMutation = { __typename?: 'Mutation', createDataset: { __typename?: 'Dataset', id: string, name: string, sizeMb?: number | null, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview: string, fields: Array<{ __typename?: 'DatasetTableFields', name: string, type: string }> }> } };
 
 export type CreateDatasetTableMutationVariables = Exact<{
   datasetId: Scalars['ID'];
@@ -90,39 +100,56 @@ export type CreateDatasetTableMutationVariables = Exact<{
 }>;
 
 
-export type CreateDatasetTableMutation = { __typename?: 'Mutation', createDatasetTable?: { __typename?: 'CreateDatasetTableMutationHandler', dataset?: { __typename?: 'Dataset', id: string, name: string, sizeMb?: number | null, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string }> } | null } | null };
+export type CreateDatasetTableMutation = { __typename?: 'Mutation', createDatasetTable?: { __typename?: 'CreateDatasetTableMutationHandler', dataset?: { __typename?: 'Dataset', id: string, name: string, sizeMb?: number | null, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview: string, fields: Array<{ __typename?: 'DatasetTableFields', name: string, type: string }> }> } | null } | null };
 
 export type DatasetQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
 
-export type DatasetQuery = { __typename?: 'Query', dataset: { __typename?: 'Dataset', id: string, name: string, sizeMb?: number | null, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string }> } };
+export type DatasetQuery = { __typename?: 'Query', dataset: { __typename?: 'Dataset', id: string, name: string, sizeMb?: number | null, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview: string, fields: Array<{ __typename?: 'DatasetTableFields', name: string, type: string }> }> } };
 
 export type DatasetsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type DatasetsQuery = { __typename?: 'Query', datasets: Array<{ __typename?: 'Dataset', id: string, name: string, sizeMb?: number | null, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string }> }> };
+export type DatasetsQuery = { __typename?: 'Query', datasets: Array<{ __typename?: 'Dataset', id: string, name: string, sizeMb?: number | null, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview: string, fields: Array<{ __typename?: 'DatasetTableFields', name: string, type: string }> }> }> };
 
-export const DatasetFieldsFragmentDoc = /*#__PURE__*/ gql`
-    fragment DatasetFields on Dataset {
+export const DatasetTableFieldsPartsFragmentDoc = /*#__PURE__*/ gql`
+    fragment DatasetTableFieldsParts on DatasetTableFields {
+  name
+  type
+}
+    `;
+export const DatasetTablePartsFragmentDoc = /*#__PURE__*/ gql`
+    fragment DatasetTableParts on DatasetTable {
+  id
+  name
+  query
+  totalRecords
+  htmlPreview
+  fields {
+    ...DatasetTableFieldsParts
+  }
+}
+    ${DatasetTableFieldsPartsFragmentDoc}`;
+export const DatasetPartsFragmentDoc = /*#__PURE__*/ gql`
+    fragment DatasetParts on Dataset {
   id
   name
   sizeMb
   lastBuiltAt
   tables {
-    id
-    name
+    ...DatasetTableParts
   }
 }
-    `;
+    ${DatasetTablePartsFragmentDoc}`;
 export const CreateDatasetDocument = /*#__PURE__*/ gql`
     mutation createDataset($name: String!) {
   createDataset(name: $name) {
-    ...DatasetFields
+    ...DatasetParts
   }
 }
-    ${DatasetFieldsFragmentDoc}`;
+    ${DatasetPartsFragmentDoc}`;
 export type CreateDatasetMutationFn = Apollo.MutationFunction<CreateDatasetMutation, CreateDatasetMutationVariables>;
 
 /**
@@ -153,11 +180,11 @@ export const CreateDatasetTableDocument = /*#__PURE__*/ gql`
     mutation createDatasetTable($datasetId: ID!, $name: String!, $query: String!) {
   createDatasetTable(datasetId: $datasetId, name: $name, query: $query) {
     dataset {
-      ...DatasetFields
+      ...DatasetParts
     }
   }
 }
-    ${DatasetFieldsFragmentDoc}`;
+    ${DatasetPartsFragmentDoc}`;
 export type CreateDatasetTableMutationFn = Apollo.MutationFunction<CreateDatasetTableMutation, CreateDatasetTableMutationVariables>;
 
 /**
@@ -189,10 +216,10 @@ export type CreateDatasetTableMutationOptions = Apollo.BaseMutationOptions<Creat
 export const DatasetDocument = /*#__PURE__*/ gql`
     query dataset($id: ID!) {
   dataset(id: $id) {
-    ...DatasetFields
+    ...DatasetParts
   }
 }
-    ${DatasetFieldsFragmentDoc}`;
+    ${DatasetPartsFragmentDoc}`;
 
 /**
  * __useDatasetQuery__
@@ -224,10 +251,10 @@ export type DatasetQueryResult = Apollo.QueryResult<DatasetQuery, DatasetQueryVa
 export const DatasetsDocument = /*#__PURE__*/ gql`
     query datasets {
   datasets {
-    ...DatasetFields
+    ...DatasetParts
   }
 }
-    ${DatasetFieldsFragmentDoc}`;
+    ${DatasetPartsFragmentDoc}`;
 
 /**
  * __useDatasetsQuery__

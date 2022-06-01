@@ -1,10 +1,10 @@
-fragment DatasetFields on Dataset {
+fragment DatasetParts on Dataset {
   id
   name
   sizeMb
   lastBuiltAt
+
   tables {
-    id
-    name
+    ...DatasetTableParts
   }
 }

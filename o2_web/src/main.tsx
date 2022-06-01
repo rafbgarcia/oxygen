@@ -15,6 +15,7 @@ import { EmbeddedDashboard } from "./pages/EmbeddedDashboard"
 import { Datasources } from "./pages/Datasources"
 import { DatasourcesEdit } from "./pages/DatasourcesEdit"
 import { DatasourcesEditTableNew } from "./pages/DatasourcesEditTableNew"
+import { DatasourcesEditTableEdit } from "./pages/DatasourcesEditTable"
 
 const client = new ApolloClient({
   uri: "http://localhost:8000/",
@@ -31,10 +32,10 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
 
             <Route path="datasets" element={<Datasources />} />
             <Route path="datasets/new" element={<Dataset />} />
-            <Route path="datasets/:datasetId">
-              <Route path="edit" element={<DatasourcesEdit />} />
+            <Route path="datasets/:datasetId" element={<DatasourcesEdit />}>
+              <Route path="edit" />
               <Route path="tables/new" element={<DatasourcesEditTableNew />} />
-              {/* <Route path="tables/:tableId/edit" element={<DatasourcesEdit />} /> */}
+              <Route path="tables/:tableId" element={<DatasourcesEditTableEdit />} />
             </Route>
 
             <Route path="dashboards" element={<Dashboards />} />

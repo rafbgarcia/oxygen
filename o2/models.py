@@ -1,6 +1,6 @@
 from django.db import models
 from model_utils.models import TimeStampedModel
-from o2.dataset import DatasetHelper
+from o2.dataset_helpers import DatasetHelper
 from o2.widgets.pivot import Pivot
 from o2.widgets.vertical_bar_chart import VerticalBarChart
 from powerBi.settings import BASE_DIR

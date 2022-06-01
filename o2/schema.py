@@ -1,18 +1,34 @@
 import graphene
 from graphene_django import DjangoObjectType, DjangoListField
+from o2.dataset_helpers import DatasetHelper
 
 from o2.models import Dataset, DatasetTable
 
+
 #########
-# Queries
+# Objects
 #########
+
+
+class DatasetTableFieldsType(graphene.ObjectType):
+    name = graphene.String(required=True)
+    type = graphene.String(required=True)
+
+    class Meta:
+        name = "DatasetTableFields"
 
 
 class DatasetTableType(DjangoObjectType):
+    id = graphene.ID(required=True)
+    name = graphene.String(required=True)
+    query = graphene.String(required=True)
+    fields = graphene.List(graphene.NonNull(DatasetTableFieldsType), required=True)
+    html_preview = graphene.String(required=True)
+    total_records = graphene.Int()
+
     class Meta:
         model = DatasetTable
         name = model.__name__
-        fields = ("id", "name", "query", "fields", "total_records", "html_preview")
 
 
 class DatasetType(DjangoObjectType):
@@ -27,6 +43,11 @@ class DatasetType(DjangoObjectType):
     class Meta:
         model = Dataset
         name = model.__name__
+
+
+#########
+# Queries
+#########
 
 
 class Query(graphene.ObjectType):
@@ -56,7 +77,15 @@ class CreateDatasetTableMutationHandler(graphene.Mutation):
     @classmethod
     def mutate(cls, root, info, dataset_id, name, query):
         dataset = Dataset.objects.get(pk=dataset_id)
-        dataset.tables.create(dataset_id=dataset_id, name=name, query=query)
+        preview = DatasetHelper.preview(query)
+        dataset.tables.create(
+            dataset_id=dataset_id,
+            name=name,
+            query=query,
+            fields=preview["fields"],
+            html_preview=preview["html_preview"],
+        )
+
         return CreateDatasetTableMutationHandler(dataset=dataset)
 
 

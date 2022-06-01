@@ -1,5 +1,5 @@
 query datasets {
   datasets {
-    ...DatasetFields
+    ...DatasetParts
   }
 }

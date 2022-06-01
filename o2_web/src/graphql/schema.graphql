@@ -21,16 +21,20 @@ type Dataset {
 
 type DatasetTable {
   id: ID!
+  dataset: Dataset!
   name: String!
   query: String!
-  fields: JSONString
+  fields: [DatasetTableFields!]!
   totalRecords: Int
-  htmlPreview: String
+  htmlPreview: String!
+}
+
+type DatasetTableFields {
+  name: String!
+  type: String!
 }
 
 scalar DateTime
-
-scalar JSONString
 
 type Mutation {
   createDataset(name: String!): Dataset!
