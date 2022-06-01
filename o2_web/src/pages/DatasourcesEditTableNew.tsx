@@ -11,9 +11,6 @@ export const DatasourcesEditTableNew = () => {
   const { register, handleSubmit } = useForm()
   const [createDataset, { loading }] = useCreateDatasetMutation()
   const onSubmit = (data) => {
-    ///////
-    // ---> include htmlPreview and field
-    ///////
     createDataset({ variables: { ...data, datasetId } })
   }
 
@@ -21,7 +18,7 @@ export const DatasourcesEditTableNew = () => {
     <Modal show onClose={noop}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Modal.Body>
-          <Modal.Title>Add Dimension</Modal.Title>
+          <Modal.Title>New Table</Modal.Title>
 
           <TextField label="Name" className="mb-5" register={register("name", { required: true })} />
         </Modal.Body>
