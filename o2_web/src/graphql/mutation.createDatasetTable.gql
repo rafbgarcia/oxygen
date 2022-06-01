@@ -1,0 +1,7 @@
+mutation createDatasetTable($datasetId: ID!, $name: String!, $query: String!) {
+  createDatasetTable(datasetId: $datasetId, name: $name, query: $query) {
+    dataset {
+      ...DatasetFields
+    }
+  }
+}

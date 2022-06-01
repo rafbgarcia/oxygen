@@ -45,25 +45,28 @@ class Query(graphene.ObjectType):
 ###########
 
 
-class CreateDatasetMutationHandler(graphene.Mutation):
+class CreateDatasetTableMutationHandler(graphene.Mutation):
     class Arguments:
+        dataset_id = graphene.ID(required=True)
         name = graphene.String(required=True)
+        query = graphene.String(required=True)
 
     dataset = graphene.Field(DatasetType)
 
     @classmethod
-    def mutate(cls, root, info, name):
-        dataset = Dataset.objects.create(name=name)
-        return CreateDatasetMutationHandler(dataset=dataset)
+    def mutate(cls, root, info, dataset_id, name, query):
+        dataset = Dataset.objects.get(pk=dataset_id)
+        dataset.tables.create(dataset_id=dataset_id, name=name, query=query)
+        return CreateDatasetTableMutationHandler(dataset=dataset)
 
 
 class Mutation(graphene.ObjectType):
-    create_dataset = CreateDatasetMutationHandler.Field()
-    # create_dataset = graphene.Field(DatasetType, name=graphene.String(required=True), required=True)
+    create_dataset = graphene.Field(DatasetType, name=graphene.String(required=True), required=True)
+    create_dataset_table = CreateDatasetTableMutationHandler.Field()
 
-    # def resolve_create_dataset(root, info, name):
-    #     dataset = Dataset.objects.create(name=name)
-    #     return dataset
+    def resolve_create_dataset(root, info, name):
+        dataset = Dataset.objects.create(name=name)
+        return dataset
 
 
 ###################

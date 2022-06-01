@@ -37,9 +37,9 @@ class DatasetTable(models.Model):
     dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE, related_name="tables")
     name = models.CharField(max_length=50)
     query = models.TextField()
-    fields = models.JSONField()
-    total_records = models.IntegerField()
-    html_preview = models.TextField()
+    fields = models.JSONField(null=True)
+    total_records = models.IntegerField(null=True)
+    html_preview = models.TextField(null=True)
 
     models.UniqueConstraint(fields=[dataset, name], name="unique_dataset_table_name")
 

@@ -25,6 +25,7 @@ MVP Roadmap:
 - Support multiple tables within a Dataset
 - Widget reuse build info
 - Load one widget at a time
+- Package manager?
 
 Tech debt:
 

@@ -5,8 +5,8 @@ type HeaderProps = {
 }
 export const Page = {
   Header: tw.header<HeaderProps>`
-    bg-white border-b py-2 px-6
-    ${(p) => p.$flex && "flex items-center justify-between"}
+    bg-white border-b py-2 px-4
+    ${(p) => p.$flex && "flex items-center justify-between gap-x-2"}
   `,
 
   Title: tw.h1`

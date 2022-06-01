@@ -16,7 +16,17 @@ export const useModal = () => {
   return { showModal, hideModal, Modal: Component }
 }
 
-export const Modal = ({ children, show, onClose, initialFocus, $xs, $sm, $md, $lg }: Record<any, any>) => {
+type ModalProps = {
+  children?: any
+  show?: any
+  onClose?: any
+  initialFocus?: any
+  $xs?: any
+  $sm?: any
+  $md?: any
+  $lg?: any
+}
+export const Modal = ({ children, show, onClose, initialFocus, $xs, $sm, $md, $lg }: ModalProps) => {
   const size = classnames({
     "w-[200px]": $xs,
     "w-[400px]": $sm || every([$xs, $md, $lg], (v) => !v),

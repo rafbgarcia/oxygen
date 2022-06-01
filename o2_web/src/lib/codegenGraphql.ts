@@ -17,8 +17,8 @@ export type Scalars = {
   JSONString: any;
 };
 
-export type CreateDatasetMutationHandler = {
-  __typename?: 'CreateDatasetMutationHandler';
+export type CreateDatasetTableMutationHandler = {
+  __typename?: 'CreateDatasetTableMutationHandler';
   dataset?: Maybe<Dataset>;
 };
 
@@ -37,22 +37,30 @@ export type Dataset = {
 
 export type DatasetTable = {
   __typename?: 'DatasetTable';
-  fields: Scalars['JSONString'];
-  htmlPreview: Scalars['String'];
+  fields?: Maybe<Scalars['JSONString']>;
+  htmlPreview?: Maybe<Scalars['String']>;
   id: Scalars['ID'];
   name: Scalars['String'];
   query: Scalars['String'];
-  totalRecords: Scalars['Int'];
+  totalRecords?: Maybe<Scalars['Int']>;
 };
 
 export type Mutation = {
   __typename?: 'Mutation';
-  createDataset?: Maybe<CreateDatasetMutationHandler>;
+  createDataset: Dataset;
+  createDatasetTable?: Maybe<CreateDatasetTableMutationHandler>;
 };
 
 
 export type MutationCreateDatasetArgs = {
   name: Scalars['String'];
+};
+
+
+export type MutationCreateDatasetTableArgs = {
+  datasetId: Scalars['ID'];
+  name: Scalars['String'];
+  query: Scalars['String'];
 };
 
 export type Query = {
@@ -73,7 +81,16 @@ export type CreateDatasetMutationVariables = Exact<{
 }>;
 
 
-export type CreateDatasetMutation = { __typename?: 'Mutation', createDataset?: { __typename?: 'CreateDatasetMutationHandler', dataset?: { __typename?: 'Dataset', id: string, name: string } | null } | null };
+export type CreateDatasetMutation = { __typename?: 'Mutation', createDataset: { __typename?: 'Dataset', id: string, name: string, sizeMb?: number | null, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string }> } };
+
+export type CreateDatasetTableMutationVariables = Exact<{
+  datasetId: Scalars['ID'];
+  name: Scalars['String'];
+  query: Scalars['String'];
+}>;
+
+
+export type CreateDatasetTableMutation = { __typename?: 'Mutation', createDatasetTable?: { __typename?: 'CreateDatasetTableMutationHandler', dataset?: { __typename?: 'Dataset', id: string, name: string, sizeMb?: number | null, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string }> } | null } | null };
 
 export type DatasetQueryVariables = Exact<{
   id: Scalars['ID'];
@@ -87,7 +104,7 @@ export type DatasetsQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type DatasetsQuery = { __typename?: 'Query', datasets: Array<{ __typename?: 'Dataset', id: string, name: string, sizeMb?: number | null, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string }> }> };
 
-export const DatasetFieldsFragmentDoc = gql`
+export const DatasetFieldsFragmentDoc = /*#__PURE__*/ gql`
     fragment DatasetFields on Dataset {
   id
   name
@@ -99,16 +116,13 @@ export const DatasetFieldsFragmentDoc = gql`
   }
 }
     `;
-export const CreateDatasetDocument = gql`
+export const CreateDatasetDocument = /*#__PURE__*/ gql`
     mutation createDataset($name: String!) {
   createDataset(name: $name) {
-    dataset {
-      id
-      name
-    }
+    ...DatasetFields
   }
 }
-    `;
+    ${DatasetFieldsFragmentDoc}`;
 export type CreateDatasetMutationFn = Apollo.MutationFunction<CreateDatasetMutation, CreateDatasetMutationVariables>;
 
 /**
@@ -135,7 +149,44 @@ export function useCreateDatasetMutation(baseOptions?: Apollo.MutationHookOption
 export type CreateDatasetMutationHookResult = ReturnType<typeof useCreateDatasetMutation>;
 export type CreateDatasetMutationResult = Apollo.MutationResult<CreateDatasetMutation>;
 export type CreateDatasetMutationOptions = Apollo.BaseMutationOptions<CreateDatasetMutation, CreateDatasetMutationVariables>;
-export const DatasetDocument = gql`
+export const CreateDatasetTableDocument = /*#__PURE__*/ gql`
+    mutation createDatasetTable($datasetId: ID!, $name: String!, $query: String!) {
+  createDatasetTable(datasetId: $datasetId, name: $name, query: $query) {
+    dataset {
+      ...DatasetFields
+    }
+  }
+}
+    ${DatasetFieldsFragmentDoc}`;
+export type CreateDatasetTableMutationFn = Apollo.MutationFunction<CreateDatasetTableMutation, CreateDatasetTableMutationVariables>;
+
+/**
+ * __useCreateDatasetTableMutation__
+ *
+ * To run a mutation, you first call `useCreateDatasetTableMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateDatasetTableMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createDatasetTableMutation, { data, loading, error }] = useCreateDatasetTableMutation({
+ *   variables: {
+ *      datasetId: // value for 'datasetId'
+ *      name: // value for 'name'
+ *      query: // value for 'query'
+ *   },
+ * });
+ */
+export function useCreateDatasetTableMutation(baseOptions?: Apollo.MutationHookOptions<CreateDatasetTableMutation, CreateDatasetTableMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateDatasetTableMutation, CreateDatasetTableMutationVariables>(CreateDatasetTableDocument, options);
+      }
+export type CreateDatasetTableMutationHookResult = ReturnType<typeof useCreateDatasetTableMutation>;
+export type CreateDatasetTableMutationResult = Apollo.MutationResult<CreateDatasetTableMutation>;
+export type CreateDatasetTableMutationOptions = Apollo.BaseMutationOptions<CreateDatasetTableMutation, CreateDatasetTableMutationVariables>;
+export const DatasetDocument = /*#__PURE__*/ gql`
     query dataset($id: ID!) {
   dataset(id: $id) {
     ...DatasetFields
@@ -170,7 +221,7 @@ export function useDatasetLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Da
 export type DatasetQueryHookResult = ReturnType<typeof useDatasetQuery>;
 export type DatasetLazyQueryHookResult = ReturnType<typeof useDatasetLazyQuery>;
 export type DatasetQueryResult = Apollo.QueryResult<DatasetQuery, DatasetQueryVariables>;
-export const DatasetsDocument = gql`
+export const DatasetsDocument = /*#__PURE__*/ gql`
     query datasets {
   datasets {
     ...DatasetFields

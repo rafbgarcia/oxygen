@@ -1,18 +1,14 @@
 import { Button } from "playbook-ui"
-import { useParams } from "react-router-dom"
+import { Link, Outlet, useParams } from "react-router-dom"
 import { Page } from "./Page"
 import { Wait } from "../components/Wait"
-import { useModal } from "../components/Modal"
-import { useForm } from "react-hook-form"
-import { TextField } from "../components/TextField"
-import { useMutation, useQuery } from "@apollo/client"
 import { PlayIcon } from "@heroicons/react/solid"
+import { TableIcon, PlusSmIcon } from "@heroicons/react/outline"
 import { useDatasetQuery } from "../lib/codegenGraphql"
 
 export const DatasourcesEdit = () => {
-  const { id } = useParams()
-  const { data, error } = useDatasetQuery({ variables: { id: id! } })
-  const { showModal, Modal } = useModal()
+  const { datasetId } = useParams()
+  const { data, error } = useDatasetQuery({ variables: { id: datasetId! } })
 
   const Waiting = Wait(data, error)
   if (Waiting) return <Waiting />
@@ -21,47 +17,41 @@ export const DatasourcesEdit = () => {
     <>
       <Page.Header $flex>
         <Page.Title>{data?.dataset.name}</Page.Title>
-        <Button icon="as" size="sm" onClick={showModal} variant="secondary">
-          <PlayIcon className="w-4" />
-          Build
+        <Link to={`../tables/new`} className="ml-auto">
+          <Button size="md" variant="secondary">
+            <span className="flex items-center gap-x-1">
+              <PlusSmIcon className="w-4" /> Table
+            </span>
+          </Button>
+        </Link>
+        <Button size="md" variant="secondary">
+          <span className="flex items-center gap-x-1">
+            <PlayIcon className="w-4" />
+            Build
+          </span>
         </Button>
       </Page.Header>
       <Page.Main>
-        <div>
-          {data?.dataset.tables?.map((table) => (
-            <div key={table.id}>{table.name}</div>
+        <div className={`bg-white w-[305px] h-[calc(100vh-98px)] overflow-auto shadow-md`}>
+          {data?.dataset.tables.length == 0 && <p className="p-4">No tables</p>}
+          {data?.dataset.tables.map((table) => (
+            <div key={table.id}>
+              <ul>
+                <li>
+                  <Link
+                    to={`../tables/${table.id}/edit`}
+                    className="text-gray-500 group flex items-center gap-x-2 p-3 cursor-pointer hover:bg-gray-100"
+                  >
+                    <TableIcon className="w-5 text-gray-400 group-hover:text-gray-500" />
+                    {table.name}
+                  </Link>
+                </li>
+              </ul>
+            </div>
           ))}
         </div>
+        <Outlet />
       </Page.Main>
     </>
-  )
-}
-
-const NewDatasourceForm = ({ hideModal, Modal }) => {
-  const { register, handleSubmit } = useForm()
-  const [createDataset, { loading }] = useMutation(mutations.createDataset, {
-    refetchQueries: [queries.datasets],
-  })
-  const onSubmit = (data) => {
-    createDataset({ variables: data })
-    hideModal()
-  }
-
-  return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <Modal.Body>
-        <Modal.Title>Add Dimension</Modal.Title>
-
-        <TextField label="Name" className="mb-5" register={register("name", { required: true })} />
-      </Modal.Body>
-      <Modal.Actions>
-        <Button size="sm" className="ml-2" htmlType="submit" loading={loading}>
-          Save
-        </Button>
-        <Button size="sm" variant="secondary" className="ml-2" onClick={hideModal}>
-          Cancel
-        </Button>
-      </Modal.Actions>
-    </form>
   )
 }
