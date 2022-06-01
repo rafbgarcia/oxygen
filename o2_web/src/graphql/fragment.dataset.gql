@@ -1,0 +1,10 @@
+fragment DatasetFields on Dataset {
+  id
+  name
+  sizeMb
+  lastBuiltAt
+  tables {
+    id
+    name
+  }
+}

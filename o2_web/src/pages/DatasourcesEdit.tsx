@@ -6,13 +6,12 @@ import { useModal } from "../components/Modal"
 import { useForm } from "react-hook-form"
 import { TextField } from "../components/TextField"
 import { useMutation, useQuery } from "@apollo/client"
-import { queries } from "../lib/queries"
-import { mutations } from "../lib/mutations"
 import { PlayIcon } from "@heroicons/react/solid"
+import { useDatasetQuery } from "../lib/codegenGraphql"
 
 export const DatasourcesEdit = () => {
   const { id } = useParams()
-  const { data, error } = useQuery(queries.dataset, { variables: { id } })
+  const { data, error } = useDatasetQuery({ variables: { id: id! } })
   const { showModal, Modal } = useModal()
 
   const Waiting = Wait(data, error)
@@ -21,13 +20,19 @@ export const DatasourcesEdit = () => {
   return (
     <>
       <Page.Header $flex>
-        <Page.Title>{data.dataset.name}</Page.Title>
+        <Page.Title>{data?.dataset.name}</Page.Title>
         <Button icon="as" size="sm" onClick={showModal} variant="secondary">
           <PlayIcon className="w-4" />
           Build
         </Button>
       </Page.Header>
-      <Page.Main className="container m-auto max-w-screen-lg"></Page.Main>
+      <Page.Main>
+        <div>
+          {data?.dataset.tables?.map((table) => (
+            <div key={table.id}>{table.name}</div>
+          ))}
+        </div>
+      </Page.Main>
     </>
   )
 }

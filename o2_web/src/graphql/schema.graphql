@@ -3,23 +3,24 @@ schema {
   mutation: Mutation
 }
 
-type CreateDatasetMutation {
+type CreateDatasetMutationHandler {
   dataset: Dataset
 }
 
 type Dataset {
   id: ID!
+  created: DateTime!
+  modified: DateTime!
   name: String!
-  isBuilding: Boolean
-  sizeMb: Decimal
+  isBuilding: Boolean!
+  sizeMb: Int
   lastBuiltAt: DateTime
-  buildDurationSeconds: Int
+  buildDurationSeconds: Float
   tables: [DatasetTable!]!
 }
 
 type DatasetTable {
   id: ID!
-  dataset: Dataset!
   name: String!
   query: String!
   fields: JSONString!
@@ -29,15 +30,13 @@ type DatasetTable {
 
 scalar DateTime
 
-scalar Decimal
-
 scalar JSONString
 
 type Mutation {
-  createDataset(name: String!): CreateDatasetMutation
+  createDataset(name: String!): CreateDatasetMutationHandler
 }
 
 type Query {
-  dataset(id: ID!): Dataset
-  datasets: [Dataset]
+  dataset(id: ID!): Dataset!
+  datasets: [Dataset!]!
 }

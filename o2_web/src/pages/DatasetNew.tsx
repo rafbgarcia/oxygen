@@ -7,9 +7,10 @@ import { TextareaField } from "../components/TextareaField"
 import { useLoadingMutation as useLoadingMutation } from "../lib/api"
 import { Table } from "../components/Table"
 import { Page } from "./Page"
-import { map } from "lodash-es"
+import { map, isEmpty } from "lodash-es"
 import { useNavigate } from "react-router-dom"
 import { classnames } from "../lib/classnames"
+import { DatasetTable } from "../lib/codegenGraphql"
 
 type Preview = { fields: DatasetTable["fields"]; html: string }
 type FormData = {
@@ -19,8 +20,12 @@ type FormData = {
 
 const newTableValues = {
   name: "Untitled",
+  query: "",
+  htmlPreview: "",
+  fields: [],
 }
 const defaultValues = {
+  name: "",
   tables: [newTableValues],
 }
 
@@ -28,7 +33,7 @@ export const Dataset = () => {
   const navigate = useNavigate()
   const [getDatasetPreview, loadingPreview] = useLoadingMutation("previewDataset")
   const [createDataset, loadingSave] = useLoadingMutation("createDataset")
-  const { register, control, watch, handleSubmit } = useForm<FormData>({ defaultValues })
+  const { register, control, watch, handleSubmit } = useForm({ defaultValues })
   const { fields: tables, append, remove, update } = useFieldArray({ control, name: "tables" })
   const [activeTableId, setActiveTableId] = useState(tables[0]?.id)
   const handlePreview = (table, index) => {
@@ -113,7 +118,7 @@ export const Dataset = () => {
                     Preview
                   </Button>
                 </div>
-                {table.htmlPreview && <Preview table={table} />}
+                {!isEmpty(table.htmlPreview) && <Preview table={table} />}
               </div>
             ))}
           </div>

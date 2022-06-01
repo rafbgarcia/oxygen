@@ -7,12 +7,10 @@ import { Wait } from "../components/Wait"
 import { useModal } from "../components/Modal"
 import { useForm } from "react-hook-form"
 import { TextField } from "../components/TextField"
-import { useMutation, useQuery } from "@apollo/client"
-import { queries } from "../lib/queries"
-import { mutations } from "../lib/mutations"
+import { DatasetsDocument, useCreateDatasetMutation, useDatasetsQuery } from "../lib/codegenGraphql"
 
 export const Datasources = () => {
-  const { error, data } = useQuery(queries.datasets)
+  const { error, data } = useDatasetsQuery()
   const { showModal, Modal } = useModal()
 
   const Waiting = Wait(data, error)
@@ -29,7 +27,7 @@ export const Datasources = () => {
       </Page.Header>
       <Page.Main className="container m-auto max-w-screen-lg">
         <div className="grid grid-cols-3 gap-x-6 gap-y-6 p-4">
-          {data.datasets.map((dataset) => (
+          {data?.datasets.map((dataset) => (
             <Link
               to={`/datasets/${dataset.id}/edit`}
               key={dataset.id}
@@ -63,8 +61,8 @@ const LastBuiltAt = ({ dateTimestring }) => {
 
 const NewDatasourceForm = ({ hideModal, Modal }) => {
   const { register, handleSubmit } = useForm()
-  const [createDataset, { loading }] = useMutation(mutations.createDataset, {
-    refetchQueries: [queries.datasets],
+  const [createDataset, { loading }] = useCreateDatasetMutation({
+    refetchQueries: [DatasetsDocument],
   })
   const onSubmit = (data) => {
     createDataset({ variables: data })

@@ -1,0 +1,5 @@
+query dataset($id: ID!) {
+  dataset(id: $id) {
+    ...DatasetFields
+  }
+}
