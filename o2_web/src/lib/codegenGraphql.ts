@@ -92,9 +92,15 @@ export type MutationCreateDatasetTableArgs = {
 
 export type Query = {
   __typename?: 'Query';
+  dashboard: Dashboard;
   dashboards: Array<Dashboard>;
   dataset: Dataset;
   datasets: Array<Dataset>;
+};
+
+
+export type QueryDashboardArgs = {
+  id: Scalars['ID'];
 };
 
 
@@ -158,6 +164,13 @@ export type CreateDatasetTableMutationVariables = Exact<{
 
 
 export type CreateDatasetTableMutation = { __typename?: 'Mutation', dataset?: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, fields: Array<{ __typename?: 'DatasetTableFields', name: string, type: string }> }> } | null };
+
+export type DashboardQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+
+export type DashboardQuery = { __typename?: 'Query', dashboard: { __typename?: 'Dashboard', id: string, name: string, layout?: any | null } };
 
 export type DashboardsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -346,6 +359,41 @@ export function useCreateDatasetTableMutation(baseOptions?: Apollo.MutationHookO
 export type CreateDatasetTableMutationHookResult = ReturnType<typeof useCreateDatasetTableMutation>;
 export type CreateDatasetTableMutationResult = Apollo.MutationResult<CreateDatasetTableMutation>;
 export type CreateDatasetTableMutationOptions = Apollo.BaseMutationOptions<CreateDatasetTableMutation, CreateDatasetTableMutationVariables>;
+export const DashboardDocument = /*#__PURE__*/ gql`
+    query dashboard($id: ID!) {
+  dashboard(id: $id) {
+    ...DashboardParts
+  }
+}
+    ${DashboardPartsFragmentDoc}`;
+
+/**
+ * __useDashboardQuery__
+ *
+ * To run a query within a React component, call `useDashboardQuery` and pass it any options that fit your needs.
+ * When your component renders, `useDashboardQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useDashboardQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useDashboardQuery(baseOptions: Apollo.QueryHookOptions<DashboardQuery, DashboardQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<DashboardQuery, DashboardQueryVariables>(DashboardDocument, options);
+      }
+export function useDashboardLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<DashboardQuery, DashboardQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<DashboardQuery, DashboardQueryVariables>(DashboardDocument, options);
+        }
+export type DashboardQueryHookResult = ReturnType<typeof useDashboardQuery>;
+export type DashboardLazyQueryHookResult = ReturnType<typeof useDashboardLazyQuery>;
+export type DashboardQueryResult = Apollo.QueryResult<DashboardQuery, DashboardQueryVariables>;
 export const DashboardsDocument = /*#__PURE__*/ gql`
     query dashboards {
   dashboards {

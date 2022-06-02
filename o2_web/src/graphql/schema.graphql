@@ -55,6 +55,7 @@ type Mutation {
 type Query {
   dataset(id: ID!): Dataset!
   datasets: [Dataset!]!
+  dashboard(id: ID!): Dashboard!
   dashboards: [Dashboard!]!
 }
 

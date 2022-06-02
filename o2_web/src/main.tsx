@@ -12,9 +12,9 @@ import { DatasetTableNew } from "./pages/Dataset/DatasetTableNew"
 import { DatasetTableShow } from "./pages/Dataset/DatasetTableShow"
 
 import { DashboardIndex } from "./pages/Dashboard/DashboardIndex"
-import { DashboardNew } from "./pages/DashboardNew"
-import { DashboardEdit } from "./pages/DashboardEdit"
-import { WidgetNew } from "./pages/WidgetNew"
+import { DashboardEdit } from "./pages/Dashboard/DashboardEdit"
+// import { DashboardNew } from "./pages/DashboardNew"
+// import { WidgetNew } from "./pages/WidgetNew"
 import { EmbeddedDashboard } from "./pages/EmbeddedDashboard"
 import { ToastContainer } from "react-toastify"
 

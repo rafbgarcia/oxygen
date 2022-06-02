@@ -54,16 +54,20 @@ class Query(graphene.ObjectType):
     dataset = graphene.Field(DatasetType, id=graphene.ID(required=True), required=True)
     datasets = graphene.List(graphene.NonNull(DatasetType), required=True)
 
+    dashboard = graphene.Field(DashboardType, id=graphene.ID(required=True), required=True)
     dashboards = graphene.List(graphene.NonNull(DashboardType), required=True)
 
     def resolve_dataset(root, info, id):
         return Dataset.objects.get(pk=id)
 
     def resolve_datasets(root, info):
-        return list(Dataset.objects.prefetch_related("tables").all())
+        return Dataset.objects.prefetch_related("tables").all()
+
+    def resolve_dashboard(root, info, id):
+        return Dashboard.objects.prefetch_related("widgets").get(pk=id)
 
     def resolve_dashboards(root, info):
-        return list(Dashboard.objects.prefetch_related("widgets").all())
+        return Dashboard.objects.prefetch_related("widgets").all()
 
 
 ###########
