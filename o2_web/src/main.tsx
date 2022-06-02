@@ -14,6 +14,7 @@ import { DatasetTableShow } from "./pages/Dataset/DatasetTableShow"
 
 import { DashboardIndex } from "./pages/Dashboard/DashboardIndex"
 import { DashboardEdit } from "./pages/Dashboard/DashboardEdit"
+import { WidgetEdit } from "./pages/Dashboard/WidgetEdit"
 // import { DashboardNew } from "./pages/DashboardNew"
 // import { WidgetNew } from "./pages/WidgetNew"
 
@@ -53,6 +54,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <Route path="dashboards" element={<DashboardIndex />} />
             <Route path="dashboards/:dashboardId" element={<DashboardEdit />}>
               <Route path="edit" element={null} />
+              <Route path="widgets/:widgetId/edit" element={<WidgetEdit />} />
             </Route>
 
             {/* <Route path="dashboards/new" element={<DashboardNew />} />

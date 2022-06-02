@@ -1,5 +1,5 @@
 import { Button } from "playbook-ui"
-import { useNavigate, useParams } from "react-router-dom"
+import { Outlet, useNavigate, useParams } from "react-router-dom"
 import { Page } from "../Page"
 import { Wait } from "../../components/Wait"
 import { useCreateWidgetMutation, useDashboardQuery, WidgetType } from "../../lib/codegenGraphql"
@@ -10,7 +10,7 @@ import { ChartBarIcon, TableIcon } from "@heroicons/react/outline"
 const initialLayout = { i: "", w: 12, h: 10, x: 0, y: 0 }
 
 export const DashboardEdit = () => {
-  const { dashboardId } = useParams()
+  const { dashboardId, widgetId } = useParams()
   const navigate = useNavigate()
   const { error, data } = useDashboardQuery({ variables: { id: dashboardId! } })
   const [createWidget] = useCreateWidgetMutation()
@@ -59,7 +59,14 @@ export const DashboardEdit = () => {
         </Popover>
       </Page.Header>
       <Page.Main>
-        <DashboardLayout dashboard={data?.dashboard} />
+        <div className="flex items-start">
+          <div className="flex-grow flex-shrink basis-full">
+            <DashboardLayout key={widgetId} dashboard={data?.dashboard} />
+          </div>
+          <div className="flex-grow-1 flex-shrink basis-0">
+            <Outlet context={{ dashboard: data!.dashboard }} />
+          </div>
+        </div>
       </Page.Main>
     </>
   )

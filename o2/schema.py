@@ -5,7 +5,7 @@ from o2.dataset_helpers import DatasetHelper
 from o2.graphql.mutation_createDataset import CreateDatasetTableMutationHandler
 from o2.models import Dashboard, Dataset, DatasetTable, Widget
 from o2.graphql.mutation_createWidget import CreateWidgetMutationHandler
-from o2.graphql.objects import DatasetObject, DashboardObject
+from o2.graphql.objects import DatasetObject, DashboardObject, WidgetObject
 
 
 #########
