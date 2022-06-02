@@ -2,6 +2,7 @@ import React from "react"
 import ReactDOM from "react-dom/client"
 import { BrowserRouter, Route, Routes } from "react-router-dom"
 import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client"
+import { ToastContainer } from "react-toastify"
 
 import { Layout } from "./pages/Layout"
 import { Home } from "./pages/Home"
@@ -15,14 +16,19 @@ import { DashboardIndex } from "./pages/Dashboard/DashboardIndex"
 import { DashboardEdit } from "./pages/Dashboard/DashboardEdit"
 // import { DashboardNew } from "./pages/DashboardNew"
 // import { WidgetNew } from "./pages/WidgetNew"
+
+/**
+ * Page to display dashboard in Nitro
+ */
 import { EmbeddedDashboard } from "./pages/EmbeddedDashboard"
-import { ToastContainer } from "react-toastify"
 
 /**
  * Vendor CSS
  */
 import "react-toastify/dist/ReactToastify.css"
-import "../node_modules/playbook-ui/dist/playbook.css"
+import "playbook-ui/dist/playbook.css"
+import "/node_modules/react-grid-layout/css/styles.css"
+import "/node_modules/react-resizable/css/styles.css"
 
 const client = new ApolloClient({
   uri: "http://localhost:8000/",

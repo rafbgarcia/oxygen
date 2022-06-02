@@ -1,0 +1,10 @@
+mutation createWidget($widgetType: WidgetType!, $dashboardId: ID!, $layout: WidgetLayoutInput!) {
+  createWidget(widgetType: $widgetType, dashboardId: $dashboardId, layout: $layout) {
+    dashboard {
+      ...DashboardParts
+    }
+    widget {
+      ...WidgetParts
+    }
+  }
+}

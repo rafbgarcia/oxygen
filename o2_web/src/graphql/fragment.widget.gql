@@ -1,0 +1,14 @@
+fragment WidgetParts on Widget {
+  id
+  title
+  type
+  buildInfo
+
+  layout {
+    i
+    w
+    h
+    x
+    y
+  }
+}

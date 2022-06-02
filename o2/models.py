@@ -83,20 +83,19 @@ class DatasetTable(models.Model):
 class Dashboard(TimeStampedModel):
     dataset = models.ForeignKey(Dataset, on_delete=models.SET_NULL, null=True)
     name = models.CharField(max_length=100)
-    layout = models.JSONField(null=True)
 
 
 class Widget(TimeStampedModel):
     class Types(models.TextChoices):
-        PIVOT_TABLE = "pivot_table"
-        LINE_CHART = "line_chart"
-        VERTICAL_BAR_CHART = "vertical_bar_chart"
+        PIVOT_TABLE = "Pivot Table"
+        LINE_CHART = "Line Chart"
+        VERTICAL_BAR_CHART = "Vertical Bar Chart"
 
     dashboard = models.ForeignKey(Dashboard, on_delete=models.CASCADE, related_name="widgets")
-    title = models.CharField(max_length=200, null=True)
     type = models.CharField(max_length=20, choices=Types.choices)
-    build_info = models.JSONField()
-    grid_row_index = models.SmallIntegerField()
+    layout = models.JSONField(null=False)
+    title = models.CharField(max_length=200, null=True)
+    build_info = models.JSONField(default=dict)
 
     WIDGET = {"pivot_table": Pivot, "vertical_bar_chart": VerticalBarChart}
 

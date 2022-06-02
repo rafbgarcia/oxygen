@@ -1,5 +1,8 @@
 fragment DashboardParts on Dashboard {
   id
   name
-  layout
+
+  widgets {
+    ...WidgetParts
+  }
 }

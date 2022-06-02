@@ -17,41 +17,4 @@ export declare global {
       }
     }
   }
-
-  /**
-   * API Responses
-   */
-
-  /**
-   * Dashboard
-   */
-  type DashboardJSON = {
-    title: string
-    dataLastUpdatedAt: string
-    gridRows: [
-      {
-        widgets: [WidgetJSON]
-      }
-    ]
-  }
-
-  /**
-   * Widget
-   */
-  type WidgetType = "pivot_table" | "vertical_bar_chart"
-
-  type WidgetJSON = {
-    id: number
-    type: WidgetType
-    meta: PivotMeta
-    build: PivotBuild
-  }
-  type PivotMeta = {
-    html: string
-  }
-  type PivotBuild = {
-    columns: [{ field: string; alias: string }]
-    rows: [{ field: string; alias: string }]
-    values: [{ fn: string; field: string; alias: string }]
-  }
 }

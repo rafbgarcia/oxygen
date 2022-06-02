@@ -3,13 +3,17 @@ schema {
   mutation: Mutation
 }
 
+type CreateWidgetMutationHandler {
+  dashboard: Dashboard!
+  widget: Widget!
+}
+
 type Dashboard {
   id: ID!
   created: DateTime!
   modified: DateTime!
   dataset: Dataset
   name: String!
-  layout: JSONString
   widgets: [Widget!]!
 }
 
@@ -50,6 +54,7 @@ type Mutation {
   buildDataset(id: ID!): Dataset!
   createDatasetTable(datasetId: ID!, name: String!, query: String!): Dataset
   createDashboard(name: String!, datasetId: ID!): Dashboard!
+  createWidget(dashboardId: ID!, layout: WidgetLayoutInput!, widgetType: WidgetType!): CreateWidgetMutationHandler
 }
 
 type Query {
@@ -64,10 +69,26 @@ type Widget {
   created: DateTime!
   modified: DateTime!
   dashboard: Dashboard!
-  title: String
   type: WidgetType!
+  layout: WidgetLayout!
+  title: String
   buildInfo: JSONString!
-  gridRowIndex: Int!
+}
+
+type WidgetLayout {
+  i: ID!
+  w: Int!
+  h: Int!
+  x: Int!
+  y: Int!
+}
+
+input WidgetLayoutInput {
+  i: ID!
+  w: Int!
+  h: Int!
+  x: Int!
+  y: Int!
 }
 
 enum WidgetType {
