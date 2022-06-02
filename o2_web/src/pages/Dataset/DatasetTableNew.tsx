@@ -1,12 +1,12 @@
 import { Button, Body } from "playbook-ui"
 import { useNavigate, useParams } from "react-router-dom"
-import { Modal } from "../components/Modal"
+import { Modal } from "../../components/Modal"
 import { useForm } from "react-hook-form"
-import { TextField } from "../components/TextField"
-import { useCreateDatasetTableMutation } from "../lib/codegenGraphql"
-import { TextareaField } from "../components/TextareaField"
+import { TextField } from "../../components/TextField"
+import { useCreateDatasetTableMutation } from "../../lib/codegenGraphql"
+import { TextareaField } from "../../components/TextareaField"
 
-export const DatasourcesEditTableNew = () => {
+export const DatasetTableNew = () => {
   const navigate = useNavigate()
   const { datasetId } = useParams()
   const { register, handleSubmit } = useForm()

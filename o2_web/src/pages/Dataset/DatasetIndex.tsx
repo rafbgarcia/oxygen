@@ -1,15 +1,15 @@
 import { Button, Body, Title, Avatar } from "playbook-ui"
 import { DatabaseIcon } from "@heroicons/react/outline"
 import { Link } from "react-router-dom"
-import { Page } from "./Page"
+import { Page } from "../Page"
 import { parseISO, formatDistanceToNowStrict } from "date-fns"
-import { Wait } from "../components/Wait"
-import { useModal } from "../components/Modal"
+import { Wait } from "../../components/Wait"
+import { useModal } from "../../components/Modal"
 import { useForm } from "react-hook-form"
-import { TextField } from "../components/TextField"
-import { DatasetsDocument, useCreateDatasetMutation, useDatasetsQuery } from "../lib/codegenGraphql"
+import { TextField } from "../../components/TextField"
+import { DatasetsDocument, useCreateDatasetMutation, useDatasetsQuery } from "../../lib/codegenGraphql"
 
-export const Datasources = () => {
+export const DatasetIndex = () => {
   const { error, data } = useDatasetsQuery()
   const { showModal, Modal } = useModal()
 

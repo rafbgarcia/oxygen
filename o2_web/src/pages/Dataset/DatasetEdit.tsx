@@ -1,12 +1,12 @@
 import React from "react"
 import { Button } from "playbook-ui"
 import { Link, Outlet, useParams } from "react-router-dom"
-import { Page } from "./Page"
-import { Wait } from "../components/Wait"
+import { Page } from "../Page"
+import { Wait } from "../../components/Wait"
 import { PlayIcon } from "@heroicons/react/solid"
 import { TableIcon, PlusSmIcon, MenuIcon, HashtagIcon, CalendarIcon } from "@heroicons/react/outline"
-import { DatasetQuery, useBuildDatasetMutation, useDatasetQuery } from "../lib/codegenGraphql"
-import { classnames } from "../lib/classnames"
+import { DatasetQuery, useBuildDatasetMutation, useDatasetQuery } from "../../lib/codegenGraphql"
+import { classnames } from "../../lib/classnames"
 import { toast } from "react-toastify"
 
 const FIELD_TYPE_ICON = {
@@ -28,7 +28,7 @@ const FIELD_TYPE_ICON = {
   ),
 }
 
-export const DatasourcesEdit = () => {
+export const DatasetEdit = () => {
   const { datasetId, tableId } = useParams()
   const { data, error } = useDatasetQuery({ variables: { id: datasetId! } })
   const [buildDataset, { loading: building }] = useBuildDatasetMutation()

@@ -1,10 +1,10 @@
 import { Title } from "playbook-ui"
 import { useOutletContext, useParams } from "react-router-dom"
-import { Dataset } from "../lib/codegenGraphql"
+import { Dataset } from "../../lib/codegenGraphql"
 import { find } from "lodash-es"
-import { Table } from "../components/Table"
+import { Table } from "../../components/Table"
 
-export const DatasourcesEditTableEdit = () => {
+export const DatasetTableShow = () => {
   const { tableId } = useParams()
   const { dataset } = useOutletContext<{ dataset: Dataset }>()
   const table = find(dataset.tables, { id: tableId })
