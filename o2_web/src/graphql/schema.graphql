@@ -7,6 +7,16 @@ type CreateDatasetTableMutationHandler {
   dataset: Dataset
 }
 
+type Dashboard {
+  id: ID!
+  created: DateTime!
+  modified: DateTime!
+  dataset: Dataset
+  name: String!
+  layout: JSONString
+  widgets: [Widget!]!
+}
+
 type Dataset {
   id: ID!
   created: DateTime!
@@ -17,6 +27,7 @@ type Dataset {
   lastBuiltAt: DateTime
   buildDurationSeconds: Float
   tables: [DatasetTable!]!
+  dashboardSet: [Dashboard!]!
 }
 
 type DatasetTable {
@@ -36,13 +47,34 @@ type DatasetTableFields {
 
 scalar DateTime
 
+scalar JSONString
+
 type Mutation {
   createDataset(name: String!): Dataset!
   buildDataset(id: ID!): Dataset!
   createDatasetTable(datasetId: ID!, name: String!, query: String!): CreateDatasetTableMutationHandler
+  createDashboard(name: String!, datasetId: ID!): Dashboard!
 }
 
 type Query {
   dataset(id: ID!): Dataset!
   datasets: [Dataset!]!
+  dashboards: [Dashboard!]!
+}
+
+type Widget {
+  id: ID!
+  created: DateTime!
+  modified: DateTime!
+  dashboard: Dashboard!
+  title: String
+  type: WidgetType!
+  buildInfo: JSONString!
+  gridRowIndex: Int!
+}
+
+enum WidgetType {
+  PIVOT_TABLE
+  LINE_CHART
+  VERTICAL_BAR_CHART
 }

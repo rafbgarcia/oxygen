@@ -1,5 +1,5 @@
 mutation createDataset($name: String!) {
-  createDataset(name: $name) {
+  dataset: createDataset(name: $name) {
     ...DatasetParts
   }
 }

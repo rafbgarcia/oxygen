@@ -1,5 +1,5 @@
 mutation buildDataset($id: ID!) {
-  buildDataset(id: $id) {
+  dataset: buildDataset(id: $id) {
     ...DatasetParts
   }
 }

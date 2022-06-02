@@ -81,10 +81,9 @@ class DatasetTable(models.Model):
 
 
 class Dashboard(TimeStampedModel):
-    name = models.CharField(max_length=100)
-    previous_version = models.ForeignKey("self", on_delete=models.SET_NULL, null=True)
     dataset = models.ForeignKey(Dataset, on_delete=models.SET_NULL, null=True)
-    grid_rows = models.JSONField(null=True)
+    name = models.CharField(max_length=100)
+    layout = models.JSONField(null=True)
 
 
 class Widget(TimeStampedModel):
@@ -93,7 +92,7 @@ class Widget(TimeStampedModel):
         LINE_CHART = "line_chart"
         VERTICAL_BAR_CHART = "vertical_bar_chart"
 
-    dashboard = models.ForeignKey(Dashboard, on_delete=models.SET_NULL, null=True)
+    dashboard = models.ForeignKey(Dashboard, on_delete=models.CASCADE, related_name="widgets")
     title = models.CharField(max_length=200, null=True)
     type = models.CharField(max_length=20, choices=Types.choices)
     build_info = models.JSONField()

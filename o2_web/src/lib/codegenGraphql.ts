@@ -14,6 +14,7 @@ export type Scalars = {
   Int: number;
   Float: number;
   DateTime: any;
+  JSONString: any;
 };
 
 export type CreateDatasetTableMutationHandler = {
@@ -21,10 +22,22 @@ export type CreateDatasetTableMutationHandler = {
   dataset?: Maybe<Dataset>;
 };
 
+export type Dashboard = {
+  __typename?: 'Dashboard';
+  created: Scalars['DateTime'];
+  dataset?: Maybe<Dataset>;
+  id: Scalars['ID'];
+  layout?: Maybe<Scalars['JSONString']>;
+  modified: Scalars['DateTime'];
+  name: Scalars['String'];
+  widgets: Array<Widget>;
+};
+
 export type Dataset = {
   __typename?: 'Dataset';
   buildDurationSeconds?: Maybe<Scalars['Float']>;
   created: Scalars['DateTime'];
+  dashboardSet: Array<Dashboard>;
   id: Scalars['ID'];
   isBuilding: Scalars['Boolean'];
   lastBuiltAt?: Maybe<Scalars['DateTime']>;
@@ -54,6 +67,7 @@ export type DatasetTableFields = {
 export type Mutation = {
   __typename?: 'Mutation';
   buildDataset: Dataset;
+  createDashboard: Dashboard;
   createDataset: Dataset;
   createDatasetTable?: Maybe<CreateDatasetTableMutationHandler>;
 };
@@ -61,6 +75,12 @@ export type Mutation = {
 
 export type MutationBuildDatasetArgs = {
   id: Scalars['ID'];
+};
+
+
+export type MutationCreateDashboardArgs = {
+  datasetId: Scalars['ID'];
+  name: Scalars['String'];
 };
 
 
@@ -77,6 +97,7 @@ export type MutationCreateDatasetTableArgs = {
 
 export type Query = {
   __typename?: 'Query';
+  dashboards: Array<Dashboard>;
   dataset: Dataset;
   datasets: Array<Dataset>;
 };
@@ -85,6 +106,26 @@ export type Query = {
 export type QueryDatasetArgs = {
   id: Scalars['ID'];
 };
+
+export type Widget = {
+  __typename?: 'Widget';
+  buildInfo: Scalars['JSONString'];
+  created: Scalars['DateTime'];
+  dashboard: Dashboard;
+  gridRowIndex: Scalars['Int'];
+  id: Scalars['ID'];
+  modified: Scalars['DateTime'];
+  title?: Maybe<Scalars['String']>;
+  type: WidgetType;
+};
+
+export enum WidgetType {
+  LineChart = 'LINE_CHART',
+  PivotTable = 'PIVOT_TABLE',
+  VerticalBarChart = 'VERTICAL_BAR_CHART'
+}
+
+export type DashboardPartsFragment = { __typename?: 'Dashboard', id: string, name: string, layout?: any | null };
 
 export type DatasetPartsFragment = { __typename?: 'Dataset', id: string, name: string, sizeMb?: number | null, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview: string, fields: Array<{ __typename?: 'DatasetTableFields', name: string, type: string }> }> };
 
@@ -97,14 +138,22 @@ export type BuildDatasetMutationVariables = Exact<{
 }>;
 
 
-export type BuildDatasetMutation = { __typename?: 'Mutation', buildDataset: { __typename?: 'Dataset', id: string, name: string, sizeMb?: number | null, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview: string, fields: Array<{ __typename?: 'DatasetTableFields', name: string, type: string }> }> } };
+export type BuildDatasetMutation = { __typename?: 'Mutation', dataset: { __typename?: 'Dataset', id: string, name: string, sizeMb?: number | null, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview: string, fields: Array<{ __typename?: 'DatasetTableFields', name: string, type: string }> }> } };
+
+export type CreateDashboardMutationVariables = Exact<{
+  name: Scalars['String'];
+  datasetId: Scalars['ID'];
+}>;
+
+
+export type CreateDashboardMutation = { __typename?: 'Mutation', dashboard: { __typename?: 'Dashboard', id: string, name: string, layout?: any | null } };
 
 export type CreateDatasetMutationVariables = Exact<{
   name: Scalars['String'];
 }>;
 
 
-export type CreateDatasetMutation = { __typename?: 'Mutation', createDataset: { __typename?: 'Dataset', id: string, name: string, sizeMb?: number | null, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview: string, fields: Array<{ __typename?: 'DatasetTableFields', name: string, type: string }> }> } };
+export type CreateDatasetMutation = { __typename?: 'Mutation', dataset: { __typename?: 'Dataset', id: string, name: string, sizeMb?: number | null, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview: string, fields: Array<{ __typename?: 'DatasetTableFields', name: string, type: string }> }> } };
 
 export type CreateDatasetTableMutationVariables = Exact<{
   datasetId: Scalars['ID'];
@@ -114,6 +163,11 @@ export type CreateDatasetTableMutationVariables = Exact<{
 
 
 export type CreateDatasetTableMutation = { __typename?: 'Mutation', createDatasetTable?: { __typename?: 'CreateDatasetTableMutationHandler', dataset?: { __typename?: 'Dataset', id: string, name: string, sizeMb?: number | null, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview: string, fields: Array<{ __typename?: 'DatasetTableFields', name: string, type: string }> }> } | null } | null };
+
+export type DashboardsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type DashboardsQuery = { __typename?: 'Query', dashboards: Array<{ __typename?: 'Dashboard', id: string, name: string, layout?: any | null }> };
 
 export type DatasetQueryVariables = Exact<{
   id: Scalars['ID'];
@@ -127,6 +181,13 @@ export type DatasetsQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type DatasetsQuery = { __typename?: 'Query', datasets: Array<{ __typename?: 'Dataset', id: string, name: string, sizeMb?: number | null, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview: string, fields: Array<{ __typename?: 'DatasetTableFields', name: string, type: string }> }> }> };
 
+export const DashboardPartsFragmentDoc = /*#__PURE__*/ gql`
+    fragment DashboardParts on Dashboard {
+  id
+  name
+  layout
+}
+    `;
 export const DatasetTableFieldsPartsFragmentDoc = /*#__PURE__*/ gql`
     fragment DatasetTableFieldsParts on DatasetTableFields {
   name
@@ -158,7 +219,7 @@ export const DatasetPartsFragmentDoc = /*#__PURE__*/ gql`
     ${DatasetTablePartsFragmentDoc}`;
 export const BuildDatasetDocument = /*#__PURE__*/ gql`
     mutation buildDataset($id: ID!) {
-  buildDataset(id: $id) {
+  dataset: buildDataset(id: $id) {
     ...DatasetParts
   }
 }
@@ -189,9 +250,43 @@ export function useBuildDatasetMutation(baseOptions?: Apollo.MutationHookOptions
 export type BuildDatasetMutationHookResult = ReturnType<typeof useBuildDatasetMutation>;
 export type BuildDatasetMutationResult = Apollo.MutationResult<BuildDatasetMutation>;
 export type BuildDatasetMutationOptions = Apollo.BaseMutationOptions<BuildDatasetMutation, BuildDatasetMutationVariables>;
+export const CreateDashboardDocument = /*#__PURE__*/ gql`
+    mutation createDashboard($name: String!, $datasetId: ID!) {
+  dashboard: createDashboard(name: $name, datasetId: $datasetId) {
+    ...DashboardParts
+  }
+}
+    ${DashboardPartsFragmentDoc}`;
+export type CreateDashboardMutationFn = Apollo.MutationFunction<CreateDashboardMutation, CreateDashboardMutationVariables>;
+
+/**
+ * __useCreateDashboardMutation__
+ *
+ * To run a mutation, you first call `useCreateDashboardMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateDashboardMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createDashboardMutation, { data, loading, error }] = useCreateDashboardMutation({
+ *   variables: {
+ *      name: // value for 'name'
+ *      datasetId: // value for 'datasetId'
+ *   },
+ * });
+ */
+export function useCreateDashboardMutation(baseOptions?: Apollo.MutationHookOptions<CreateDashboardMutation, CreateDashboardMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateDashboardMutation, CreateDashboardMutationVariables>(CreateDashboardDocument, options);
+      }
+export type CreateDashboardMutationHookResult = ReturnType<typeof useCreateDashboardMutation>;
+export type CreateDashboardMutationResult = Apollo.MutationResult<CreateDashboardMutation>;
+export type CreateDashboardMutationOptions = Apollo.BaseMutationOptions<CreateDashboardMutation, CreateDashboardMutationVariables>;
 export const CreateDatasetDocument = /*#__PURE__*/ gql`
     mutation createDataset($name: String!) {
-  createDataset(name: $name) {
+  dataset: createDataset(name: $name) {
     ...DatasetParts
   }
 }
@@ -259,6 +354,40 @@ export function useCreateDatasetTableMutation(baseOptions?: Apollo.MutationHookO
 export type CreateDatasetTableMutationHookResult = ReturnType<typeof useCreateDatasetTableMutation>;
 export type CreateDatasetTableMutationResult = Apollo.MutationResult<CreateDatasetTableMutation>;
 export type CreateDatasetTableMutationOptions = Apollo.BaseMutationOptions<CreateDatasetTableMutation, CreateDatasetTableMutationVariables>;
+export const DashboardsDocument = /*#__PURE__*/ gql`
+    query dashboards {
+  dashboards {
+    ...DashboardParts
+  }
+}
+    ${DashboardPartsFragmentDoc}`;
+
+/**
+ * __useDashboardsQuery__
+ *
+ * To run a query within a React component, call `useDashboardsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useDashboardsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useDashboardsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useDashboardsQuery(baseOptions?: Apollo.QueryHookOptions<DashboardsQuery, DashboardsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<DashboardsQuery, DashboardsQueryVariables>(DashboardsDocument, options);
+      }
+export function useDashboardsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<DashboardsQuery, DashboardsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<DashboardsQuery, DashboardsQueryVariables>(DashboardsDocument, options);
+        }
+export type DashboardsQueryHookResult = ReturnType<typeof useDashboardsQuery>;
+export type DashboardsLazyQueryHookResult = ReturnType<typeof useDashboardsLazyQuery>;
+export type DashboardsQueryResult = Apollo.QueryResult<DashboardsQuery, DashboardsQueryVariables>;
 export const DatasetDocument = /*#__PURE__*/ gql`
     query dataset($id: ID!) {
   dataset(id: $id) {

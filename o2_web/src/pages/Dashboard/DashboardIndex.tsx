@@ -1,16 +1,24 @@
 import { Button, Body, Title, Avatar } from "playbook-ui"
 import { DatabaseIcon } from "@heroicons/react/outline"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { Page } from "../Page"
-import { parseISO, formatDistanceToNowStrict } from "date-fns"
 import { Wait } from "../../components/Wait"
 import { useModal } from "../../components/Modal"
 import { useForm } from "react-hook-form"
 import { TextField } from "../../components/TextField"
-import { DatasetsDocument, useCreateDatasetMutation, useDatasetsQuery } from "../../lib/codegenGraphql"
+import {
+  DashboardsDocument,
+  DatasetsDocument,
+  useCreateDashboardMutation,
+  useCreateDatasetMutation,
+  useDashboardsQuery,
+  useDatasetsQuery,
+} from "../../lib/codegenGraphql"
+import { SelectField } from "../../components/SelectField"
+import { map } from "lodash-es"
 
-export const DatasetIndex = () => {
-  const { error, data } = useDatasetsQuery()
+export const DashboardIndex = () => {
+  const { error, data } = useDashboardsQuery()
   const { showModal, Modal } = useModal()
 
   const Waiting = Wait(data, error)
@@ -18,28 +26,25 @@ export const DatasetIndex = () => {
 
   return (
     <>
-      <Modal children={NewDatasourceForm} />
+      <Modal children={NewDashboardForm} />
       <Page.Header $flex>
-        <Page.Title>Data Sources</Page.Title>
+        <Page.Title>Dashboards</Page.Title>
         <Button size="sm" onClick={showModal} variant="secondary">
-          + Data Source
+          + Dashboard
         </Button>
       </Page.Header>
       <Page.Main className="container m-auto max-w-screen-lg">
         <div className="grid grid-cols-3 gap-x-6 gap-y-6 p-4">
-          {data?.datasets.map((dataset) => (
+          {data?.dashboards.map((dataset) => (
             <Link
-              to={`/datasets/${dataset.id}/edit`}
+              to={`/dashboards/${dataset.id}/edit`}
               key={dataset.id}
               className="relative bg-white transition rounded-md cursor-pointer shadow-sm shadow-gray-300 hover:shadow-gray-400"
             >
               <div className="p-4 border-b">
                 <Title size={5} className="text-lg font-medium text-gray-900 flex items-center">
-                  <DatabaseIcon className="w-4 mr-1" />
                   {dataset.name}
                 </Title>
-
-                <LastBuiltAt dateTimestring={dataset.lastBuiltAt} />
               </div>
               <div className="flex items-center p-4">
                 <Avatar size="xs" className="mr-2" name="Rafael Garcia" /> Rafael Garcia
@@ -52,32 +57,35 @@ export const DatasetIndex = () => {
   )
 }
 
-const LastBuiltAt = ({ dateTimestring }) => {
-  const text = dateTimestring
-    ? `Last built ${formatDistanceToNowStrict(parseISO(dateTimestring))} ago`
-    : "Never built"
-  return <Body color="light">{text}</Body>
-}
-
-const NewDatasourceForm = ({ hideModal, Modal }) => {
+const NewDashboardForm = ({ hideModal, Modal }) => {
+  const navigate = useNavigate()
   const { register, handleSubmit } = useForm()
-  const [createDataset, { loading }] = useCreateDatasetMutation({
-    refetchQueries: [DatasetsDocument],
+  const { data } = useDatasetsQuery()
+  const [createDashboard, { loading: creating }] = useCreateDashboardMutation({
+    refetchQueries: [DashboardsDocument],
   })
   const onSubmit = (data) => {
-    createDataset({ variables: data })
+    createDashboard({ variables: data }).then(({ data }) =>
+      navigate(`/dashboards/${data?.dashboard.id}/edit`)
+    )
     hideModal()
   }
+  const datasetCollection = map(data?.datasets, ({ id, name }) => ({ value: id, label: name }))
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Modal.Body>
-        <Modal.Title>Add Dataset</Modal.Title>
-
-        <TextField label="Name" className="mb-5" register={register("name", { required: true })} />
+        <TextField autoFocus label="Name" className="mb-5" register={register("name", { required: true })} />
+        <SelectField
+          collection={datasetCollection}
+          allowBlank
+          label="Dataset"
+          register={register("datasetId", { required: true })}
+          className="mb-5"
+        />
       </Modal.Body>
       <Modal.Actions>
-        <Button size="sm" className="ml-2" htmlType="submit" loading={loading}>
+        <Button size="sm" className="ml-2" htmlType="submit" loading={creating}>
           Save
         </Button>
         <Button size="sm" variant="secondary" className="ml-2" onClick={hideModal}>

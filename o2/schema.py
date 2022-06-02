@@ -2,7 +2,7 @@ import graphene
 from graphene_django import DjangoObjectType, DjangoListField
 from o2.dataset_helpers import DatasetHelper
 
-from o2.models import Dataset, DatasetTable
+from o2.models import Dashboard, Dataset, DatasetTable, Widget
 
 
 #########
@@ -45,6 +45,18 @@ class DatasetType(DjangoObjectType):
         name = model.__name__
 
 
+class DashboardType(DjangoObjectType):
+    class Meta:
+        model = Dashboard
+        name = model.__name__
+
+
+class WidgetType(DjangoObjectType):
+    class Meta:
+        model = Widget
+        name = model.__name__
+
+
 #########
 # Queries
 #########
@@ -54,11 +66,16 @@ class Query(graphene.ObjectType):
     dataset = graphene.Field(DatasetType, id=graphene.ID(required=True), required=True)
     datasets = graphene.List(graphene.NonNull(DatasetType), required=True)
 
+    dashboards = graphene.List(graphene.NonNull(DashboardType), required=True)
+
     def resolve_dataset(root, info, id):
         return Dataset.objects.get(pk=id)
 
     def resolve_datasets(root, info):
         return list(Dataset.objects.prefetch_related("tables").all())
+
+    def resolve_dashboards(root, info):
+        return list(Dashboard.objects.prefetch_related("widgets").all())
 
 
 ###########
@@ -94,12 +111,21 @@ class Mutation(graphene.ObjectType):
     build_dataset = graphene.Field(DatasetType, id=graphene.ID(required=True), required=True)
     create_dataset_table = CreateDatasetTableMutationHandler.Field()
 
+    create_dashboard = graphene.Field(
+        DashboardType,
+        name=graphene.String(required=True),
+        dataset_id=graphene.ID(required=True),
+        required=True,
+    )
+
     def resolve_create_dataset(root, info, name):
-        dataset = Dataset.objects.create(name=name)
-        return dataset
+        return Dataset.objects.create(name=name)
 
     def resolve_build_dataset(root, info, id):
         return Dataset.build(id)
+
+    def resolve_create_dashboard(root, info, name, dataset_id):
+        return Dashboard.objects.create(name=name, dataset_id=dataset_id)
 
 
 ###################
