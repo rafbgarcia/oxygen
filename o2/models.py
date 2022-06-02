@@ -22,8 +22,8 @@ class Dataset(TimeStampedModel):
     last_built_at = models.DateTimeField(null=True)
     build_duration_seconds = models.SmallIntegerField(null=True)
 
-    @classmethod
-    def build(self, id):
+    @staticmethod
+    def build(id):
         dataset = Dataset.objects.prefetch_related("tables").get(pk=id)
 
         start_time = time()

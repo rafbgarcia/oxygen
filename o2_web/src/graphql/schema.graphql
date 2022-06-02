@@ -3,10 +3,6 @@ schema {
   mutation: Mutation
 }
 
-type CreateDatasetTableMutationHandler {
-  dataset: Dataset
-}
-
 type Dashboard {
   id: ID!
   created: DateTime!
@@ -22,10 +18,10 @@ type Dataset {
   created: DateTime!
   modified: DateTime!
   name: String!
-  isBuilding: Boolean!
-  sizeMb: Int
+  isBuilding: Boolean
+  sizeMb: Float
   lastBuiltAt: DateTime
-  buildDurationSeconds: Float
+  buildDurationSeconds: Int
   tables: [DatasetTable!]!
   dashboardSet: [Dashboard!]!
 }
@@ -37,7 +33,7 @@ type DatasetTable {
   query: String!
   fields: [DatasetTableFields!]!
   totalRecords: Int
-  htmlPreview: String!
+  htmlPreview: String
 }
 
 type DatasetTableFields {
@@ -52,7 +48,7 @@ scalar JSONString
 type Mutation {
   createDataset(name: String!): Dataset!
   buildDataset(id: ID!): Dataset!
-  createDatasetTable(datasetId: ID!, name: String!, query: String!): CreateDatasetTableMutationHandler
+  createDatasetTable(datasetId: ID!, name: String!, query: String!): Dataset
   createDashboard(name: String!, datasetId: ID!): Dashboard!
 }
 

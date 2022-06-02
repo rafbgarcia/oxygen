@@ -1,6 +1,6 @@
 import { Button, Body, Title, Avatar } from "playbook-ui"
 import { DatabaseIcon } from "@heroicons/react/outline"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { Page } from "../Page"
 import { parseISO, formatDistanceToNowStrict } from "date-fns"
 import { Wait } from "../../components/Wait"
@@ -60,13 +60,15 @@ const LastBuiltAt = ({ dateTimestring }) => {
 }
 
 const NewDatasourceForm = ({ hideModal, Modal }) => {
+  const navigate = useNavigate()
   const { register, handleSubmit } = useForm()
   const [createDataset, { loading }] = useCreateDatasetMutation({
     refetchQueries: [DatasetsDocument],
   })
-  const onSubmit = (data) => {
-    createDataset({ variables: data })
-    hideModal()
+  const onSubmit = (formData) => {
+    createDataset({ variables: formData }).then(({ data }) => {
+      navigate(`/datasets/${data?.dataset.id}`)
+    })
   }
 
   return (

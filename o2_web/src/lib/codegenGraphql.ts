@@ -17,11 +17,6 @@ export type Scalars = {
   JSONString: any;
 };
 
-export type CreateDatasetTableMutationHandler = {
-  __typename?: 'CreateDatasetTableMutationHandler';
-  dataset?: Maybe<Dataset>;
-};
-
 export type Dashboard = {
   __typename?: 'Dashboard';
   created: Scalars['DateTime'];
@@ -35,15 +30,15 @@ export type Dashboard = {
 
 export type Dataset = {
   __typename?: 'Dataset';
-  buildDurationSeconds?: Maybe<Scalars['Float']>;
+  buildDurationSeconds?: Maybe<Scalars['Int']>;
   created: Scalars['DateTime'];
   dashboardSet: Array<Dashboard>;
   id: Scalars['ID'];
-  isBuilding: Scalars['Boolean'];
+  isBuilding?: Maybe<Scalars['Boolean']>;
   lastBuiltAt?: Maybe<Scalars['DateTime']>;
   modified: Scalars['DateTime'];
   name: Scalars['String'];
-  sizeMb?: Maybe<Scalars['Int']>;
+  sizeMb?: Maybe<Scalars['Float']>;
   tables: Array<DatasetTable>;
 };
 
@@ -51,7 +46,7 @@ export type DatasetTable = {
   __typename?: 'DatasetTable';
   dataset: Dataset;
   fields: Array<DatasetTableFields>;
-  htmlPreview: Scalars['String'];
+  htmlPreview?: Maybe<Scalars['String']>;
   id: Scalars['ID'];
   name: Scalars['String'];
   query: Scalars['String'];
@@ -69,7 +64,7 @@ export type Mutation = {
   buildDataset: Dataset;
   createDashboard: Dashboard;
   createDataset: Dataset;
-  createDatasetTable?: Maybe<CreateDatasetTableMutationHandler>;
+  createDatasetTable?: Maybe<Dataset>;
 };
 
 
@@ -127,9 +122,9 @@ export enum WidgetType {
 
 export type DashboardPartsFragment = { __typename?: 'Dashboard', id: string, name: string, layout?: any | null };
 
-export type DatasetPartsFragment = { __typename?: 'Dataset', id: string, name: string, sizeMb?: number | null, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview: string, fields: Array<{ __typename?: 'DatasetTableFields', name: string, type: string }> }> };
+export type DatasetPartsFragment = { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, fields: Array<{ __typename?: 'DatasetTableFields', name: string, type: string }> }> };
 
-export type DatasetTablePartsFragment = { __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview: string, fields: Array<{ __typename?: 'DatasetTableFields', name: string, type: string }> };
+export type DatasetTablePartsFragment = { __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, fields: Array<{ __typename?: 'DatasetTableFields', name: string, type: string }> };
 
 export type DatasetTableFieldsPartsFragment = { __typename?: 'DatasetTableFields', name: string, type: string };
 
@@ -138,7 +133,7 @@ export type BuildDatasetMutationVariables = Exact<{
 }>;
 
 
-export type BuildDatasetMutation = { __typename?: 'Mutation', dataset: { __typename?: 'Dataset', id: string, name: string, sizeMb?: number | null, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview: string, fields: Array<{ __typename?: 'DatasetTableFields', name: string, type: string }> }> } };
+export type BuildDatasetMutation = { __typename?: 'Mutation', dataset: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, fields: Array<{ __typename?: 'DatasetTableFields', name: string, type: string }> }> } };
 
 export type CreateDashboardMutationVariables = Exact<{
   name: Scalars['String'];
@@ -153,7 +148,7 @@ export type CreateDatasetMutationVariables = Exact<{
 }>;
 
 
-export type CreateDatasetMutation = { __typename?: 'Mutation', dataset: { __typename?: 'Dataset', id: string, name: string, sizeMb?: number | null, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview: string, fields: Array<{ __typename?: 'DatasetTableFields', name: string, type: string }> }> } };
+export type CreateDatasetMutation = { __typename?: 'Mutation', dataset: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, fields: Array<{ __typename?: 'DatasetTableFields', name: string, type: string }> }> } };
 
 export type CreateDatasetTableMutationVariables = Exact<{
   datasetId: Scalars['ID'];
@@ -162,7 +157,7 @@ export type CreateDatasetTableMutationVariables = Exact<{
 }>;
 
 
-export type CreateDatasetTableMutation = { __typename?: 'Mutation', createDatasetTable?: { __typename?: 'CreateDatasetTableMutationHandler', dataset?: { __typename?: 'Dataset', id: string, name: string, sizeMb?: number | null, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview: string, fields: Array<{ __typename?: 'DatasetTableFields', name: string, type: string }> }> } | null } | null };
+export type CreateDatasetTableMutation = { __typename?: 'Mutation', dataset?: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, fields: Array<{ __typename?: 'DatasetTableFields', name: string, type: string }> }> } | null };
 
 export type DashboardsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -174,12 +169,12 @@ export type DatasetQueryVariables = Exact<{
 }>;
 
 
-export type DatasetQuery = { __typename?: 'Query', dataset: { __typename?: 'Dataset', id: string, name: string, sizeMb?: number | null, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview: string, fields: Array<{ __typename?: 'DatasetTableFields', name: string, type: string }> }> } };
+export type DatasetQuery = { __typename?: 'Query', dataset: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, fields: Array<{ __typename?: 'DatasetTableFields', name: string, type: string }> }> } };
 
 export type DatasetsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type DatasetsQuery = { __typename?: 'Query', datasets: Array<{ __typename?: 'Dataset', id: string, name: string, sizeMb?: number | null, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview: string, fields: Array<{ __typename?: 'DatasetTableFields', name: string, type: string }> }> }> };
+export type DatasetsQuery = { __typename?: 'Query', datasets: Array<{ __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, fields: Array<{ __typename?: 'DatasetTableFields', name: string, type: string }> }> }> };
 
 export const DashboardPartsFragmentDoc = /*#__PURE__*/ gql`
     fragment DashboardParts on Dashboard {
@@ -210,7 +205,6 @@ export const DatasetPartsFragmentDoc = /*#__PURE__*/ gql`
     fragment DatasetParts on Dataset {
   id
   name
-  sizeMb
   lastBuiltAt
   tables {
     ...DatasetTableParts
@@ -319,10 +313,8 @@ export type CreateDatasetMutationResult = Apollo.MutationResult<CreateDatasetMut
 export type CreateDatasetMutationOptions = Apollo.BaseMutationOptions<CreateDatasetMutation, CreateDatasetMutationVariables>;
 export const CreateDatasetTableDocument = /*#__PURE__*/ gql`
     mutation createDatasetTable($datasetId: ID!, $name: String!, $query: String!) {
-  createDatasetTable(datasetId: $datasetId, name: $name, query: $query) {
-    dataset {
-      ...DatasetParts
-    }
+  dataset: createDatasetTable(datasetId: $datasetId, name: $name, query: $query) {
+    ...DatasetParts
   }
 }
     ${DatasetPartsFragmentDoc}`;

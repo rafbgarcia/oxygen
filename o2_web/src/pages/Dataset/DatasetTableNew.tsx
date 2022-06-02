@@ -22,7 +22,7 @@ export const DatasetTableNew = () => {
 
   const onSubmit = (data) => {
     createDatasetTable({ variables: { ...data, datasetId } }).then((res) => {
-      const tables = res.data?.createDatasetTable?.dataset?.tables
+      const tables = res.data?.dataset?.tables
       if (!tables) return
 
       hideModal(tables[tables.length - 1].id)

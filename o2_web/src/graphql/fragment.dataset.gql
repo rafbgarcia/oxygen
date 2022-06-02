@@ -1,7 +1,6 @@
 fragment DatasetParts on Dataset {
   id
   name
-  sizeMb
   lastBuiltAt
 
   tables {

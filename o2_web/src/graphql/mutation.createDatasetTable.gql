@@ -1,7 +1,5 @@
 mutation createDatasetTable($datasetId: ID!, $name: String!, $query: String!) {
-  createDatasetTable(datasetId: $datasetId, name: $name, query: $query) {
-    dataset {
-      ...DatasetParts
-    }
+  dataset: createDatasetTable(datasetId: $datasetId, name: $name, query: $query) {
+    ...DatasetParts
   }
 }
