@@ -91,11 +91,15 @@ class CreateDatasetTableMutationHandler(graphene.Mutation):
 
 class Mutation(graphene.ObjectType):
     create_dataset = graphene.Field(DatasetType, name=graphene.String(required=True), required=True)
+    build_dataset = graphene.Field(DatasetType, id=graphene.ID(required=True), required=True)
     create_dataset_table = CreateDatasetTableMutationHandler.Field()
 
     def resolve_create_dataset(root, info, name):
         dataset = Dataset.objects.create(name=name)
         return dataset
+
+    def resolve_build_dataset(root, info, id):
+        return Dataset.build(id)
 
 
 ###################

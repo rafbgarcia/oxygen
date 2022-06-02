@@ -12,7 +12,14 @@ export const DatasourcesEditTableNew = () => {
   const { register, handleSubmit } = useForm()
   const [createDatasetTable, { loading: saving, error }] = useCreateDatasetTableMutation()
 
-  const hideModal = (tableId?: string) => navigate(tableId ? `../tables/${tableId}` : "../")
+  const hideModal = (tableId?: string) => {
+    if (typeof tableId === "string") {
+      navigate(`/datasets/${datasetId}/tables/${tableId}`)
+    } else {
+      navigate(`/datasets/${datasetId}/edit`)
+    }
+  }
+
   const onSubmit = (data) => {
     createDatasetTable({ variables: { ...data, datasetId } }).then((res) => {
       const tables = res.data?.createDatasetTable?.dataset?.tables

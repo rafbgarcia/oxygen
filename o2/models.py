@@ -1,5 +1,9 @@
+import os
+from time import time
 from django.db import models
+from django.utils import timezone
 from model_utils.models import TimeStampedModel
+from o2.connectors import MySQLConnector
 from o2.dataset_helpers import DatasetHelper
 from o2.widgets.pivot import Pivot
 from o2.widgets.vertical_bar_chart import VerticalBarChart
@@ -18,10 +22,36 @@ class Dataset(TimeStampedModel):
     last_built_at = models.DateTimeField(null=True)
     build_duration_seconds = models.SmallIntegerField(null=True)
 
-    def file_path(self):
-        return BASE_DIR / f"{self.name}.hyper"
+    @classmethod
+    def build(self, id):
+        dataset = Dataset.objects.prefetch_related("tables").get(pk=id)
 
-    def exists(self):
+        start_time = time()
+        for table in dataset.tables.all():
+            table.total_records = 0
+
+            with MySQLConnector().execute(table.query) as cursor:
+                while True:
+                    rows = cursor.fetchmany(100_000)
+                    if len(rows) == 0:
+                        break
+
+                    table.total_records += len(rows)
+                    dataset.append(table, rows)
+
+            table.save()
+
+        dataset.build_duration_seconds = time() - start_time
+        dataset.size_mb = os.path.getsize(dataset.file_path()) / 1e6
+        dataset.last_built_at = timezone.now()
+        dataset.save()
+
+        return dataset
+
+    def file_path(self):
+        return BASE_DIR / "datasources" / f"{self.name}.hyper"
+
+    def file_exists(self):
         return exists(self.file_path())
 
     def append(self, table, rows):

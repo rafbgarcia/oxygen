@@ -30,5 +30,5 @@ MVP Roadmap:
 Tech debt:
 
 - Use Celery worker to build datasets
-- Preview is slow for a large number of records. Is there a way to limit it?
 - https://react-hook-form.com/advanced-usage#SmartFormComponent
+- Graphene --watch error causes foreman to exit

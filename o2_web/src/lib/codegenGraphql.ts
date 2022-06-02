@@ -53,8 +53,14 @@ export type DatasetTableFields = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  buildDataset: Dataset;
   createDataset: Dataset;
   createDatasetTable?: Maybe<CreateDatasetTableMutationHandler>;
+};
+
+
+export type MutationBuildDatasetArgs = {
+  id: Scalars['ID'];
 };
 
 
@@ -85,6 +91,13 @@ export type DatasetPartsFragment = { __typename?: 'Dataset', id: string, name: s
 export type DatasetTablePartsFragment = { __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview: string, fields: Array<{ __typename?: 'DatasetTableFields', name: string, type: string }> };
 
 export type DatasetTableFieldsPartsFragment = { __typename?: 'DatasetTableFields', name: string, type: string };
+
+export type BuildDatasetMutationVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+
+export type BuildDatasetMutation = { __typename?: 'Mutation', buildDataset: { __typename?: 'Dataset', id: string, name: string, sizeMb?: number | null, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview: string, fields: Array<{ __typename?: 'DatasetTableFields', name: string, type: string }> }> } };
 
 export type CreateDatasetMutationVariables = Exact<{
   name: Scalars['String'];
@@ -143,6 +156,39 @@ export const DatasetPartsFragmentDoc = /*#__PURE__*/ gql`
   }
 }
     ${DatasetTablePartsFragmentDoc}`;
+export const BuildDatasetDocument = /*#__PURE__*/ gql`
+    mutation buildDataset($id: ID!) {
+  buildDataset(id: $id) {
+    ...DatasetParts
+  }
+}
+    ${DatasetPartsFragmentDoc}`;
+export type BuildDatasetMutationFn = Apollo.MutationFunction<BuildDatasetMutation, BuildDatasetMutationVariables>;
+
+/**
+ * __useBuildDatasetMutation__
+ *
+ * To run a mutation, you first call `useBuildDatasetMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useBuildDatasetMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [buildDatasetMutation, { data, loading, error }] = useBuildDatasetMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useBuildDatasetMutation(baseOptions?: Apollo.MutationHookOptions<BuildDatasetMutation, BuildDatasetMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<BuildDatasetMutation, BuildDatasetMutationVariables>(BuildDatasetDocument, options);
+      }
+export type BuildDatasetMutationHookResult = ReturnType<typeof useBuildDatasetMutation>;
+export type BuildDatasetMutationResult = Apollo.MutationResult<BuildDatasetMutation>;
+export type BuildDatasetMutationOptions = Apollo.BaseMutationOptions<BuildDatasetMutation, BuildDatasetMutationVariables>;
 export const CreateDatasetDocument = /*#__PURE__*/ gql`
     mutation createDataset($name: String!) {
   createDataset(name: $name) {

@@ -16,6 +16,13 @@ import { Datasources } from "./pages/Datasources"
 import { DatasourcesEdit } from "./pages/DatasourcesEdit"
 import { DatasourcesEditTableNew } from "./pages/DatasourcesEditTableNew"
 import { DatasourcesEditTableEdit } from "./pages/DatasourcesEditTable"
+import { ToastContainer } from "react-toastify"
+
+/**
+ * Vendor CSS
+ */
+import "react-toastify/dist/ReactToastify.css"
+import "../node_modules/playbook-ui/dist/playbook.css"
 
 const client = new ApolloClient({
   uri: "http://localhost:8000/",
@@ -33,7 +40,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <Route path="datasets" element={<Datasources />} />
             <Route path="datasets/new" element={<Dataset />} />
             <Route path="datasets/:datasetId" element={<DatasourcesEdit />}>
-              <Route path="edit" />
+              <Route path="edit" element={null} />
               <Route path="tables/new" element={<DatasourcesEditTableNew />} />
               <Route path="tables/:tableId" element={<DatasourcesEditTableEdit />} />
             </Route>
@@ -47,5 +54,17 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         </Routes>
       </BrowserRouter>
     </ApolloProvider>
+
+    <ToastContainer
+      position="bottom-left"
+      autoClose={5000}
+      hideProgressBar={false}
+      newestOnTop
+      closeOnClick
+      rtl={false}
+      pauseOnFocusLoss
+      draggable
+      pauseOnHover
+    />
   </React.StrictMode>
 )

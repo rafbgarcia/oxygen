@@ -38,6 +38,7 @@ scalar DateTime
 
 type Mutation {
   createDataset(name: String!): Dataset!
+  buildDataset(id: ID!): Dataset!
   createDatasetTable(datasetId: ID!, name: String!, query: String!): CreateDatasetTableMutationHandler
 }
 
