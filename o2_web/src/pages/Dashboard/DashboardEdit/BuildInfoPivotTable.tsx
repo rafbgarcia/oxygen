@@ -1,4 +1,8 @@
-import { BuildInfoWithDatasetFields, dataType } from "./_BuildInfoWithDatasetFields"
+import {
+  BuildInfoWithDatasetFields,
+  BuildInfoWithDatasetFieldsProps,
+  dataType,
+} from "./_BuildInfoWithDatasetFields"
 import type { BuildInfoSections } from "./_BuildInfoWithDatasetFields"
 
 const sections: BuildInfoSections = [
@@ -7,11 +11,6 @@ const sections: BuildInfoSections = [
   { renderDataKey: "columns", label: "Columns", dataType: dataType.DIMENSION },
 ]
 
-type Props = {
-  onChange: any
-  dashboard: any
-}
-
-export const BuildInfoPivotTable = (props: Props) => {
+export const BuildInfoPivotTable = (props: Omit<BuildInfoWithDatasetFieldsProps, "sections">) => {
   return <BuildInfoWithDatasetFields sections={sections} {...props} />
 }

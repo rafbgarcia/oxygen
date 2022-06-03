@@ -6,6 +6,7 @@ import { useCreateWidgetMutation, useDashboardQuery, WidgetType } from "../../li
 import { DashboardLayout } from "./DashboardLayout"
 import { Popover } from "../../components/Popover"
 import { ChartBarIcon, TableIcon } from "@heroicons/react/outline"
+import { initialBuildInfo } from "./DashboardEdit/initialBuildInfo"
 
 const initialLayout = { i: "", w: 12, h: 15, x: 0, y: 0 }
 
@@ -19,9 +20,14 @@ export const DashboardEdit = () => {
   if (Waiting) return <Waiting />
 
   const handleCreateWidget = (type: WidgetType) => () => {
-    const variables = { dashboardId: dashboardId!, widgetType: type, layout: initialLayout }
-
-    createWidget({ variables }).then(({ data }) => {
+    createWidget({
+      variables: {
+        dashboardId: dashboardId!,
+        widgetType: type,
+        layout: initialLayout,
+        buildInfo: initialBuildInfo[type],
+      },
+    }).then(({ data }) => {
       navigate(`/dashboards/${dashboardId}/widgets/${data?.createWidget?.widget.id}/edit`)
     })
   }

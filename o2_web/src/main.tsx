@@ -14,7 +14,7 @@ import { DatasetTableShow } from "./pages/Dataset/DatasetTableShow"
 
 import { DashboardIndex } from "./pages/Dashboard/DashboardIndex"
 import { DashboardEdit } from "./pages/Dashboard/DashboardEdit"
-import { WidgetEdit } from "./pages/Dashboard/WidgetEdit"
+import { WidgetEdit } from "./pages/Dashboard/DashboardEdit/WidgetEdit"
 // import { DashboardNew } from "./pages/DashboardNew"
 // import { WidgetNew } from "./pages/WidgetNew"
 

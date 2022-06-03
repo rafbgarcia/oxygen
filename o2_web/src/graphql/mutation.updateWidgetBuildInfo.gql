@@ -1,4 +1,4 @@
-mutation updateWidgetBuildInfo($widgetId: ID!, $buildInfo: JSONString!) {
+mutation updateWidgetBuildInfo($widgetId: ID!, $buildInfo: JSON!) {
   dashboard: updateWidgetBuildInfo(widgetId: $widgetId, buildInfo: $buildInfo) {
     ...DashboardParts
   }

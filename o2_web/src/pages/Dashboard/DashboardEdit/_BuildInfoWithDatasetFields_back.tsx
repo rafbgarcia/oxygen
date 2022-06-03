@@ -1,33 +1,31 @@
 import { TrashIcon, PlusSmIcon } from "@heroicons/react/outline"
-import { Button } from "../../components/Button"
-import { reduce, map, filter, isEmpty } from "lodash-es"
+import { Button } from "../../../components/Button"
+import { reduce, filter, isEmpty } from "lodash-es"
 import { useEffect, useMemo } from "react"
 import { useImmerReducer } from "use-immer"
-import { Popover } from "../../components/Popover"
-import { useOutletContext } from "react-router-dom"
+import { Popover } from "../../../components/Popover"
 import { Title } from "playbook-ui"
-import type {
-  WidgetType,
-  Dataset,
-  Dashboard,
-  DatasetTable,
-  DashboardQuery,
-  DatasetTablePartsFragment,
-} from "../../lib/codegenGraphql"
+import type { DashboardQuery } from "../../../lib/codegenGraphql"
 
 type BuildInfoSectionType = { renderDataKey: string; label: string; dataType: dataType }
 export type BuildInfoSections = Array<BuildInfoSectionType>
+export type BuildInfoWithDatasetFieldsProps = {
+  dataset: DashboardQuery["dashboard"]["dataset"]
+  sections: BuildInfoSections
+  onChange: any
+  buildInfo: any
+}
 export enum dataType {
   MEASURE = "Measure",
   DIMENSION = "Dimension",
 }
+
 const AGGREGATIONS = ["COUNT", "COUNT DISTINCT", "SUM"]
 const FUNCTIONS = ["CONTRIBUTION"]
 const buildInfoFromSections = (sections: BuildInfoSections): Record<string, []> => {
   const fn = (result, section: BuildInfoSectionType) => ({ ...result, [section.renderDataKey]: [] })
   return reduce(sections, fn, {})
 }
-
 const actions = {
   removeField: (draft, { renderDataKey, index }) => {
     draft[renderDataKey].splice(index, 1)
@@ -38,14 +36,11 @@ const actions = {
 }
 
 export const BuildInfoWithDatasetFields = ({
-  dashboard,
+  dataset,
+  buildInfo: widgetBuildInfo,
   sections,
   onChange,
-}: {
-  dashboard: DashboardQuery["dashboard"]
-  sections: BuildInfoSections
-  onChange: any
-}) => {
+}: BuildInfoWithDatasetFieldsProps) => {
   const initialBuildInfo = useMemo(() => buildInfoFromSections(sections), [sections])
   const [buildInfo, dispatch] = useImmerReducer((draft, { action, ...payload }) => {
     actions[action](draft, payload)
@@ -57,8 +52,6 @@ export const BuildInfoWithDatasetFields = ({
       return
     }
     onChange(buildInfo)
-    // const data = { buildInfo: state.buildInfo, type, dataset }
-    // api.widgetPreview(dashboardId, data).then(setPreviewData).catch(console.log)
   }, [buildInfo])
 
   return (
@@ -68,7 +61,7 @@ export const BuildInfoWithDatasetFields = ({
           key={section.renderDataKey}
           section={section}
           buildInfo={buildInfo}
-          dataset={dashboard.dataset}
+          dataset={dataset}
           dispatch={dispatch}
         />
       ))}

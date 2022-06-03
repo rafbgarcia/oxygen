@@ -4,8 +4,15 @@ from o2.errors import ValueNotSupported
 
 
 class Pivot:
-    @classmethod
-    def metadata(klass, dataset, build_info, limit=25, offset=0):
+    @staticmethod
+    def has_required_attrs(build_info):
+        return hasattr(build_info, "rows")
+
+    @staticmethod
+    def metadata(dataset, build_info, limit=25, offset=0):
+        if not Pivot.has_required_attrs(build_info):
+            return None
+
         columns = build_info["columns"]
         pivot = Pivot.build(dataset, build_info)
         if len(columns) > 0:
@@ -14,8 +21,8 @@ class Pivot:
 
         return {"html": pivot[offset:limit].to_html(escape=False, na_rep="-", index_names=True)}
 
-    @classmethod
-    def build(klass, dataset, build_info):
+    @staticmethod
+    def build(dataset, build_info):
         query = _build_sql(dataset, build_info)
         rows = [field["alias"] for field in build_info["rows"]]
         values = [field["alias"] for field in build_info["values"]]

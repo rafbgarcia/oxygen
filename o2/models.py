@@ -93,7 +93,6 @@ class Widget(TimeStampedModel):
     dashboard = models.ForeignKey(Dashboard, on_delete=models.CASCADE, related_name="widgets")
     type = models.CharField(max_length=20, choices=Types.choices)
     layout = models.JSONField(null=False)
-    title = models.CharField(max_length=200, null=True)
     build_info = models.JSONField(default=dict)
 
     WIDGET = {Types.PIVOT_TABLE: Pivot, Types.VERTICAL_BAR_CHART: VerticalBarChart}

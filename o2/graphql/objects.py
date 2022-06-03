@@ -1,5 +1,6 @@
 import graphene
 from graphene_django import DjangoObjectType
+from o2.graphql.types.json import JSON
 from o2.models import Dataset, DatasetTable, Dashboard, Widget
 
 
@@ -44,34 +45,62 @@ class DashboardObject(DjangoObjectType):
         name = model.__name__
 
 
-class WidgetChartRenderData(graphene.ObjectType):
+#
+# renderData UNION
+#
+
+
+class PivotTableRenderData(graphene.ObjectType):
     html = graphene.String()
-
-    class Meta:
-        name = "ChartRenderData"
-
-
-class WidgetPivotTableRenderData(graphene.ObjectType):
-    html = graphene.String()
-
-    class Meta:
-        name = "PivotTableRenderData"
 
 
 class WidgetRenderData(graphene.Union):
     class Meta:
-        types = (WidgetPivotTableRenderData, WidgetChartRenderData)
+        types = (PivotTableRenderData,)
+
+
+#
+# buildInfo UNION
+#
+class PivotTableBuildInfoField(graphene.ObjectType):
+    tableId = graphene.ID()
+    name = graphene.String()
+    alias = graphene.String()
+    agg = graphene.String()
+
+
+class PivotTableBuildInfo(graphene.ObjectType):
+    rows = graphene.List(PivotTableBuildInfoField, required=True)
+    values = graphene.List(PivotTableBuildInfoField, required=True)
+    columns = graphene.List(PivotTableBuildInfoField, required=True)
+
+
+class VerticalBarChartBuildInfo(graphene.ObjectType):
+    categories = graphene.List(PivotTableBuildInfoField)
+    values = graphene.List(PivotTableBuildInfoField)
+    breakby = graphene.List(PivotTableBuildInfoField)
+
+
+class WidgetBuildInfo(graphene.Union):
+    class Meta:
+        types = (PivotTableBuildInfo, VerticalBarChartBuildInfo)
 
 
 class WidgetObject(DjangoObjectType):
     layout = graphene.NonNull(WidgetLayoutObject)
+    build_info = graphene.Field(JSON)
     render_data = graphene.Field(WidgetRenderData)
 
     class Meta:
         model = Widget
         name = model.__name__
 
+    # def resolve_build_info(widget, info):
+    #     return PivotTableBuildInfo(**widget.build_info)
+
     def resolve_render_data(widget, info):
-        if len(widget.build_info) == 0:
+        render_data = widget.metadata(widget.dashboard.dataset)
+        if not render_data:
             return None
-        return WidgetPivotTableRenderData(**widget.metadata(widget.dashboard.dataset))
+
+        return PivotTableRenderData(**render_data)

@@ -1,13 +1,29 @@
 fragment WidgetParts on Widget {
   id
-  title
   type
   buildInfo
+  # {
+  #   ... on PivotTableBuildInfo {
+  #     rows {
+  #       tableId
+  #       name
+  #       alias
+  #     }
+  #     values {
+  #       tableId
+  #       name
+  #       alias
+  #       agg
+  #     }
+  #     columns {
+  #       tableId
+  #       name
+  #       alias
+  #     }
+  #   }
+  # }
   renderData {
     ... on PivotTableRenderData {
-      html
-    }
-    ... on ChartRenderData {
       html
     }
   }

@@ -1,4 +1,5 @@
 import graphene
+from o2.graphql.types.json import JSON
 from o2.models import Dashboard, Widget
 
 from o2.graphql.objects import DashboardObject
@@ -7,7 +8,7 @@ from o2.graphql.objects import DashboardObject
 class UpdateWidgetBuildInfoMutationHandler(graphene.Mutation):
     class Arguments:
         widget_id = graphene.ID(required=True)
-        build_info = graphene.JSONString(required=True)
+        build_info = JSON(required=True)
 
     Output = DashboardObject
 
