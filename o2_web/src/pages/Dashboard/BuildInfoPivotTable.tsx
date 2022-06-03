@@ -7,6 +7,11 @@ const sections: BuildInfoSections = [
   { renderDataKey: "columns", label: "Columns", dataType: dataType.DIMENSION },
 ]
 
-export const BuildInfoPivotTable = ({ onChange }) => {
-  return <BuildInfoWithDatasetFields sections={sections} onChange={onChange} />
+type Props = {
+  onChange: any
+  dashboard: any
+}
+
+export const BuildInfoPivotTable = (props: Props) => {
+  return <BuildInfoWithDatasetFields sections={sections} {...props} />
 }

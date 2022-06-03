@@ -16,7 +16,7 @@ type Dashboard {
   id: ID!
   created: DateTime!
   modified: DateTime!
-  dataset: Dataset
+  dataset: Dataset!
   name: String!
   widgets: [Widget!]!
 }

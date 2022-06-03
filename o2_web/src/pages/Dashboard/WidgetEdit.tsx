@@ -41,7 +41,7 @@ export const WidgetEdit = () => {
           {loading && <Spinner $size="sm" />}
         </header>
 
-        {React.createElement(WIDGET_TYPE_ELEMENT[widget.type], { onChange: didChangeBuildInfo })}
+        {React.createElement(WIDGET_TYPE_ELEMENT[widget.type], { onChange: didChangeBuildInfo, dashboard })}
 
         <div className="flex items-center gap-x-2">
           <Button variant="secondary" onClick={didCancel}>

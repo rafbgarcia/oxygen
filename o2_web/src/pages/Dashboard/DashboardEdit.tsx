@@ -30,7 +30,7 @@ export const DashboardEdit = () => {
     <>
       <Page.Header $flex>
         <Page.Title>
-          Dashboards {">"} {data?.dashboard.name}
+          Dashboards {">"} {data!.dashboard.name}
         </Page.Title>
         <Popover
           position="bottom-left"

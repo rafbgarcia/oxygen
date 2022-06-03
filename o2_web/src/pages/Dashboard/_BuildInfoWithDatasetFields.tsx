@@ -6,7 +6,14 @@ import { useImmerReducer } from "use-immer"
 import { Popover } from "../../components/Popover"
 import { useOutletContext } from "react-router-dom"
 import { Title } from "playbook-ui"
-import type { WidgetType, Dataset, Dashboard, DatasetTable } from "../../lib/codegenGraphql"
+import type {
+  WidgetType,
+  Dataset,
+  Dashboard,
+  DatasetTable,
+  DashboardQuery,
+  DatasetTablePartsFragment,
+} from "../../lib/codegenGraphql"
 
 type BuildInfoSectionType = { renderDataKey: string; label: string; dataType: dataType }
 export type BuildInfoSections = Array<BuildInfoSectionType>
@@ -31,14 +38,15 @@ const actions = {
 }
 
 export const BuildInfoWithDatasetFields = ({
+  dashboard,
   sections,
   onChange,
 }: {
+  dashboard: DashboardQuery["dashboard"]
   sections: BuildInfoSections
   onChange: any
 }) => {
   const initialBuildInfo = useMemo(() => buildInfoFromSections(sections), [sections])
-  const { dashboard } = useOutletContext<{ dashboard: Dashboard }>()
   const [buildInfo, dispatch] = useImmerReducer((draft, { action, ...payload }) => {
     actions[action](draft, payload)
   }, initialBuildInfo)
@@ -60,7 +68,7 @@ export const BuildInfoWithDatasetFields = ({
           key={section.renderDataKey}
           section={section}
           buildInfo={buildInfo}
-          dataset={dashboard.dataset!}
+          dataset={dashboard.dataset}
           dispatch={dispatch}
         />
       ))}
@@ -77,7 +85,7 @@ const BuildInfoSection = ({
   buildInfo: any
   section: BuildInfoSectionType
   dispatch: any
-  dataset: Dataset
+  dataset: DashboardQuery["dashboard"]["dataset"]
 }) => {
   const didAddField = (table, field) => () => {
     dispatch({ action: "addField", renderDataKey: section.renderDataKey, table, field })
@@ -146,15 +154,7 @@ const FIELD_TYPE_DEFAULT_ACTION = {
     DateTime: "All Items",
   },
 }
-const TableFields = ({
-  table,
-  dataType,
-  didAddField,
-}: {
-  table: DatasetTable
-  dataType: dataType
-  didAddField: any
-}) => {
+const TableFields = ({ table, dataType, didAddField }) => {
   return (
     <div>
       <div className="p-4 border-b">

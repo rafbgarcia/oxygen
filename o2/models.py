@@ -81,7 +81,7 @@ class DatasetTable(models.Model):
 
 
 class Dashboard(TimeStampedModel):
-    dataset = models.ForeignKey(Dataset, on_delete=models.SET_NULL, null=True)
+    dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
 
 
