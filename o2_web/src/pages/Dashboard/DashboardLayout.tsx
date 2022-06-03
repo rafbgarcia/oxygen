@@ -28,7 +28,7 @@ export const DashboardLayout = ({ dashboard }: { dashboard: DashboardQuery["dash
       >
         {dashboard.widgets.map((widget) => (
           <div key={widget.id} data-grid={widget.layout}>
-            <figure className="relative group h-full overflow-auto">
+            <figure className="relative group h-full overflow-auto border-dashed border-2 border-gray-300">
               <WidgetActions widgetId={widget.id} />
               <Widget type={widget.type} renderData={widget.renderData || {}} theme={{}} />
             </figure>

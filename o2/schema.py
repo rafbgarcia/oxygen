@@ -52,6 +52,7 @@ class Mutation(graphene.ObjectType):
     )
     create_widget = CreateWidgetMutationHandler.Field()
     update_widget_build_info = UpdateWidgetBuildInfoMutationHandler.Field()
+    delete_widget = graphene.Field(DashboardObject, widget_id=graphene.ID(required=True), required=True)
 
     def resolve_create_dataset(root, info, name):
         return Dataset.objects.create(name=name)
@@ -61,6 +62,11 @@ class Mutation(graphene.ObjectType):
 
     def resolve_create_dashboard(root, info, name, dataset_id):
         return Dashboard.objects.create(name=name, dataset_id=dataset_id)
+
+    def resolve_delete_widget(root, info, widget_id):
+        widget = Widget.objects.get(pk=widget_id)
+        widget.delete()
+        return widget.dashboard
 
 
 ###################

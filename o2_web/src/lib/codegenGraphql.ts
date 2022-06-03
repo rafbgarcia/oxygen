@@ -76,6 +76,7 @@ export type Mutation = {
   createDataset: Dataset;
   createDatasetTable?: Maybe<Dataset>;
   createWidget?: Maybe<CreateWidgetMutationHandler>;
+  deleteWidget: Dashboard;
   updateWidgetBuildInfo?: Maybe<Dashboard>;
 };
 
@@ -107,6 +108,11 @@ export type MutationCreateWidgetArgs = {
   dashboardId: Scalars['ID'];
   layout: WidgetLayoutInput;
   widgetType: WidgetType;
+};
+
+
+export type MutationDeleteWidgetArgs = {
+  widgetId: Scalars['ID'];
 };
 
 
@@ -222,6 +228,13 @@ export type CreateWidgetMutationVariables = Exact<{
 
 
 export type CreateWidgetMutation = { __typename?: 'Mutation', createWidget?: { __typename?: 'CreateWidgetMutationHandler', dashboard: { __typename?: 'Dashboard', id: string, name: string, created: any, modified: any, dataset?: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, fields: Array<{ __typename?: 'DatasetTableFields', name: string, type: string }> }> } | null, widgets: Array<{ __typename?: 'Widget', id: string, title?: string | null, type: WidgetType, buildInfo: any, renderData?: { __typename?: 'ChartRenderData', html?: string | null } | { __typename?: 'PivotTableRenderData', html?: string | null } | null, layout: { __typename?: 'WidgetLayout', i: string, w: number, h: number, x: number, y: number } }> }, widget: { __typename?: 'Widget', id: string, title?: string | null, type: WidgetType, buildInfo: any, renderData?: { __typename?: 'ChartRenderData', html?: string | null } | { __typename?: 'PivotTableRenderData', html?: string | null } | null, layout: { __typename?: 'WidgetLayout', i: string, w: number, h: number, x: number, y: number } } } | null };
+
+export type DeleteWidgetMutationVariables = Exact<{
+  widgetId: Scalars['ID'];
+}>;
+
+
+export type DeleteWidgetMutation = { __typename?: 'Mutation', dashboard: { __typename?: 'Dashboard', id: string, name: string, created: any, modified: any, dataset?: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, fields: Array<{ __typename?: 'DatasetTableFields', name: string, type: string }> }> } | null, widgets: Array<{ __typename?: 'Widget', id: string, title?: string | null, type: WidgetType, buildInfo: any, renderData?: { __typename?: 'ChartRenderData', html?: string | null } | { __typename?: 'PivotTableRenderData', html?: string | null } | null, layout: { __typename?: 'WidgetLayout', i: string, w: number, h: number, x: number, y: number } }> } };
 
 export type UpdateWidgetBuildInfoMutationVariables = Exact<{
   widgetId: Scalars['ID'];
@@ -496,6 +509,39 @@ export function useCreateWidgetMutation(baseOptions?: Apollo.MutationHookOptions
 export type CreateWidgetMutationHookResult = ReturnType<typeof useCreateWidgetMutation>;
 export type CreateWidgetMutationResult = Apollo.MutationResult<CreateWidgetMutation>;
 export type CreateWidgetMutationOptions = Apollo.BaseMutationOptions<CreateWidgetMutation, CreateWidgetMutationVariables>;
+export const DeleteWidgetDocument = /*#__PURE__*/ gql`
+    mutation deleteWidget($widgetId: ID!) {
+  dashboard: deleteWidget(widgetId: $widgetId) {
+    ...DashboardParts
+  }
+}
+    ${DashboardPartsFragmentDoc}`;
+export type DeleteWidgetMutationFn = Apollo.MutationFunction<DeleteWidgetMutation, DeleteWidgetMutationVariables>;
+
+/**
+ * __useDeleteWidgetMutation__
+ *
+ * To run a mutation, you first call `useDeleteWidgetMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteWidgetMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteWidgetMutation, { data, loading, error }] = useDeleteWidgetMutation({
+ *   variables: {
+ *      widgetId: // value for 'widgetId'
+ *   },
+ * });
+ */
+export function useDeleteWidgetMutation(baseOptions?: Apollo.MutationHookOptions<DeleteWidgetMutation, DeleteWidgetMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteWidgetMutation, DeleteWidgetMutationVariables>(DeleteWidgetDocument, options);
+      }
+export type DeleteWidgetMutationHookResult = ReturnType<typeof useDeleteWidgetMutation>;
+export type DeleteWidgetMutationResult = Apollo.MutationResult<DeleteWidgetMutation>;
+export type DeleteWidgetMutationOptions = Apollo.BaseMutationOptions<DeleteWidgetMutation, DeleteWidgetMutationVariables>;
 export const UpdateWidgetBuildInfoDocument = /*#__PURE__*/ gql`
     mutation updateWidgetBuildInfo($widgetId: ID!, $buildInfo: JSONString!) {
   dashboard: updateWidgetBuildInfo(widgetId: $widgetId, buildInfo: $buildInfo) {

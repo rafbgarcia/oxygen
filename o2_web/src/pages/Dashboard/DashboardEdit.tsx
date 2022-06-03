@@ -7,7 +7,7 @@ import { DashboardLayout } from "./DashboardLayout"
 import { Popover } from "../../components/Popover"
 import { ChartBarIcon, TableIcon } from "@heroicons/react/outline"
 
-const initialLayout = { i: "", w: 12, h: 30, x: 0, y: 0 }
+const initialLayout = { i: "", w: 12, h: 15, x: 0, y: 0 }
 
 export const DashboardEdit = () => {
   const { dashboardId, widgetId } = useParams()

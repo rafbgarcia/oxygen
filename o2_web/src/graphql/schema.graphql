@@ -60,6 +60,7 @@ type Mutation {
   createDashboard(name: String!, datasetId: ID!): Dashboard!
   createWidget(dashboardId: ID!, layout: WidgetLayoutInput!, widgetType: WidgetType!): CreateWidgetMutationHandler
   updateWidgetBuildInfo(buildInfo: JSONString!, widgetId: ID!): Dashboard
+  deleteWidget(widgetId: ID!): Dashboard!
 }
 
 type PivotTableRenderData {

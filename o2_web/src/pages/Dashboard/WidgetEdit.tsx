@@ -1,7 +1,12 @@
 import { Button, Title } from "playbook-ui"
 import { useNavigate, useOutletContext, useParams } from "react-router-dom"
 
-import { Dashboard, useUpdateWidgetBuildInfoMutation, WidgetType } from "../../lib/codegenGraphql"
+import {
+  Dashboard,
+  useDeleteWidgetMutation,
+  useUpdateWidgetBuildInfoMutation,
+  WidgetType,
+} from "../../lib/codegenGraphql"
 import { find } from "lodash-es"
 import { BuildInfoPivotTable } from "./BuildInfoPivotTable"
 import React from "react"
@@ -17,11 +22,15 @@ export const WidgetEdit = () => {
   const { widgetId } = useParams()
   const navigate = useNavigate()
   const [updateBuildInfo, { loading }] = useUpdateWidgetBuildInfoMutation()
+  const [removeWidget, { loading: deleting }] = useDeleteWidgetMutation()
 
   const widget = find(dashboard.widgets, { id: widgetId })
   const didCancel = () => navigate(`/dashboards/${dashboard.id}`)
   const didChangeBuildInfo = (buildInfo) => {
     updateBuildInfo({ variables: { buildInfo: JSON.stringify(buildInfo), widgetId: widgetId! } })
+  }
+  const didRemoveWidget = () => {
+    removeWidget({ variables: { widgetId: widgetId! } }).then(didCancel)
   }
 
   return (
@@ -34,9 +43,14 @@ export const WidgetEdit = () => {
 
         {React.createElement(WIDGET_TYPE_ELEMENT[widget.type], { onChange: didChangeBuildInfo })}
 
-        <Button variant="secondary" onClick={didCancel}>
-          Close
-        </Button>
+        <div className="flex items-center gap-x-2">
+          <Button variant="secondary" onClick={didCancel}>
+            Close
+          </Button>
+          <Button variant="secondary" onClick={didRemoveWidget} loading={deleting}>
+            Remove
+          </Button>
+        </div>
       </div>
     </aside>
   )
