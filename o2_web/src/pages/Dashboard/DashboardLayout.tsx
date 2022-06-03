@@ -14,7 +14,7 @@ export const DashboardLayout = ({
   activeWidgetId,
 }: {
   dashboard: DashboardQuery["dashboard"]
-  activeWidgetId: string
+  activeWidgetId: string | undefined
 }) => {
   const handleLayoutChange = (layout) => {
     // console.log(layout)
