@@ -45,51 +45,51 @@ class DashboardObject(DjangoObjectType):
         name = model.__name__
 
 
-#
-# renderData UNION
-#
+# #
+# # renderData UNION
+# #
 
 
-class PivotTableRenderData(graphene.ObjectType):
-    html = graphene.String()
+# class PivotTableRenderData(graphene.ObjectType):
+#     html = graphene.String()
 
 
-class WidgetRenderData(graphene.Union):
-    class Meta:
-        types = (PivotTableRenderData,)
+# class WidgetRenderData(graphene.Union):
+#     class Meta:
+#         types = (PivotTableRenderData,)
 
 
-#
-# buildInfo UNION
-#
-class PivotTableBuildInfoField(graphene.ObjectType):
-    tableId = graphene.ID()
-    name = graphene.String()
-    alias = graphene.String()
-    agg = graphene.String()
+# #
+# # buildInfo UNION
+# #
+# class PivotTableBuildInfoField(graphene.ObjectType):
+#     tableId = graphene.ID()
+#     name = graphene.String()
+#     alias = graphene.String()
+#     agg = graphene.String()
 
 
-class PivotTableBuildInfo(graphene.ObjectType):
-    rows = graphene.List(PivotTableBuildInfoField, required=True)
-    values = graphene.List(PivotTableBuildInfoField, required=True)
-    columns = graphene.List(PivotTableBuildInfoField, required=True)
+# class PivotTableBuildInfo(graphene.ObjectType):
+#     rows = graphene.List(PivotTableBuildInfoField, required=True)
+#     values = graphene.List(PivotTableBuildInfoField, required=True)
+#     columns = graphene.List(PivotTableBuildInfoField, required=True)
 
 
-class VerticalBarChartBuildInfo(graphene.ObjectType):
-    categories = graphene.List(PivotTableBuildInfoField)
-    values = graphene.List(PivotTableBuildInfoField)
-    breakby = graphene.List(PivotTableBuildInfoField)
+# class VerticalBarChartBuildInfo(graphene.ObjectType):
+#     categories = graphene.List(PivotTableBuildInfoField)
+#     values = graphene.List(PivotTableBuildInfoField)
+#     breakby = graphene.List(PivotTableBuildInfoField)
 
 
-class WidgetBuildInfo(graphene.Union):
-    class Meta:
-        types = (PivotTableBuildInfo, VerticalBarChartBuildInfo)
+# class WidgetBuildInfo(graphene.Union):
+#     class Meta:
+#         types = (PivotTableBuildInfo, VerticalBarChartBuildInfo)
 
 
 class WidgetObject(DjangoObjectType):
     layout = graphene.NonNull(WidgetLayoutObject)
     build_info = graphene.Field(JSON)
-    render_data = graphene.Field(WidgetRenderData)
+    render_data = graphene.Field(JSON)
 
     class Meta:
         model = Widget
@@ -99,8 +99,4 @@ class WidgetObject(DjangoObjectType):
     #     return PivotTableBuildInfo(**widget.build_info)
 
     def resolve_render_data(widget, info):
-        render_data = widget.metadata(widget.dashboard.dataset)
-        if not render_data:
-            return None
-
-        return PivotTableRenderData(**render_data)
+        return widget.metadata(widget.dashboard.dataset)

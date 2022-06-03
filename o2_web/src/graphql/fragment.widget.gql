@@ -2,32 +2,7 @@ fragment WidgetParts on Widget {
   id
   type
   buildInfo
-  # {
-  #   ... on PivotTableBuildInfo {
-  #     rows {
-  #       tableId
-  #       name
-  #       alias
-  #     }
-  #     values {
-  #       tableId
-  #       name
-  #       alias
-  #       agg
-  #     }
-  #     columns {
-  #       tableId
-  #       name
-  #       alias
-  #     }
-  #   }
-  # }
-  renderData {
-    ... on PivotTableRenderData {
-      html
-    }
-  }
-
+  renderData
   layout {
     i
     w

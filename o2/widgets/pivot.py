@@ -6,7 +6,9 @@ from o2.errors import ValueNotSupported
 class Pivot:
     @staticmethod
     def has_required_attrs(build_info):
-        return hasattr(build_info, "rows")
+        return len(build_info["values"]) > 0 and (
+            len(build_info["rows"]) > 0 or len(build_info["columns"]) > 0
+        )
 
     @staticmethod
     def metadata(dataset, build_info, limit=25, offset=0):

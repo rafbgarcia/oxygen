@@ -59,10 +59,6 @@ type Mutation {
   deleteWidget(widgetId: ID!): Dashboard!
 }
 
-type PivotTableRenderData {
-  html: String
-}
-
 type Query {
   dataset(id: ID!): Dataset!
   datasets: [Dataset!]!
@@ -78,7 +74,7 @@ type Widget {
   type: WidgetType!
   layout: WidgetLayout!
   buildInfo: JSON
-  renderData: WidgetRenderData
+  renderData: JSON
 }
 
 type WidgetLayout {
@@ -96,8 +92,6 @@ input WidgetLayoutInput {
   x: Int!
   y: Int!
 }
-
-union WidgetRenderData = PivotTableRenderData
 
 enum WidgetType {
   PIVOT_TABLE
