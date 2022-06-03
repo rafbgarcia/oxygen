@@ -69,7 +69,7 @@ export const DashboardEdit = () => {
       <Page.Main>
         <div className="flex items-start">
           <div className="flex-grow flex-shrink basis-full">
-            <DashboardLayout key={widgetId} dashboard={data?.dashboard!} activeWidgetId={widgetId} />
+            <DashboardLayout dashboard={data?.dashboard!} activeWidgetId={widgetId} />
           </div>
           <div className="flex-grow-1 flex-shrink basis-0">
             <Outlet context={{ dashboard: data!.dashboard }} />
