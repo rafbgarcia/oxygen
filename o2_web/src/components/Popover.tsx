@@ -30,3 +30,5 @@ export const Popover = ({ Button, children, position }: PopoverProps) => {
     </HeadlessPopover>
   )
 }
+
+Popover.Button = HeadlessPopover.Button

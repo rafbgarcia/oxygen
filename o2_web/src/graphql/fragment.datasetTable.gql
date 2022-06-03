@@ -6,6 +6,7 @@ fragment DatasetTableParts on DatasetTable {
   htmlPreview
 
   fields {
-    ...DatasetTableFieldsParts
+    name
+    type
   }
 }

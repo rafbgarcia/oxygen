@@ -3,6 +3,7 @@ import graphene
 from graphene_django import DjangoObjectType, DjangoListField
 from o2.dataset_helpers import DatasetHelper
 from o2.graphql.mutation_createDataset import CreateDatasetTableMutationHandler
+from o2.graphql.mutation_updateWidgetBuildInfo import UpdateWidgetBuildInfoMutationHandler
 from o2.models import Dashboard, Dataset, DatasetTable, Widget
 from o2.graphql.mutation_createWidget import CreateWidgetMutationHandler
 from o2.graphql.objects import DatasetObject, DashboardObject, WidgetObject
@@ -50,6 +51,7 @@ class Mutation(graphene.ObjectType):
         required=True,
     )
     create_widget = CreateWidgetMutationHandler.Field()
+    update_widget_build_info = UpdateWidgetBuildInfoMutationHandler.Field()
 
     def resolve_create_dataset(root, info, name):
         return Dataset.objects.create(name=name)

@@ -36,9 +36,9 @@ AGG_FN = {
 }
 
 
-def _define_table(dataset):
-    columns = [column(field["name"]) for field in dataset.fields]
-    return table(dataset.name, *columns)
+def _define_table(datasetTable):
+    columns = [column(field["name"]) for field in datasetTable.fields]
+    return table(datasetTable.name, *columns)
 
 
 def _need_cte(field):
@@ -105,7 +105,7 @@ def _build_ctes(table, build_info):
 
 
 def _build_sql(dataset, build_info):
-    table = _define_table(dataset)
+    table = _define_table(dataset.tables.first())
     rows = build_info["rows"]
     values = build_info["values"]
     columns = build_info["columns"]

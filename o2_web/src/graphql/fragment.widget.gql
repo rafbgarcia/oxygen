@@ -3,6 +3,14 @@ fragment WidgetParts on Widget {
   title
   type
   buildInfo
+  renderData {
+    ... on PivotTableRenderData {
+      html
+    }
+    ... on ChartRenderData {
+      html
+    }
+  }
 
   layout {
     i

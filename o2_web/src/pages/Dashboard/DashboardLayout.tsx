@@ -3,50 +3,39 @@ import { Title } from "playbook-ui"
 import GridLayout, { WidthProvider } from "react-grid-layout"
 import { PencilAltIcon } from "@heroicons/react/outline"
 import { useNavigate, useParams } from "react-router-dom"
+import type { DashboardQuery } from "../../lib/codegenGraphql"
 
 // Auto height: https://github.com/ctrlplusb/react-sizeme
 const GridLayoutAutoWidth = WidthProvider(GridLayout)
 
-export const DashboardLayout = ({ dashboard }) => {
+export const DashboardLayout = ({ dashboard }: { dashboard: DashboardQuery["dashboard"] }) => {
   const handleLayoutChange = (layout) => {
     // console.log(layout)
   }
 
   return (
     <section>
-      <header className="p-4 mb-10">
+      <header className="p-4">
         <Title>{dashboard.name}</Title>
       </header>
 
       <GridLayoutAutoWidth
         className="layout"
         cols={12}
-        rowHeight={30}
+        rowHeight={10}
         autoSize
         onLayoutChange={handleLayoutChange}
       >
         {dashboard.widgets.map((widget) => (
-          <figure key={widget.id} data-grid={widget.layout} className="bg-gray-200 relative group">
-            <WidgetActions widgetId={widget.id} />
-            <WidgetTitle title={widget.title} />
-
-            <Widget type={widget.type} meta={widget.meta} theme={{}} />
-          </figure>
+          <div key={widget.id} data-grid={widget.layout}>
+            <figure className="relative group h-full overflow-auto">
+              <WidgetActions widgetId={widget.id} />
+              <Widget type={widget.type} renderData={widget.renderData || {}} theme={{}} />
+            </figure>
+          </div>
         ))}
       </GridLayoutAutoWidth>
     </section>
-  )
-}
-
-const WidgetTitle = ({ title }) => {
-  if (!title) return null
-
-  return (
-    <figcaption>
-      <Title size={3} className="font-medium text-lg">
-        {title}
-      </Title>
-    </figcaption>
   )
 }
 

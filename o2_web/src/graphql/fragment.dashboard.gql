@@ -1,6 +1,12 @@
 fragment DashboardParts on Dashboard {
   id
   name
+  created
+  modified
+
+  dataset {
+    ...DatasetParts
+  }
 
   widgets {
     ...WidgetParts

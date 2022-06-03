@@ -1,8 +1,7 @@
-
-
 import graphene
 from graphene_django import DjangoObjectType
 from o2.models import Dataset, DatasetTable, Dashboard, Widget
+
 
 class DatasetTableFieldsObject(graphene.ObjectType):
     name = graphene.String(required=True)
@@ -45,9 +44,34 @@ class DashboardObject(DjangoObjectType):
         name = model.__name__
 
 
+class WidgetChartRenderData(graphene.ObjectType):
+    html = graphene.String()
+
+    class Meta:
+        name = "ChartRenderData"
+
+
+class WidgetPivotTableRenderData(graphene.ObjectType):
+    html = graphene.String()
+
+    class Meta:
+        name = "PivotTableRenderData"
+
+
+class WidgetRenderData(graphene.Union):
+    class Meta:
+        types = (WidgetPivotTableRenderData, WidgetChartRenderData)
+
+
 class WidgetObject(DjangoObjectType):
     layout = graphene.NonNull(WidgetLayoutObject)
+    render_data = graphene.Field(WidgetRenderData)
 
     class Meta:
         model = Widget
         name = model.__name__
+
+    def resolve_render_data(widget, info):
+        if len(widget.build_info) == 0:
+            return None
+        return WidgetPivotTableRenderData(**widget.metadata(widget.dashboard.dataset))

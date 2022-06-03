@@ -1,4 +1,0 @@
-fragment DatasetTableFieldsParts on DatasetTableFields {
-  name
-  type
-}

@@ -3,6 +3,10 @@ schema {
   mutation: Mutation
 }
 
+type ChartRenderData {
+  html: String
+}
+
 type CreateWidgetMutationHandler {
   dashboard: Dashboard!
   widget: Widget!
@@ -55,6 +59,11 @@ type Mutation {
   createDatasetTable(datasetId: ID!, name: String!, query: String!): Dataset
   createDashboard(name: String!, datasetId: ID!): Dashboard!
   createWidget(dashboardId: ID!, layout: WidgetLayoutInput!, widgetType: WidgetType!): CreateWidgetMutationHandler
+  updateWidgetBuildInfo(buildInfo: JSONString!, widgetId: ID!): Dashboard
+}
+
+type PivotTableRenderData {
+  html: String
 }
 
 type Query {
@@ -73,6 +82,7 @@ type Widget {
   layout: WidgetLayout!
   title: String
   buildInfo: JSONString!
+  renderData: WidgetRenderData
 }
 
 type WidgetLayout {
@@ -91,8 +101,9 @@ input WidgetLayoutInput {
   y: Int!
 }
 
+union WidgetRenderData = PivotTableRenderData | ChartRenderData
+
 enum WidgetType {
   PIVOT_TABLE
-  LINE_CHART
   VERTICAL_BAR_CHART
 }

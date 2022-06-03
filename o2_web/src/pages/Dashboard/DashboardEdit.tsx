@@ -7,7 +7,7 @@ import { DashboardLayout } from "./DashboardLayout"
 import { Popover } from "../../components/Popover"
 import { ChartBarIcon, TableIcon } from "@heroicons/react/outline"
 
-const initialLayout = { i: "", w: 12, h: 10, x: 0, y: 0 }
+const initialLayout = { i: "", w: 12, h: 30, x: 0, y: 0 }
 
 export const DashboardEdit = () => {
   const { dashboardId, widgetId } = useParams()
@@ -35,33 +35,35 @@ export const DashboardEdit = () => {
         <Popover
           position="bottom-left"
           Button={
-            <Button size="sm" onClick={() => {}} variant="secondary">
+            <Button onClick={() => {}} variant="secondary">
               + Widget
             </Button>
           }
         >
           <ul className="whitespace-nowrap">
-            <li
+            <Popover.Button
+              as="li"
               className="p-4 flex items-center gap-x-2 cursor-pointer hover:bg-gray-100"
               onClick={handleCreateWidget(WidgetType.PivotTable)}
             >
               <TableIcon className="w-4" />
               Pivot Table
-            </li>
-            <li
+            </Popover.Button>
+            <Popover.Button
+              as="li"
               className="p-4 flex items-center gap-x-2 cursor-pointer hover:bg-gray-100"
               onClick={handleCreateWidget(WidgetType.VerticalBarChart)}
             >
               <ChartBarIcon className="w-4" />
               Vertical Bar Chart
-            </li>
+            </Popover.Button>
           </ul>
         </Popover>
       </Page.Header>
       <Page.Main>
         <div className="flex items-start">
           <div className="flex-grow flex-shrink basis-full">
-            <DashboardLayout key={widgetId} dashboard={data?.dashboard} />
+            <DashboardLayout key={widgetId} dashboard={data?.dashboard!} />
           </div>
           <div className="flex-grow-1 flex-shrink basis-0">
             <Outlet context={{ dashboard: data!.dashboard }} />

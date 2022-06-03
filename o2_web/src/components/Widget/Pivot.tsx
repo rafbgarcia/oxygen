@@ -24,7 +24,7 @@ const DefaultTable = ({ children }: any) => (
 
 export const Pivot = ({ meta, theme }: PivotWidget) => {
   if (!meta?.html) {
-    return <></>
+    return null
   }
   const table = tableHtmlComponent(meta.html)
   const theadHTML = table?.children[0]?.innerHTML
