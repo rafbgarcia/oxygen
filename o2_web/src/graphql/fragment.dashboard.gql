@@ -4,18 +4,6 @@ fragment DashboardParts on Dashboard {
   created
   modified
   layout {
-    i
-    w
-    h
-    x
-    y
-  }
-
-  dataset {
-    ...DatasetParts
-  }
-
-  widgets {
-    ...WidgetParts
+    ...DashboardLayoutParts
   }
 }

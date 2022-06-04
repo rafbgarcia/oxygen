@@ -14,8 +14,16 @@ type Dashboard {
   modified: DateTime!
   dataset: Dataset!
   name: String!
-  layout: [WidgetLayout]
+  layout: [DashboardLayout]
   widgets: [Widget!]!
+}
+
+type DashboardLayout {
+  i: ID!
+  w: Int!
+  h: Int!
+  x: Int!
+  y: Int!
 }
 
 type Dataset {
@@ -56,7 +64,7 @@ type Mutation {
   createDatasetTable(datasetId: ID!, name: String!, query: String!): Dataset
   createDashboard(name: String!, datasetId: ID!): Dashboard!
   createWidget(buildInfo: JSON!, dashboardId: ID!, layout: WidgetLayoutInput!, widgetType: WidgetType!): CreateWidgetMutationHandler
-  updateWidgetBuildInfo(buildInfo: JSON!, widgetId: ID!): Dashboard
+  updateWidgetBuildInfo(buildInfo: JSON!, widgetId: ID!): Widget
   deleteWidget(widgetId: ID!): Dashboard!
   updateDashboardLayout(dashboardId: ID!, layout: JSON!): Dashboard!
 }
@@ -76,14 +84,6 @@ type Widget {
   type: WidgetType!
   buildInfo: JSON
   renderData: JSON
-}
-
-type WidgetLayout {
-  i: ID!
-  w: Int!
-  h: Int!
-  x: Int!
-  y: Int!
 }
 
 input WidgetLayoutInput {

@@ -2,8 +2,4 @@ fragment DatasetParts on Dataset {
   id
   name
   lastBuiltAt
-
-  tables {
-    ...DatasetTableParts
-  }
 }

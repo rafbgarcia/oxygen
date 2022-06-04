@@ -7,7 +7,12 @@ mutation createWidget(
   createWidget(widgetType: $widgetType, dashboardId: $dashboardId, layout: $layout, buildInfo: $buildInfo) {
     dashboard {
       ...DashboardParts
+
+      widgets {
+        ...WidgetParts
+      }
     }
+
     widget {
       ...WidgetParts
     }

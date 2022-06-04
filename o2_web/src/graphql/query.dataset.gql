@@ -1,5 +1,9 @@
 query dataset($id: ID!) {
   dataset(id: $id) {
     ...DatasetParts
+
+    tables {
+      ...DatasetTableParts
+    }
   }
 }

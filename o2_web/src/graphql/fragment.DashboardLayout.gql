@@ -1,0 +1,7 @@
+fragment DashboardLayoutParts on DashboardLayout {
+  i
+  x
+  y
+  w
+  h
+}

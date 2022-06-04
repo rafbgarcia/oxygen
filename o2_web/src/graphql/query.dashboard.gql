@@ -1,5 +1,17 @@
 query dashboard($id: ID!) {
   dashboard(id: $id) {
     ...DashboardParts
+
+    dataset {
+      ...DatasetParts
+
+      tables {
+        ...DatasetTableParts
+      }
+    }
+
+    widgets {
+      ...WidgetParts
+    }
   }
 }

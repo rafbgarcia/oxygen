@@ -2,7 +2,7 @@ import graphene
 from o2.graphql.types.json import JSON
 from o2.models import Dashboard, Widget
 
-from o2.graphql.objects import DashboardObject
+from o2.graphql.objects import DashboardObject, WidgetObject
 
 
 class UpdateWidgetBuildInfoMutationHandler(graphene.Mutation):
@@ -10,7 +10,7 @@ class UpdateWidgetBuildInfoMutationHandler(graphene.Mutation):
         widget_id = graphene.ID(required=True)
         build_info = JSON(required=True)
 
-    Output = DashboardObject
+    Output = WidgetObject
 
     @classmethod
     def mutate(cls, root, info, widget_id, build_info):
@@ -18,5 +18,5 @@ class UpdateWidgetBuildInfoMutationHandler(graphene.Mutation):
         widget.build_info = build_info
         widget.save()
 
-        dashboard = Dashboard.objects.prefetch_related("widgets").get(pk=widget.dashboard_id)
-        return dashboard
+        # dashboard = Dashboard.objects.prefetch_related("widgets").get(pk=widget.dashboard_id)
+        return widget

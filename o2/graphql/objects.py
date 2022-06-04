@@ -28,7 +28,7 @@ class DatasetObject(DjangoObjectType):
         name = model.__name__
 
 
-class LayoutItemObject(graphene.ObjectType):
+class DashboardLayoutObject(graphene.ObjectType):
     i = graphene.ID(description="Unique ID to be used as the JSX element `key` prop", required=True)
     w = graphene.Int(description="Width", required=True)
     h = graphene.Int(description="Height", required=True)
@@ -36,11 +36,11 @@ class LayoutItemObject(graphene.ObjectType):
     y = graphene.Int(description="Y-axis position", required=True)
 
     class Meta:
-        name = "WidgetLayout"
+        name = "DashboardLayout"
 
 
 class DashboardObject(DjangoObjectType):
-    layout = graphene.List(LayoutItemObject)
+    layout = graphene.List(DashboardLayoutObject)
 
     class Meta:
         model = Dashboard

@@ -1,5 +1,9 @@
 mutation createDatasetTable($datasetId: ID!, $name: String!, $query: String!) {
   dataset: createDatasetTable(datasetId: $datasetId, name: $name, query: $query) {
     ...DatasetParts
+
+    tables {
+      ...DatasetTableParts
+    }
   }
 }

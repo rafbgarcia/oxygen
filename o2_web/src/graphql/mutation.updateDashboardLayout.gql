@@ -1,6 +1,8 @@
 mutation updateDashboardLayout($dashboardId: ID!, $layout: JSON!) {
   dashboard: updateDashboardLayout(dashboardId: $dashboardId, layout: $layout) {
     id
-    layout
+    layout {
+      ...DashboardLayoutParts
+    }
   }
 }
