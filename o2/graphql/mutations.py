@@ -1,43 +1,10 @@
-from pydoc import describe
 import graphene
-from graphene_django import DjangoObjectType, DjangoListField
-from o2.dataset_helpers import DatasetHelper
 from o2.graphql.mutation_createDataset import CreateDatasetTableMutationHandler
 from o2.graphql.mutation_updateWidgetBuildInfo import UpdateWidgetBuildInfoMutationHandler
 from o2.graphql.types.json import JSON
-from o2.models import Dashboard, Dataset, DatasetTable, Widget
+from o2.models import Dashboard, Dataset, Widget
 from o2.graphql.mutation_createWidget import CreateWidgetMutationHandler
 from o2.graphql.objects import DatasetObject, DashboardObject, WidgetObject
-
-
-#########
-# Queries
-#########
-
-
-class Query(graphene.ObjectType):
-    dataset = graphene.Field(DatasetObject, id=graphene.ID(required=True), required=True)
-    datasets = graphene.List(graphene.NonNull(DatasetObject), required=True)
-
-    dashboard = graphene.Field(DashboardObject, id=graphene.ID(required=True), required=True)
-    dashboards = graphene.List(graphene.NonNull(DashboardObject), required=True)
-
-    def resolve_dataset(root, info, id):
-        return Dataset.objects.get(pk=id)
-
-    def resolve_datasets(root, info):
-        return Dataset.objects.prefetch_related("tables").all()
-
-    def resolve_dashboard(root, info, id):
-        return Dashboard.objects.prefetch_related("widgets").get(pk=id)
-
-    def resolve_dashboards(root, info):
-        return Dashboard.objects.prefetch_related("widgets").all()
-
-
-###########
-# Mutations
-###########
 
 
 class Mutation(graphene.ObjectType):
@@ -77,10 +44,3 @@ class Mutation(graphene.ObjectType):
         dashboard.layout = layout
         dashboard.save()
         return dashboard
-
-
-###################
-# Schema definition
-###################
-
-schema = graphene.Schema(query=Query, mutation=Mutation)

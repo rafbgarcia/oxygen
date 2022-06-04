@@ -10,7 +10,7 @@ start:
 	honcho start
 
 graphql_schema:
-	python manage.py graphql_schema --schema o2.schema.schema --out o2_web/src/graphql/schema.graphql --watch
+	python manage.py graphql_schema --schema o2.graphql.schema.schema --out o2_web/src/graphql/schema.graphql --watch
 
 install_deps:
 	pip install --requirement requirements.txt

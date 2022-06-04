@@ -47,47 +47,6 @@ class DashboardObject(DjangoObjectType):
         name = model.__name__
 
 
-# #
-# # renderData UNION
-# #
-
-
-# class PivotTableRenderData(graphene.ObjectType):
-#     html = graphene.String()
-
-
-# class WidgetRenderData(graphene.Union):
-#     class Meta:
-#         types = (PivotTableRenderData,)
-
-
-# #
-# # buildInfo UNION
-# #
-# class PivotTableBuildInfoField(graphene.ObjectType):
-#     tableId = graphene.ID()
-#     name = graphene.String()
-#     alias = graphene.String()
-#     agg = graphene.String()
-
-
-# class PivotTableBuildInfo(graphene.ObjectType):
-#     rows = graphene.List(PivotTableBuildInfoField, required=True)
-#     values = graphene.List(PivotTableBuildInfoField, required=True)
-#     columns = graphene.List(PivotTableBuildInfoField, required=True)
-
-
-# class VerticalBarChartBuildInfo(graphene.ObjectType):
-#     categories = graphene.List(PivotTableBuildInfoField)
-#     values = graphene.List(PivotTableBuildInfoField)
-#     breakby = graphene.List(PivotTableBuildInfoField)
-
-
-# class WidgetBuildInfo(graphene.Union):
-#     class Meta:
-#         types = (PivotTableBuildInfo, VerticalBarChartBuildInfo)
-
-
 class WidgetObject(DjangoObjectType):
     build_info = graphene.Field(JSON)
     render_data = graphene.Field(JSON)
@@ -95,9 +54,6 @@ class WidgetObject(DjangoObjectType):
     class Meta:
         model = Widget
         name = model.__name__
-
-    # def resolve_build_info(widget, info):
-    #     return PivotTableBuildInfo(**widget.build_info)
 
     def resolve_render_data(widget, info):
         return widget.metadata(widget.dashboard.dataset)

@@ -3,7 +3,7 @@ from o2 import dashboard_views, dataset_views, widget_views
 
 from django.views.decorators.csrf import csrf_exempt
 from graphene_django.views import GraphQLView
-from o2.schema import schema
+from o2.graphql.schema import schema
 
 dataset_paths = [
     path("datasets", dataset_views.index),
