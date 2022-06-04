@@ -58,12 +58,12 @@ class Dataset(TimeStampedModel):
         return exists(self.file_path())
 
     def append(self, table, rows):
-        df = pd.DataFrame(rows, columns=table.field_names())
+        df = pd.DataFrame(rows, columns=table.column_names())
         df = df.astype(table.dtypes(), errors="ignore")
         pantab.frame_to_hyper(df, self.file_path(), table=table.name, table_mode=TABLE_MODE_APPEND)
 
     def replace(self, table, rows):
-        df = pd.DataFrame(rows, columns=table.field_names())
+        df = pd.DataFrame(rows, columns=table.column_names())
         df = df.astype(table.dtypes(), errors="ignore")
         pantab.frame_to_hyper(df, self.file_path(), table=table.name, table_mode=TABLE_MODE_REPLACE)
 
@@ -75,17 +75,38 @@ class DatasetTable(models.Model):
     dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE, related_name="tables")
     name = models.CharField(max_length=50)
     query = models.TextField()
-    fields = models.JSONField(null=True)
     total_records = models.IntegerField(null=True)
     html_preview = models.TextField(null=True)
 
     models.UniqueConstraint(fields=[dataset, name], name="unique_dataset_table_name")
 
     def dtypes(self):
-        return DatasetHelper.fields_to_pandas_dtype(self.fields)
+        return DatasetHelper.fields_to_pandas_dtype(self.columns.all())
 
-    def field_names(self):
-        return [field["name"] for field in self.fields]
+    def column_names(self):
+        return [column.name for column in self.columns.all()]
+
+
+class DatasetTableColumn(models.Model):
+    class JoinTypes(models.TextChoices):
+        INNER_JOIN = "INNER JOIN"
+        LEFT_JOIN = "LEFT JOIN"
+
+    class FieldTypes(models.TextChoices):
+        TEXT = "Text"
+        INTEGER = "Integer"
+        FLOAT = "Float"
+        DATETIME = "DateTime"
+
+    name = models.CharField(max_length=50)
+    type = models.CharField(max_length=20, choices=FieldTypes.choices)
+    table = models.ForeignKey(DatasetTable, on_delete=models.CASCADE, related_name="columns")
+    foreign_key = models.ForeignKey(
+        "self", on_delete=models.SET_NULL, related_name="relationships", null=True
+    )
+    join_type = models.CharField(max_length=20, choices=JoinTypes.choices)
+
+    models.UniqueConstraint(fields=[table, name], name="unique_table_column_name")
 
 
 class Dashboard(TimeStampedModel):

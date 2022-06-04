@@ -1,63 +1,87 @@
-from django.test import SimpleTestCase
+from django.test import TransactionTestCase
 from o2.models import Dataset, DatasetTable
 from o2.widgets.pivot import Pivot, _build_sql
-from o2.tests.fixtures.territories import territories_df_to_dict, territories_fields
-from o2.tests.fixtures.branches import branches_df_to_dict, branches_fields
+from o2.tests.fixtures.branches import (
+    territories_df_to_dict,
+    territories_columns,
+    branches_df_to_dict,
+    branches_columns,
+)
 from unittest.mock import MagicMock, Mock
 
 
-class PivotCase(SimpleTestCase):
+class PivotCase(TransactionTestCase):
     @classmethod
     def setUpClass(self):
         self.maxDiff = None
 
-        territories = DatasetTable(id=1, name="Territories", query="", fields=territories_fields)
-        branches = DatasetTable(id=2, name="Branches", query="", fields=branches_fields)
+        Dataset.objects.all().delete()
+        dataset = Dataset.objects.create(name="TA - Follow ups")
 
-        dataset = Dataset(name="TA - Follow ups")
+        territories = dataset.tables.create(name="Territories")
+        territories.columns.set(territories_columns, bulk=False)
+        branches = dataset.tables.create(name="Branches")
+        branches.columns.set(branches_columns, bulk=False)
+
+        dataset.tables.set([territories, branches])
         dataset.replace(territories, territories_df_to_dict)
-        dataset.replace(branches, branches_df_to_dict)
+        dataset.append(branches, branches_df_to_dict)
 
-        dataset_mock = Mock()
-        dataset_mock.tables.all = MagicMock(return_value=[territories, branches])
-        self.dataset = dataset_mock
+        self.dataset = dataset
+        self.territories = territories
+        self.branches = branches
+
+    @classmethod
+    def tearDownClass(self) -> None:
+        Dataset.objects.all().delete()
 
     #
     #
-    def _test_build_sql_count(self):
+    def test_two_tables_join(self):
         build_info = {
-            "rows": [{"table_id": "1", "name": "name", "alias": "Territory"}],
+            "rows": [{"table_id": self.territories.id, "name": "name", "alias": "Territory"}],
             "columns": [],
             "values": [
-                {"table_id": "2", "agg": "COUNT", "name": "id", "alias": "# of branches"},
+                {"table_id": self.branches.id, "agg": "COUNT", "name": "id", "alias": "# of branches"},
             ],
         }
-        expected = 'SELECT "Follow ups".follow_up_result AS "Result", count("Follow ups".application_id) AS "Applications" FROM "Follow ups" GROUP BY "Follow ups".follow_up_result ORDER BY "Follow ups".follow_up_result'
-        self.assertHTMLEqual(_build_sql(self.dataset, build_info), expected)
-
-    #
-    #
-    def test_build_sql_count(self):
-        build_info = {
-            "rows": [{"agg": "COUNT", "name": "name", "alias": "name", "table_id": "1"}],
-            "values": [{"agg": "COUNT", "name": "id", "alias": "id", "table_id": "2"}],
-            "columns": [],
+        expected = {
+            "# of branches": {
+                ("Atlanta",): 1,
+                ("Austin",): 1,
+                ("Boston",): 1,
+                ("Charlotte",): 1,
+                ("Chicago",): 2,
+                ("Connecticut",): 1,
+                ("Dallas",): 2,
+                ("Denver",): 1,
+                ("Detroit",): 1,
+                ("Houston",): 1,
+                ("Long Island",): 2,
+                ("Maryland",): 3,
+                ("Nashville",): 1,
+                ("New Jersey",): 2,
+                ("Philadelphia",): 1,
+                ("Phoenix",): 1,
+                ("Pittsburgh",): 1,
+                ("Tampa",): 1,
+            }
         }
-        expected = ""
-        self.assertHTMLEqual(_build_sql(self.dataset, build_info), expected)
+        pivot = Pivot.build(self.dataset, build_info).to_dict()
+        self.assertDictEqual(pivot, expected)
 
     # #
     # #
     # def test_build_sql_count_countdistinct(self):
     #     build_info = {
-    #         "rows": [{"name": "follow_up_result", "alias": "Result"}],
+    #         "rows": [{"table_id": "1", "name": "name", "alias": "Territory"}],
     #         "columns": [],
     #         "values": [
-    #             {"agg": "COUNT", "name": "application_id", "alias": "Appls"},
-    #             {"agg": "COUNT DISTINCT", "name": "application_id", "alias": "Unique Appls"},
+    #             {"table_id": "2", "agg": "COUNT", "name": "id", "alias": "# of branches"},
+    #             {"table_id": "1", "agg": "COUNT DISTINCT", "name": "id", "alias": "# of territories"},
     #         ],
     #     }
-    #     expected = 'SELECT test.follow_up_result AS "Result", count(test.application_id) AS "Appls", count(distinct(test.application_id)) AS "Unique Appls" FROM test GROUP BY test.follow_up_result ORDER BY test.follow_up_result'
+    #     expected = ""
     #     self.assertHTMLEqual(_build_sql(self.dataset, build_info), expected)
 
     # #

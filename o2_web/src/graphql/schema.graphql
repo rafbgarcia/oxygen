@@ -44,9 +44,9 @@ type DatasetTable {
   dataset: Dataset!
   name: String!
   query: String!
-  fields: [DatasetTableFields!]!
   totalRecords: Int
   htmlPreview: String
+  fields: [DatasetTableFields!]!
 }
 
 type DatasetTableFields {

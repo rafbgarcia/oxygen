@@ -20,4 +20,4 @@ migrate:
 
 # make test_watch dir=o2/<folder>
 test_watch:
-	ag -l --python | entr python manage.py test $(dir)
+	ag -l --python | entr python manage.py test --keepdb $(dir)

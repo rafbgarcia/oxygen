@@ -1,5 +1,18 @@
 from copy import deepcopy
-from sqlalchemy import table as makeTable, column, select, func, cast, Float
+from operator import itemgetter
+from sqlalchemy import (
+    ForeignKey,
+    ForeignKeyConstraint,
+    MetaData,
+    table as makeTable,
+    column,
+    select,
+    func,
+    cast,
+    Float,
+    Table,
+    Column,
+)
 from sqlalchemy.dialects import postgresql
 from o2.errors import ValueNotSupported
 
@@ -16,8 +29,8 @@ class Pivot:
         if not Pivot.has_required_attrs(build_info):
             return None
 
-        columns = build_info["columns"]
         pivot = Pivot.build(dataset, build_info)
+        columns = build_info["columns"]
         if len(columns) > 0:
             # Swap the first column with the values table row
             pivot = pivot.swaplevel(0, len(columns), axis="columns").sort_index(axis="columns")
@@ -32,7 +45,7 @@ class Pivot:
         columns = [field["alias"] for field in build_info["columns"]]
 
         df = dataset.execute(query)
-        pivot = df.pivot(columns=columns, values=values, index=rows).fillna("-")
+        pivot = df.pivot(columns=columns, values=values, index=rows)
 
         return pivot
 
@@ -46,21 +59,8 @@ AGG_FN = {
 }
 
 
-def _define_tables(tables):
-    return {table.id: _define_table(table) for table in tables}
-
-
-def _define_table(datasetTable):
-    columns = [column(field["name"]) for field in datasetTable.fields]
-    return makeTable(datasetTable.name, *columns)
-
-
 def _need_cte(field):
     return "function" in field and field["function"] in NEED_CTE_FUNCTIONS
-
-
-def _aliased_col(tables, field):
-    return getattr(tables[field["table_id"]].c, field["name"]).label(field["alias"])
 
 
 def _table_cols(tables, fields):
@@ -118,40 +118,93 @@ def _build_ctes(table, rows, values):
     return {_cte_field_alias(field): cte for field in cte_fields}
 
 
-def _sanitize_fields(fields):
-    new_fields = []
-    for field in fields:
-        new_fields.append({**field, "table_id": int(field["table_id"])})
-    return new_fields
+### new code
+
+
+def _define_tables(tables_with_fks, tables_without_fks):
+    without_fks = {table.id: _define_table(table) for table in tables_without_fks}
+    with_fks = {table.id: _define_table(table, without_fks) for table in tables_with_fks}
+    return {**without_fks, **with_fks}
+
+
+def _define_table(datasetTable, tables=[]):
+    columns = list()
+
+    for column in datasetTable.columns.all():
+        if column.foreign_key:
+            fk = tables[column.foreign_key.table_id].c[column.foreign_key.name]
+            columns.append(Column(column.name, None, ForeignKey(fk)))
+        else:
+            columns.append(Column(column.name))
+
+    return Table(datasetTable.name, MetaData(), *columns)
+
+
+def _aliased_col(tables, field):
+    return getattr(tables[field["table_id"]].c, field["name"]).label(field["alias"])
+
+
+def _build_dimensions(tables, build_info):
+    rows = [_aliased_col(tables, field) for field in build_info["rows"]]
+    columns = [_aliased_col(tables, field) for field in build_info["columns"]]
+    return rows, columns
+
+
+def _build_measures(tables, build_info):
+    values = list()
+    for field in build_info["values"]:
+        values.append(_build_agg2(tables, field))
+    return values
+
+
+def _build_agg2(tables, field):
+    table_id, name, alias, agg = itemgetter("table_id", "name", "alias", "agg")(field)
+    if agg not in AGG_FN:
+        raise ValueNotSupported("Aggregation", agg)
+
+    return AGG_FN[agg](tables[table_id].c[name]).label(alias)
+
+
+def _select_from(tables, tables_with_fks):
+    if len(tables_with_fks) == 0:
+        return None
+
+    # TODO: do not join tables
+    # pode ter tabelas sem relacao e tabelas relacionadas
+    ts = list(tables.values())
+    joined = ts[0]
+    for t in ts[1:]:
+        joined = joined.join(t)
+    return joined
 
 
 def _build_sql(dataset, build_info):
-    tables = _define_tables(dataset.tables.all())
-    rows = _sanitize_fields(build_info["rows"])
-    values = _sanitize_fields(build_info["values"])
-    columns = _sanitize_fields(build_info["columns"])
+    tables_with_fks = dataset.tables.distinct().filter(columns__foreign_key__isnull=False).all()
+    tables_without_fks = dataset.tables.exclude(id__in=tables_with_fks).all()
+    tables = _define_tables(tables_with_fks, tables_without_fks)
 
-    def ctes():
-        """
-        Common Table Expressions are used to:
-        - Calculate percentages for CONTRIBUTION fields
-        """
-        return _build_ctes(tables, rows, values)
+    rows, columns = _build_dimensions(tables, build_info)
+    values = _build_measures(tables, build_info)
 
-    def select_cols(ctes):
-        rows_cols = [_aliased_col(tables, field) for field in rows]
-        columns_cols = [_aliased_col(tables, field) for field in columns]
-        agg_without_function_cols = [_build_agg(tables, field) for field in values if not _need_cte(field)]
-        agg_with_function_cols = _cte_select_cols(tables, ctes, values)
-        return rows_cols + columns_cols + agg_without_function_cols + agg_with_function_cols
+    select_columns = rows + columns + values
+    select_from = _select_from(
+        tables,
+        tables_with_fks,
+    )
+    group_by_columns = rows + columns
 
-    def group_by_cols():
-        rows_groupby = _table_cols(tables, rows)
-        columns_groupby = _table_cols(tables, columns)
-        return rows_groupby + columns_groupby
+    query = (
+        select(*select_columns)
+        .select_from(select_from)
+        .group_by(*group_by_columns)
+        .order_by(*group_by_columns)
+    )
 
-    groupby_cols = group_by_cols()
-    query = select(*select_cols(ctes())).group_by(*groupby_cols).order_by(*groupby_cols)
-
-    # return str(query.compile(dialect=postgresql.dialect()))
     return str(query.compile())
+
+    # def ctes():
+    #     """
+    #     Common Table Expressions are used to:
+    #     - Calculate percentages for CONTRIBUTION fields
+    #     """
+    #     return _build_ctes(fields)
