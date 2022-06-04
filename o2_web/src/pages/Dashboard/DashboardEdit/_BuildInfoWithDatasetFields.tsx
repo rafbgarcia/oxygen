@@ -1,7 +1,5 @@
 import { TrashIcon, PlusSmIcon } from "@heroicons/react/outline"
 import { Button } from "../../../components/Button"
-import { filter, isEmpty } from "lodash-es"
-import { useEffect } from "react"
 import { Popover } from "../../../components/Popover"
 import { Title } from "playbook-ui"
 import type { DashboardQuery } from "../../../lib/codegenGraphql"

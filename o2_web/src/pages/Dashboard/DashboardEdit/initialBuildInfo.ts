@@ -1,7 +1,6 @@
 import type { Widget, WidgetType } from "../../../lib/codegenGraphql"
 import { dataType } from "./_BuildInfoWithDatasetFields"
 
-// :
 export const initialBuildInfo: Record<WidgetType, any> = {
   PIVOT_TABLE: {
     sections: [

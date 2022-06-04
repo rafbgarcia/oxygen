@@ -1,7 +1,7 @@
 import { Button, Title } from "playbook-ui"
 import { useNavigate, useOutletContext, useParams } from "react-router-dom"
 import { useDeleteWidgetMutation, useUpdateWidgetBuildInfoMutation } from "../../../lib/codegenGraphql"
-import type { DashboardQuery, WidgetType } from "../../../lib/codegenGraphql"
+import type { DashboardQuery } from "../../../lib/codegenGraphql"
 import { find } from "lodash-es"
 import React from "react"
 import { Spinner } from "../../../components/Spinner"
