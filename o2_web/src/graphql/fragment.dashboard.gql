@@ -3,6 +3,13 @@ fragment DashboardParts on Dashboard {
   name
   created
   modified
+  layout {
+    i
+    w
+    h
+    x
+    y
+  }
 
   dataset {
     ...DatasetParts

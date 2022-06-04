@@ -3,13 +3,19 @@ import { Title } from "playbook-ui"
 import GridLayout, { WidthProvider } from "react-grid-layout"
 import { PencilAltIcon } from "@heroicons/react/outline"
 import { useNavigate, useParams } from "react-router-dom"
+import { useUpdateDashboardLayoutMutation } from "../../lib/codegenGraphql"
 import type { DashboardQuery } from "../../lib/codegenGraphql"
 import { classnames } from "../../lib/classnames"
 import { tw } from "../../lib/tw"
 import { useEffect } from "react"
+import map from "lodash/fp/map"
+import at from "lodash/fp/at"
 
-// Auto height: https://github.com/ctrlplusb/react-sizeme
 const GridLayoutAutoWidth = WidthProvider(GridLayout)
+const layoutMatchFields = map(at(["i", "x", "y", "w", "h"]))
+const layoutMatch = (layout1, layout2) => {
+  return layoutMatchFields(layout1).toString() === layoutMatchFields(layout2).toString()
+}
 
 export const DashboardLayout = ({
   dashboard,
@@ -18,8 +24,12 @@ export const DashboardLayout = ({
   dashboard: DashboardQuery["dashboard"]
   activeWidgetId: string | undefined
 }) => {
-  const handleLayoutChange = (layout) => {
-    console.log(layout)
+  const [updateLayout] = useUpdateDashboardLayoutMutation()
+  const layoutDidChange = (layout) => {
+    if (layoutMatch(layout, dashboard.layout)) {
+      return
+    }
+    updateLayout({ variables: { dashboardId: dashboard.id, layout } })
   }
 
   useEffect(() => {
@@ -31,17 +41,18 @@ export const DashboardLayout = ({
   }, [activeWidgetId])
 
   return (
-    <section>
+    <section className="overflow-auto max-h-[calc(100vh-120px)]">
       <header className="p-4">
         <Title>{dashboard.name}</Title>
       </header>
 
       <GridLayoutAutoWidth
-        measureBeforeMount
-        compactType={"horizontal"}
+        layout={dashboard.layout}
         cols={12}
         rowHeight={10}
-        onLayoutChange={handleLayoutChange}
+        onLayoutChange={layoutDidChange}
+        compactType={"vertical"}
+        measureBeforeMount
         autoSize
       >
         {dashboard.widgets.map((widget) => {
@@ -50,7 +61,8 @@ export const DashboardLayout = ({
             "ring-2": widget.id == activeWidgetId,
           })
           return (
-            <div key={widget.id} data-grid={widget.layout} className="relative group">
+            //  data-grid={widget.layout}
+            <div key={widget.id} className="relative group">
               <WidgetActions widgetId={widget.id} />
 
               <figure className={widgetContainerClasses}>

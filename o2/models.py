@@ -83,6 +83,7 @@ class DatasetTable(models.Model):
 class Dashboard(TimeStampedModel):
     dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
+    layout = models.JSONField(null=False, default=list)
 
 
 class Widget(TimeStampedModel):
@@ -92,7 +93,6 @@ class Widget(TimeStampedModel):
 
     dashboard = models.ForeignKey(Dashboard, on_delete=models.CASCADE, related_name="widgets")
     type = models.CharField(max_length=20, choices=Types.choices)
-    layout = models.JSONField(null=False)
     build_info = models.JSONField(default=dict)
 
     WIDGET = {Types.PIVOT_TABLE: Pivot, Types.VERTICAL_BAR_CHART: VerticalBarChart}

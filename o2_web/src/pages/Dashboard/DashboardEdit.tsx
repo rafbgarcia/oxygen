@@ -8,7 +8,7 @@ import { Popover } from "../../components/Popover"
 import { ChartBarIcon, TableIcon } from "@heroicons/react/outline"
 import { initialBuildInfo } from "./DashboardEdit/initialBuildInfo"
 
-const initialLayout = { i: "", w: 12, h: 15, x: 0, y: 0 }
+const initialLayout = { w: 12, h: 15, x: 0, y: 0 }
 
 export const DashboardEdit = () => {
   const { dashboardId, widgetId } = useParams()
@@ -69,7 +69,11 @@ export const DashboardEdit = () => {
       <Page.Main>
         <div className="flex items-start">
           <div className="flex-grow flex-shrink basis-full">
-            <DashboardLayout dashboard={data?.dashboard!} activeWidgetId={widgetId} />
+            <DashboardLayout
+              key={data?.dashboard.widgets.length}
+              dashboard={data?.dashboard!}
+              activeWidgetId={widgetId}
+            />
           </div>
           <div className="flex-grow-1 flex-shrink basis-0">
             <Outlet context={{ dashboard: data!.dashboard }} />

@@ -32,7 +32,7 @@ export const WidgetEdit = () => {
   }
 
   return (
-    <aside className="bg-white h-full z-10 w-[300px] min-h-screen shadow-md">
+    <aside className="bg-white z-10 w-[300px] h-[calc(100vh-120px)] shadow-md">
       <div className="p-4">
         <header className="flex items-center mb-10">
           <Title size={4}>Pivot Table</Title>

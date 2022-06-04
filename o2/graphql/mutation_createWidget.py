@@ -6,7 +6,6 @@ from o2.graphql.objects import DashboardObject, WidgetObject
 
 
 class WidgetLayoutInput(graphene.InputObjectType):
-    i = graphene.ID(required=True)
     w = graphene.Int(required=True)
     h = graphene.Int(required=True)
     x = graphene.Int(required=True)
@@ -26,5 +25,8 @@ class CreateWidgetMutationHandler(graphene.Mutation):
     @classmethod
     def mutate(cls, root, info, dashboard_id, widget_type, layout, build_info):
         dashboard = Dashboard.objects.get(pk=dashboard_id)
-        widget = dashboard.widgets.create(type=widget_type, layout=layout, build_info=build_info)
+        widget = dashboard.widgets.create(type=widget_type, build_info=build_info)
+        layout["i"] = widget.id
+        dashboard.layout.append(layout)
+        dashboard.save()
         return CreateWidgetMutationHandler(dashboard=dashboard, widget=widget)

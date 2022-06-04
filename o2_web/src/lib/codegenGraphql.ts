@@ -28,6 +28,7 @@ export type Dashboard = {
   created: Scalars['DateTime'];
   dataset: Dataset;
   id: Scalars['ID'];
+  layout?: Maybe<Array<Maybe<WidgetLayout>>>;
   modified: Scalars['DateTime'];
   name: Scalars['String'];
   widgets: Array<Widget>;
@@ -72,6 +73,7 @@ export type Mutation = {
   createDatasetTable?: Maybe<Dataset>;
   createWidget?: Maybe<CreateWidgetMutationHandler>;
   deleteWidget: Dashboard;
+  updateDashboardLayout: Dashboard;
   updateWidgetBuildInfo?: Maybe<Dashboard>;
 };
 
@@ -112,6 +114,12 @@ export type MutationDeleteWidgetArgs = {
 };
 
 
+export type MutationUpdateDashboardLayoutArgs = {
+  dashboardId: Scalars['ID'];
+  layout: Scalars['JSON'];
+};
+
+
 export type MutationUpdateWidgetBuildInfoArgs = {
   buildInfo: Scalars['JSON'];
   widgetId: Scalars['ID'];
@@ -141,7 +149,6 @@ export type Widget = {
   created: Scalars['DateTime'];
   dashboard: Dashboard;
   id: Scalars['ID'];
-  layout: WidgetLayout;
   modified: Scalars['DateTime'];
   renderData?: Maybe<Scalars['JSON']>;
   type: WidgetType;
@@ -158,7 +165,6 @@ export type WidgetLayout = {
 
 export type WidgetLayoutInput = {
   h: Scalars['Int'];
-  i: Scalars['ID'];
   w: Scalars['Int'];
   x: Scalars['Int'];
   y: Scalars['Int'];
@@ -169,13 +175,13 @@ export enum WidgetType {
   VerticalBarChart = 'VERTICAL_BAR_CHART'
 }
 
-export type DashboardPartsFragment = { __typename?: 'Dashboard', id: string, name: string, created: any, modified: any, dataset: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, fields: Array<{ __typename?: 'DatasetTableFields', name: string, type: string }> }> }, widgets: Array<{ __typename?: 'Widget', id: string, type: WidgetType, buildInfo?: any | null, renderData?: any | null, layout: { __typename?: 'WidgetLayout', i: string, w: number, h: number, x: number, y: number } }> };
+export type DashboardPartsFragment = { __typename?: 'Dashboard', id: string, name: string, created: any, modified: any, layout?: Array<{ __typename?: 'WidgetLayout', i: string, w: number, h: number, x: number, y: number } | null> | null, dataset: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, fields: Array<{ __typename?: 'DatasetTableFields', name: string, type: string }> }> }, widgets: Array<{ __typename?: 'Widget', id: string, type: WidgetType, buildInfo?: any | null, renderData?: any | null }> };
 
 export type DatasetPartsFragment = { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, fields: Array<{ __typename?: 'DatasetTableFields', name: string, type: string }> }> };
 
 export type DatasetTablePartsFragment = { __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, fields: Array<{ __typename?: 'DatasetTableFields', name: string, type: string }> };
 
-export type WidgetPartsFragment = { __typename?: 'Widget', id: string, type: WidgetType, buildInfo?: any | null, renderData?: any | null, layout: { __typename?: 'WidgetLayout', i: string, w: number, h: number, x: number, y: number } };
+export type WidgetPartsFragment = { __typename?: 'Widget', id: string, type: WidgetType, buildInfo?: any | null, renderData?: any | null };
 
 export type BuildDatasetMutationVariables = Exact<{
   id: Scalars['ID'];
@@ -190,7 +196,7 @@ export type CreateDashboardMutationVariables = Exact<{
 }>;
 
 
-export type CreateDashboardMutation = { __typename?: 'Mutation', dashboard: { __typename?: 'Dashboard', id: string, name: string, created: any, modified: any, dataset: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, fields: Array<{ __typename?: 'DatasetTableFields', name: string, type: string }> }> }, widgets: Array<{ __typename?: 'Widget', id: string, type: WidgetType, buildInfo?: any | null, renderData?: any | null, layout: { __typename?: 'WidgetLayout', i: string, w: number, h: number, x: number, y: number } }> } };
+export type CreateDashboardMutation = { __typename?: 'Mutation', dashboard: { __typename?: 'Dashboard', id: string, name: string, created: any, modified: any, layout?: Array<{ __typename?: 'WidgetLayout', i: string, w: number, h: number, x: number, y: number } | null> | null, dataset: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, fields: Array<{ __typename?: 'DatasetTableFields', name: string, type: string }> }> }, widgets: Array<{ __typename?: 'Widget', id: string, type: WidgetType, buildInfo?: any | null, renderData?: any | null }> } };
 
 export type CreateDatasetMutationVariables = Exact<{
   name: Scalars['String'];
@@ -216,14 +222,22 @@ export type CreateWidgetMutationVariables = Exact<{
 }>;
 
 
-export type CreateWidgetMutation = { __typename?: 'Mutation', createWidget?: { __typename?: 'CreateWidgetMutationHandler', dashboard: { __typename?: 'Dashboard', id: string, name: string, created: any, modified: any, dataset: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, fields: Array<{ __typename?: 'DatasetTableFields', name: string, type: string }> }> }, widgets: Array<{ __typename?: 'Widget', id: string, type: WidgetType, buildInfo?: any | null, renderData?: any | null, layout: { __typename?: 'WidgetLayout', i: string, w: number, h: number, x: number, y: number } }> }, widget: { __typename?: 'Widget', id: string, type: WidgetType, buildInfo?: any | null, renderData?: any | null, layout: { __typename?: 'WidgetLayout', i: string, w: number, h: number, x: number, y: number } } } | null };
+export type CreateWidgetMutation = { __typename?: 'Mutation', createWidget?: { __typename?: 'CreateWidgetMutationHandler', dashboard: { __typename?: 'Dashboard', id: string, name: string, created: any, modified: any, layout?: Array<{ __typename?: 'WidgetLayout', i: string, w: number, h: number, x: number, y: number } | null> | null, dataset: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, fields: Array<{ __typename?: 'DatasetTableFields', name: string, type: string }> }> }, widgets: Array<{ __typename?: 'Widget', id: string, type: WidgetType, buildInfo?: any | null, renderData?: any | null }> }, widget: { __typename?: 'Widget', id: string, type: WidgetType, buildInfo?: any | null, renderData?: any | null } } | null };
 
 export type DeleteWidgetMutationVariables = Exact<{
   widgetId: Scalars['ID'];
 }>;
 
 
-export type DeleteWidgetMutation = { __typename?: 'Mutation', dashboard: { __typename?: 'Dashboard', id: string, name: string, created: any, modified: any, dataset: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, fields: Array<{ __typename?: 'DatasetTableFields', name: string, type: string }> }> }, widgets: Array<{ __typename?: 'Widget', id: string, type: WidgetType, buildInfo?: any | null, renderData?: any | null, layout: { __typename?: 'WidgetLayout', i: string, w: number, h: number, x: number, y: number } }> } };
+export type DeleteWidgetMutation = { __typename?: 'Mutation', dashboard: { __typename?: 'Dashboard', id: string, name: string, created: any, modified: any, layout?: Array<{ __typename?: 'WidgetLayout', i: string, w: number, h: number, x: number, y: number } | null> | null, dataset: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, fields: Array<{ __typename?: 'DatasetTableFields', name: string, type: string }> }> }, widgets: Array<{ __typename?: 'Widget', id: string, type: WidgetType, buildInfo?: any | null, renderData?: any | null }> } };
+
+export type UpdateDashboardLayoutMutationVariables = Exact<{
+  dashboardId: Scalars['ID'];
+  layout: Scalars['JSON'];
+}>;
+
+
+export type UpdateDashboardLayoutMutation = { __typename?: 'Mutation', dashboard: { __typename?: 'Dashboard', id: string, name: string, created: any, modified: any, layout?: Array<{ __typename?: 'WidgetLayout', i: string, w: number, h: number, x: number, y: number } | null> | null, dataset: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, fields: Array<{ __typename?: 'DatasetTableFields', name: string, type: string }> }> }, widgets: Array<{ __typename?: 'Widget', id: string, type: WidgetType, buildInfo?: any | null, renderData?: any | null }> } };
 
 export type UpdateWidgetBuildInfoMutationVariables = Exact<{
   widgetId: Scalars['ID'];
@@ -231,19 +245,19 @@ export type UpdateWidgetBuildInfoMutationVariables = Exact<{
 }>;
 
 
-export type UpdateWidgetBuildInfoMutation = { __typename?: 'Mutation', dashboard?: { __typename?: 'Dashboard', id: string, name: string, created: any, modified: any, dataset: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, fields: Array<{ __typename?: 'DatasetTableFields', name: string, type: string }> }> }, widgets: Array<{ __typename?: 'Widget', id: string, type: WidgetType, buildInfo?: any | null, renderData?: any | null, layout: { __typename?: 'WidgetLayout', i: string, w: number, h: number, x: number, y: number } }> } | null };
+export type UpdateWidgetBuildInfoMutation = { __typename?: 'Mutation', dashboard?: { __typename?: 'Dashboard', id: string, name: string, created: any, modified: any, layout?: Array<{ __typename?: 'WidgetLayout', i: string, w: number, h: number, x: number, y: number } | null> | null, dataset: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, fields: Array<{ __typename?: 'DatasetTableFields', name: string, type: string }> }> }, widgets: Array<{ __typename?: 'Widget', id: string, type: WidgetType, buildInfo?: any | null, renderData?: any | null }> } | null };
 
 export type DashboardQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
 
-export type DashboardQuery = { __typename?: 'Query', dashboard: { __typename?: 'Dashboard', id: string, name: string, created: any, modified: any, dataset: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, fields: Array<{ __typename?: 'DatasetTableFields', name: string, type: string }> }> }, widgets: Array<{ __typename?: 'Widget', id: string, type: WidgetType, buildInfo?: any | null, renderData?: any | null, layout: { __typename?: 'WidgetLayout', i: string, w: number, h: number, x: number, y: number } }> } };
+export type DashboardQuery = { __typename?: 'Query', dashboard: { __typename?: 'Dashboard', id: string, name: string, created: any, modified: any, layout?: Array<{ __typename?: 'WidgetLayout', i: string, w: number, h: number, x: number, y: number } | null> | null, dataset: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, fields: Array<{ __typename?: 'DatasetTableFields', name: string, type: string }> }> }, widgets: Array<{ __typename?: 'Widget', id: string, type: WidgetType, buildInfo?: any | null, renderData?: any | null }> } };
 
 export type DashboardsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type DashboardsQuery = { __typename?: 'Query', dashboards: Array<{ __typename?: 'Dashboard', id: string, name: string, created: any, modified: any, dataset: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, fields: Array<{ __typename?: 'DatasetTableFields', name: string, type: string }> }> }, widgets: Array<{ __typename?: 'Widget', id: string, type: WidgetType, buildInfo?: any | null, renderData?: any | null, layout: { __typename?: 'WidgetLayout', i: string, w: number, h: number, x: number, y: number } }> }> };
+export type DashboardsQuery = { __typename?: 'Query', dashboards: Array<{ __typename?: 'Dashboard', id: string, name: string, created: any, modified: any, layout?: Array<{ __typename?: 'WidgetLayout', i: string, w: number, h: number, x: number, y: number } | null> | null, dataset: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, fields: Array<{ __typename?: 'DatasetTableFields', name: string, type: string }> }> }, widgets: Array<{ __typename?: 'Widget', id: string, type: WidgetType, buildInfo?: any | null, renderData?: any | null }> }> };
 
 export type DatasetQueryVariables = Exact<{
   id: Scalars['ID'];
@@ -286,13 +300,6 @@ export const WidgetPartsFragmentDoc = /*#__PURE__*/ gql`
   type
   buildInfo
   renderData
-  layout {
-    i
-    w
-    h
-    x
-    y
-  }
 }
     `;
 export const DashboardPartsFragmentDoc = /*#__PURE__*/ gql`
@@ -301,6 +308,13 @@ export const DashboardPartsFragmentDoc = /*#__PURE__*/ gql`
   name
   created
   modified
+  layout {
+    i
+    w
+    h
+    x
+    y
+  }
   dataset {
     ...DatasetParts
   }
@@ -525,6 +539,40 @@ export function useDeleteWidgetMutation(baseOptions?: Apollo.MutationHookOptions
 export type DeleteWidgetMutationHookResult = ReturnType<typeof useDeleteWidgetMutation>;
 export type DeleteWidgetMutationResult = Apollo.MutationResult<DeleteWidgetMutation>;
 export type DeleteWidgetMutationOptions = Apollo.BaseMutationOptions<DeleteWidgetMutation, DeleteWidgetMutationVariables>;
+export const UpdateDashboardLayoutDocument = /*#__PURE__*/ gql`
+    mutation updateDashboardLayout($dashboardId: ID!, $layout: JSON!) {
+  dashboard: updateDashboardLayout(dashboardId: $dashboardId, layout: $layout) {
+    ...DashboardParts
+  }
+}
+    ${DashboardPartsFragmentDoc}`;
+export type UpdateDashboardLayoutMutationFn = Apollo.MutationFunction<UpdateDashboardLayoutMutation, UpdateDashboardLayoutMutationVariables>;
+
+/**
+ * __useUpdateDashboardLayoutMutation__
+ *
+ * To run a mutation, you first call `useUpdateDashboardLayoutMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateDashboardLayoutMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateDashboardLayoutMutation, { data, loading, error }] = useUpdateDashboardLayoutMutation({
+ *   variables: {
+ *      dashboardId: // value for 'dashboardId'
+ *      layout: // value for 'layout'
+ *   },
+ * });
+ */
+export function useUpdateDashboardLayoutMutation(baseOptions?: Apollo.MutationHookOptions<UpdateDashboardLayoutMutation, UpdateDashboardLayoutMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateDashboardLayoutMutation, UpdateDashboardLayoutMutationVariables>(UpdateDashboardLayoutDocument, options);
+      }
+export type UpdateDashboardLayoutMutationHookResult = ReturnType<typeof useUpdateDashboardLayoutMutation>;
+export type UpdateDashboardLayoutMutationResult = Apollo.MutationResult<UpdateDashboardLayoutMutation>;
+export type UpdateDashboardLayoutMutationOptions = Apollo.BaseMutationOptions<UpdateDashboardLayoutMutation, UpdateDashboardLayoutMutationVariables>;
 export const UpdateWidgetBuildInfoDocument = /*#__PURE__*/ gql`
     mutation updateWidgetBuildInfo($widgetId: ID!, $buildInfo: JSON!) {
   dashboard: updateWidgetBuildInfo(widgetId: $widgetId, buildInfo: $buildInfo) {

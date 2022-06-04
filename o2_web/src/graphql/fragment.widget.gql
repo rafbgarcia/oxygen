@@ -3,11 +3,4 @@ fragment WidgetParts on Widget {
   type
   buildInfo
   renderData
-  layout {
-    i
-    w
-    h
-    x
-    y
-  }
 }

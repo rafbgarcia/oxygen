@@ -4,6 +4,7 @@ from graphene_django import DjangoObjectType, DjangoListField
 from o2.dataset_helpers import DatasetHelper
 from o2.graphql.mutation_createDataset import CreateDatasetTableMutationHandler
 from o2.graphql.mutation_updateWidgetBuildInfo import UpdateWidgetBuildInfoMutationHandler
+from o2.graphql.types.json import JSON
 from o2.models import Dashboard, Dataset, DatasetTable, Widget
 from o2.graphql.mutation_createWidget import CreateWidgetMutationHandler
 from o2.graphql.objects import DatasetObject, DashboardObject, WidgetObject
@@ -53,6 +54,9 @@ class Mutation(graphene.ObjectType):
     create_widget = CreateWidgetMutationHandler.Field()
     update_widget_build_info = UpdateWidgetBuildInfoMutationHandler.Field()
     delete_widget = graphene.Field(DashboardObject, widget_id=graphene.ID(required=True), required=True)
+    update_dashboard_layout = graphene.Field(
+        DashboardObject, dashboard_id=graphene.ID(required=True), layout=JSON(required=True), required=True
+    )
 
     def resolve_create_dataset(root, info, name):
         return Dataset.objects.create(name=name)
@@ -67,6 +71,12 @@ class Mutation(graphene.ObjectType):
         widget = Widget.objects.get(pk=widget_id)
         widget.delete()
         return widget.dashboard
+
+    def resolve_update_dashboard_layout(root, info, dashboard_id, layout):
+        dashboard = Dashboard.objects.get(pk=dashboard_id)
+        dashboard.layout = layout
+        dashboard.save()
+        return dashboard
 
 
 ###################
