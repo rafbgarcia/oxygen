@@ -15,8 +15,6 @@ import { DatasetTableShow } from "./pages/Dataset/DatasetTableShow"
 import { DashboardIndex } from "./pages/Dashboard/DashboardIndex"
 import { DashboardEdit } from "./pages/Dashboard/DashboardEdit"
 import { WidgetEdit } from "./pages/Dashboard/DashboardEdit/WidgetEdit"
-// import { DashboardNew } from "./pages/DashboardNew"
-// import { WidgetNew } from "./pages/WidgetNew"
 
 /**
  * Page to display dashboard in Nitro
@@ -33,7 +31,20 @@ import "/node_modules/react-resizable/css/styles.css"
 
 const client = new ApolloClient({
   uri: "http://localhost:8000/",
-  cache: new InMemoryCache(),
+  cache: new InMemoryCache({
+    typePolicies: {
+      Dashboard: {
+        fields: {
+          layout: {
+            merge: (existing, incoming) => incoming,
+          },
+          widgets: {
+            merge: (existing, incoming) => incoming,
+          },
+        },
+      },
+    },
+  }),
 })
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
