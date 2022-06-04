@@ -65,39 +65,3 @@ def create(request):
     params = humps.decamelize(json.loads(request.body))
     dataset = Dataset.objects.create(name=params["name"])
     return JsonResponse(humps.camelize(model_to_dict(dataset)))
-
-
-@csrf_exempt
-def _back_create(request):
-    params = humps.decamelize(json.loads(request.body))
-    dataset = Dataset.objects.create(name=params["name"])
-    tables = params["tables"]
-
-    start_time = time()
-    for table in tables:
-        table = DatasetTable(
-            dataset=dataset,
-            name=table["name"],
-            query=table["query"],
-            fields=table["fields"],
-            html_preview=table["html_preview"],
-        )
-        table.total_records = 0
-
-        with MySQL(connection_config).execute(table.query) as cursor:
-            while True:
-                rows = cursor.fetchmany(ROWS_COUNT)
-                if len(rows) == 0:
-                    break
-
-                table.total_records += len(rows)
-                dataset.append(table, rows)
-
-        table.save()
-
-    dataset.build_duration_seconds = time() - start_time
-    dataset.size_mb = os.path.getsize(dataset.file_path()) / 1e6
-    dataset.last_built_at = timezone.now()
-    dataset.save()
-
-    return JsonResponse(humps.camelize(model_to_dict(dataset)))

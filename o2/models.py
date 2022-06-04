@@ -12,6 +12,7 @@ import pandas as pd
 import pantab
 from os.path import exists
 
+TABLE_MODE_REPLACE = "w"
 TABLE_MODE_APPEND = "a"
 
 
@@ -25,6 +26,8 @@ class Dataset(TimeStampedModel):
     @staticmethod
     def build(id):
         dataset = Dataset.objects.prefetch_related("tables").get(pk=id)
+        if dataset.file_exists():
+            os.remove(dataset.file_path())
 
         start_time = time()
         for table in dataset.tables.all():
@@ -58,6 +61,11 @@ class Dataset(TimeStampedModel):
         df = pd.DataFrame(rows, columns=table.field_names())
         df = df.astype(table.dtypes(), errors="ignore")
         pantab.frame_to_hyper(df, self.file_path(), table=table.name, table_mode=TABLE_MODE_APPEND)
+
+    def replace(self, table, rows):
+        df = pd.DataFrame(rows, columns=table.field_names())
+        df = df.astype(table.dtypes(), errors="ignore")
+        pantab.frame_to_hyper(df, self.file_path(), table=table.name, table_mode=TABLE_MODE_REPLACE)
 
     def execute(self, sql):
         return pantab.frame_from_hyper_query(self.file_path(), sql)

@@ -1,4 +1,5 @@
-from sqlalchemy import table, column, select, func, cast, Float
+from copy import deepcopy
+from sqlalchemy import table as makeTable, column, select, func, cast, Float
 from sqlalchemy.dialects import postgresql
 from o2.errors import ValueNotSupported
 
@@ -45,29 +46,33 @@ AGG_FN = {
 }
 
 
+def _define_tables(tables):
+    return {table.id: _define_table(table) for table in tables}
+
+
 def _define_table(datasetTable):
     columns = [column(field["name"]) for field in datasetTable.fields]
-    return table(datasetTable.name, *columns)
+    return makeTable(datasetTable.name, *columns)
 
 
 def _need_cte(field):
     return "function" in field and field["function"] in NEED_CTE_FUNCTIONS
 
 
-def _aliased_col(table, field):
-    return getattr(table.c, field["name"]).label(field["alias"])
+def _aliased_col(tables, field):
+    return getattr(tables[field["table_id"]].c, field["name"]).label(field["alias"])
 
 
-def _table_cols(table, fields):
-    return [_table_col(table, field) for field in fields]
+def _table_cols(tables, fields):
+    return [_table_col(tables, field) for field in fields]
 
 
-def _table_col(table, field):
-    return getattr(table.c, field["name"])
+def _table_col(tables, field):
+    return getattr(tables[field["table_id"]].c, field["name"])
 
 
 def _cte_field_alias(field):
-    return field["agg"] + "_" + field["function"] + "_" + field["alias"]
+    return field["alias"]
 
 
 def _build_agg(table, field):
@@ -77,8 +82,8 @@ def _build_agg(table, field):
     return AGG_FN[field["agg"]](_table_col(table, field)).label(field["alias"])
 
 
-def _cte_select_cols(table, ctes, build_info):
-    cte_fields = [field for field in build_info["values"] if _need_cte(field)]
+def _cte_select_cols(table, ctes, values):
+    cte_fields = [field for field in values if _need_cte(field)]
 
     cte_cols = []
     for field in cte_fields:
@@ -90,9 +95,9 @@ def _cte_select_cols(table, ctes, build_info):
     return cte_cols
 
 
-def _build_ctes(table, build_info):
-    cte_fields = [field for field in build_info["values"] if _need_cte(field)]
-    rows = build_info["rows"]
+def _build_ctes(table, rows, values):
+    cte_fields = [field for field in values if _need_cte(field)]
+    rows = rows
 
     def grouped_totals_cte():
         rows_cols = _table_cols(table, rows)
@@ -113,32 +118,40 @@ def _build_ctes(table, build_info):
     return {_cte_field_alias(field): cte for field in cte_fields}
 
 
+def _sanitize_fields(fields):
+    new_fields = []
+    for field in fields:
+        new_fields.append({**field, "table_id": int(field["table_id"])})
+    return new_fields
+
+
 def _build_sql(dataset, build_info):
-    table = _define_table(dataset.tables.first())
-    rows = build_info["rows"]
-    values = build_info["values"]
-    columns = build_info["columns"]
+    tables = _define_tables(dataset.tables.all())
+    rows = _sanitize_fields(build_info["rows"])
+    values = _sanitize_fields(build_info["values"])
+    columns = _sanitize_fields(build_info["columns"])
 
     def ctes():
         """
         Common Table Expressions are used to:
         - Calculate percentages for CONTRIBUTION fields
         """
-        return _build_ctes(table, build_info)
+        return _build_ctes(tables, rows, values)
 
     def select_cols(ctes):
-        rows_cols = [_aliased_col(table, field) for field in rows]
-        columns_cols = [_aliased_col(table, field) for field in columns]
-        agg_without_function_cols = [_build_agg(table, field) for field in values if not _need_cte(field)]
-        agg_with_function_cols = _cte_select_cols(table, ctes, build_info)
+        rows_cols = [_aliased_col(tables, field) for field in rows]
+        columns_cols = [_aliased_col(tables, field) for field in columns]
+        agg_without_function_cols = [_build_agg(tables, field) for field in values if not _need_cte(field)]
+        agg_with_function_cols = _cte_select_cols(tables, ctes, values)
         return rows_cols + columns_cols + agg_without_function_cols + agg_with_function_cols
 
     def group_by_cols():
-        rows_groupby = _table_cols(table, rows)
-        columns_groupby = _table_cols(table, columns)
+        rows_groupby = _table_cols(tables, rows)
+        columns_groupby = _table_cols(tables, columns)
         return rows_groupby + columns_groupby
 
     groupby_cols = group_by_cols()
     query = select(*select_cols(ctes())).group_by(*groupby_cols).order_by(*groupby_cols)
+
     # return str(query.compile(dialect=postgresql.dialect()))
     return str(query.compile())

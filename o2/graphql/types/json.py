@@ -1,5 +1,6 @@
 from graphene.types import Scalar
 from graphql.language import ast
+import humps
 
 
 class JSON(Scalar):
@@ -10,13 +11,13 @@ class JSON(Scalar):
     """
 
     @staticmethod
-    def serialize(val):
-        return val
+    def serialize(value):
+        return humps.camelize(value)
 
     @staticmethod
     def parse_literal(node):
-        return node.value
+        return humps.decamelize(node.value)
 
     @staticmethod
     def parse_value(value):
-        return value
+        return humps.decamelize(value)
