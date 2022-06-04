@@ -4,8 +4,17 @@ from o2.errors import ValueNotSupported
 
 
 class Pivot:
-    @classmethod
-    def metadata(klass, dataset, build_info, limit=25, offset=0):
+    @staticmethod
+    def has_required_attrs(build_info):
+        return len(build_info["values"]) > 0 and (
+            len(build_info["rows"]) > 0 or len(build_info["columns"]) > 0
+        )
+
+    @staticmethod
+    def metadata(dataset, build_info, limit=25, offset=0):
+        if not Pivot.has_required_attrs(build_info):
+            return None
+
         columns = build_info["columns"]
         pivot = Pivot.build(dataset, build_info)
         if len(columns) > 0:
@@ -14,8 +23,8 @@ class Pivot:
 
         return {"html": pivot[offset:limit].to_html(escape=False, na_rep="-", index_names=True)}
 
-    @classmethod
-    def build(klass, dataset, build_info):
+    @staticmethod
+    def build(dataset, build_info):
         query = _build_sql(dataset, build_info)
         rows = [field["alias"] for field in build_info["rows"]]
         values = [field["alias"] for field in build_info["values"]]
@@ -36,9 +45,9 @@ AGG_FN = {
 }
 
 
-def _define_table(dataset):
-    columns = [column(field["name"]) for field in dataset.fields]
-    return table(dataset.name, *columns)
+def _define_table(datasetTable):
+    columns = [column(field["name"]) for field in datasetTable.fields]
+    return table(datasetTable.name, *columns)
 
 
 def _need_cte(field):
@@ -105,7 +114,7 @@ def _build_ctes(table, build_info):
 
 
 def _build_sql(dataset, build_info):
-    table = _define_table(dataset)
+    table = _define_table(dataset.tables.first())
     rows = build_info["rows"]
     values = build_info["values"]
     columns = build_info["columns"]

@@ -62,7 +62,7 @@ export const api = {
 type MutationKeys = keyof typeof MUTATIONS
 type MutationTypes = typeof MUTATIONS[keyof typeof MUTATIONS]
 
-export const useMutation = (action: MutationKeys): [(...arg: any[]) => Promise<any>, boolean] => {
+export const useLoadingMutation = (action: MutationKeys): [(...arg: any[]) => Promise<any>, boolean] => {
   const [loading, setLoading] = useState(false)
   const fn = (...arg) => {
     setLoading(true)

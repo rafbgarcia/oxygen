@@ -1,0 +1,5 @@
+mutation buildDataset($id: ID!) {
+  dataset: buildDataset(id: $id) {
+    ...DatasetParts
+  }
+}

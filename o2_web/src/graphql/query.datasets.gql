@@ -1,0 +1,5 @@
+query datasets {
+  datasets {
+    ...DatasetParts
+  }
+}

@@ -1,0 +1,99 @@
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+type CreateWidgetMutationHandler {
+  dashboard: Dashboard!
+  widget: Widget!
+}
+
+type Dashboard {
+  id: ID!
+  created: DateTime!
+  modified: DateTime!
+  dataset: Dataset!
+  name: String!
+  layout: [WidgetLayout]
+  widgets: [Widget!]!
+}
+
+type Dataset {
+  id: ID!
+  created: DateTime!
+  modified: DateTime!
+  name: String!
+  isBuilding: Boolean
+  sizeMb: Float
+  lastBuiltAt: DateTime
+  buildDurationSeconds: Int
+  tables: [DatasetTable!]!
+  dashboardSet: [Dashboard!]!
+}
+
+type DatasetTable {
+  id: ID!
+  dataset: Dataset!
+  name: String!
+  query: String!
+  fields: [DatasetTableFields!]!
+  totalRecords: Int
+  htmlPreview: String
+}
+
+type DatasetTableFields {
+  name: String!
+  type: String!
+}
+
+scalar DateTime
+
+scalar JSON
+
+type Mutation {
+  createDataset(name: String!): Dataset!
+  buildDataset(id: ID!): Dataset!
+  createDatasetTable(datasetId: ID!, name: String!, query: String!): Dataset
+  createDashboard(name: String!, datasetId: ID!): Dashboard!
+  createWidget(buildInfo: JSON!, dashboardId: ID!, layout: WidgetLayoutInput!, widgetType: WidgetType!): CreateWidgetMutationHandler
+  updateWidgetBuildInfo(buildInfo: JSON!, widgetId: ID!): Dashboard
+  deleteWidget(widgetId: ID!): Dashboard!
+  updateDashboardLayout(dashboardId: ID!, layout: JSON!): Dashboard!
+}
+
+type Query {
+  dataset(id: ID!): Dataset!
+  datasets: [Dataset!]!
+  dashboard(id: ID!): Dashboard!
+  dashboards: [Dashboard!]!
+}
+
+type Widget {
+  id: ID!
+  created: DateTime!
+  modified: DateTime!
+  dashboard: Dashboard!
+  type: WidgetType!
+  buildInfo: JSON
+  renderData: JSON
+}
+
+type WidgetLayout {
+  i: ID!
+  w: Int!
+  h: Int!
+  x: Int!
+  y: Int!
+}
+
+input WidgetLayoutInput {
+  w: Int!
+  h: Int!
+  x: Int!
+  y: Int!
+}
+
+enum WidgetType {
+  PIVOT_TABLE
+  VERTICAL_BAR_CHART
+}

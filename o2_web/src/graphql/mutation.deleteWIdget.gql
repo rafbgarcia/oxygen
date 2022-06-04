@@ -1,0 +1,5 @@
+mutation deleteWidget($widgetId: ID!) {
+  dashboard: deleteWidget(widgetId: $widgetId) {
+    ...DashboardParts
+  }
+}

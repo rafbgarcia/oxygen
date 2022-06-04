@@ -1,0 +1,4 @@
+- `$ make up` // uses nitro's services for now
+- `$ make start`
+  - Client: http://localhost:4000
+  - Server: http://localhost:8000 (is also GraphiQL)

@@ -11,9 +11,9 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ")
 }
 
-const ActiveLink = ({ children, to, ...props }: LinkProps) => {
+const ActiveLink = ({ children, to, end, ...props }: LinkProps & { end?: boolean }) => {
   let resolved = useResolvedPath(to)
-  let match = useMatch({ path: resolved.pathname, end: true })
+  let match = useMatch({ path: resolved.pathname, end: end || false })
 
   const classes = classnames("text-white px-3 py-2 rounded-md text-sm font-medium", {
     "bg-gray-900": match,
@@ -41,7 +41,9 @@ const Nav = () => {
             </Link>
             <div className="hidden sm:block sm:ml-6">
               <div className="flex space-x-4">
-                <ActiveLink to="/">Home</ActiveLink>
+                <ActiveLink to="/" end>
+                  Home
+                </ActiveLink>
                 <ActiveLink to="/datasets">Datasets</ActiveLink>
                 <ActiveLink to="/dashboards">Dashboards</ActiveLink>
               </div>

@@ -1,0 +1,5 @@
+mutation createDashboard($name: String!, $datasetId: ID!) {
+  dashboard: createDashboard(name: $name, datasetId: $datasetId) {
+    ...DashboardParts
+  }
+}

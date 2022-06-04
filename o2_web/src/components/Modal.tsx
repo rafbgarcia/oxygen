@@ -1,10 +1,42 @@
-import { Fragment } from "react"
+import { Fragment, useState } from "react"
 import { Dialog, Transition } from "@headlessui/react"
 import { tw } from "../lib/tw"
 import { classnames } from "../lib/classnames"
 import { every } from "lodash-es"
 
-export const Modal = ({ children, show, onClose, initialFocus, $xs, $sm, $md, $lg }: Record<any, any>) => {
+export const useModal = () => {
+  const [show, setShow] = useState(false)
+  const showModal = () => setShow(true)
+  const hideModal = () => setShow(false)
+  const Component = ({ children, ...props }) => (
+    <Modal show={show} onClose={setShow} $sm {...props}>
+      {children({ showModal, hideModal, Modal: Modal })}
+    </Modal>
+  )
+  return { showModal, hideModal, Modal: Component }
+}
+
+type ModalProps = React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> & {
+  children?: any
+  show?: any
+  onClose?: any
+  initialFocus?: any
+  $xs?: any
+  $sm?: any
+  $md?: any
+  $lg?: any
+}
+export const Modal = ({
+  children,
+  show,
+  onClose,
+  initialFocus,
+  $xs,
+  $sm,
+  $md,
+  $lg,
+  ...props
+}: ModalProps) => {
   const size = classnames({
     "w-[200px]": $xs,
     "w-[400px]": $sm || every([$xs, $md, $lg], (v) => !v),
@@ -13,7 +45,7 @@ export const Modal = ({ children, show, onClose, initialFocus, $xs, $sm, $md, $l
   })
   return (
     <Transition.Root show={show} as={Fragment}>
-      <Dialog as="div" className="relative z-10" onClose={onClose} initialFocus={initialFocus}>
+      <Dialog unmount as="div" className="relative z-10" onClose={onClose} initialFocus={initialFocus}>
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -27,7 +59,7 @@ export const Modal = ({ children, show, onClose, initialFocus, $xs, $sm, $md, $l
         </Transition.Child>
 
         <div className="fixed z-10 inset-0 overflow-y-auto">
-          <div className="flex items-center justify-center min-h-full p-4 text-center">
+          <div className="flex items-center justify-center min-h-full p-4">
             <Transition.Child
               as={Fragment}
               enter="ease-out duration-300"
@@ -39,6 +71,7 @@ export const Modal = ({ children, show, onClose, initialFocus, $xs, $sm, $md, $l
             >
               <Dialog.Panel
                 className={`${size} relative bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all my-8`}
+                {...props}
               >
                 {children}
               </Dialog.Panel>

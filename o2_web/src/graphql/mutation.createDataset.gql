@@ -1,0 +1,5 @@
+mutation createDataset($name: String!) {
+  dataset: createDataset(name: $name) {
+    ...DatasetParts
+  }
+}

@@ -1,0 +1,21 @@
+fragment DashboardParts on Dashboard {
+  id
+  name
+  created
+  modified
+  layout {
+    i
+    w
+    h
+    x
+    y
+  }
+
+  dataset {
+    ...DatasetParts
+  }
+
+  widgets {
+    ...WidgetParts
+  }
+}

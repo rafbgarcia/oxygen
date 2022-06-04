@@ -1,0 +1,12 @@
+fragment DatasetTableParts on DatasetTable {
+  id
+  name
+  query
+  totalRecords
+  htmlPreview
+
+  fields {
+    name
+    type
+  }
+}

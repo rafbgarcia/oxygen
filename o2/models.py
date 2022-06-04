@@ -1,6 +1,10 @@
+import os
+from time import time
 from django.db import models
+from django.utils import timezone
 from model_utils.models import TimeStampedModel
-from o2.dataset import DatasetHelper
+from o2.connectors import MySQLConnector
+from o2.dataset_helpers import DatasetHelper
 from o2.widgets.pivot import Pivot
 from o2.widgets.vertical_bar_chart import VerticalBarChart
 from powerBi.settings import BASE_DIR
@@ -18,10 +22,36 @@ class Dataset(TimeStampedModel):
     last_built_at = models.DateTimeField(null=True)
     build_duration_seconds = models.SmallIntegerField(null=True)
 
-    def file_path(self):
-        return BASE_DIR / f"{self.name}.hyper"
+    @staticmethod
+    def build(id):
+        dataset = Dataset.objects.prefetch_related("tables").get(pk=id)
 
-    def exists(self):
+        start_time = time()
+        for table in dataset.tables.all():
+            table.total_records = 0
+
+            with MySQLConnector().execute(table.query) as cursor:
+                while True:
+                    rows = cursor.fetchmany(100_000)
+                    if len(rows) == 0:
+                        break
+
+                    table.total_records += len(rows)
+                    dataset.append(table, rows)
+
+            table.save()
+
+        dataset.build_duration_seconds = time() - start_time
+        dataset.size_mb = os.path.getsize(dataset.file_path()) / 1e6
+        dataset.last_built_at = timezone.now()
+        dataset.save()
+
+        return dataset
+
+    def file_path(self):
+        return BASE_DIR / "datasources" / f"{self.name}.hyper"
+
+    def file_exists(self):
         return exists(self.file_path())
 
     def append(self, table, rows):
@@ -37,9 +67,9 @@ class DatasetTable(models.Model):
     dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE, related_name="tables")
     name = models.CharField(max_length=50)
     query = models.TextField()
-    fields = models.JSONField()
-    total_records = models.IntegerField()
-    html_preview = models.TextField()
+    fields = models.JSONField(null=True)
+    total_records = models.IntegerField(null=True)
+    html_preview = models.TextField(null=True)
 
     models.UniqueConstraint(fields=[dataset, name], name="unique_dataset_table_name")
 
@@ -51,25 +81,21 @@ class DatasetTable(models.Model):
 
 
 class Dashboard(TimeStampedModel):
+    dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
-    previous_version = models.ForeignKey("self", on_delete=models.SET_NULL, null=True)
-    dataset = models.ForeignKey(Dataset, on_delete=models.SET_NULL, null=True)
-    grid_rows = models.JSONField(null=True)
+    layout = models.JSONField(null=False, default=list)
 
 
 class Widget(TimeStampedModel):
     class Types(models.TextChoices):
-        PIVOT_TABLE = "pivot_table"
-        LINE_CHART = "line_chart"
-        VERTICAL_BAR_CHART = "vertical_bar_chart"
+        PIVOT_TABLE = "Pivot Table"
+        VERTICAL_BAR_CHART = "Vertical Bar Chart"
 
-    dashboard = models.ForeignKey(Dashboard, on_delete=models.SET_NULL, null=True)
-    title = models.CharField(max_length=200, null=True)
+    dashboard = models.ForeignKey(Dashboard, on_delete=models.CASCADE, related_name="widgets")
     type = models.CharField(max_length=20, choices=Types.choices)
-    build_info = models.JSONField()
-    grid_row_index = models.SmallIntegerField()
+    build_info = models.JSONField(default=dict)
 
-    WIDGET = {"pivot_table": Pivot, "vertical_bar_chart": VerticalBarChart}
+    WIDGET = {Types.PIVOT_TABLE: Pivot, Types.VERTICAL_BAR_CHART: VerticalBarChart}
 
     def builder(self):
         return self.WIDGET[self.type]

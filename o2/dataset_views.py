@@ -7,7 +7,7 @@ import pandas as pd
 import mysql.connector
 import humps
 from django.utils import timezone
-from o2.dataset import DatasetHelper
+from o2.dataset_helpers import DatasetHelper
 from o2.models import Dataset, DatasetTable
 from django.views.decorators.csrf import csrf_exempt
 from powerBi.settings import BASE_DIR
@@ -62,6 +62,13 @@ def preview(request):
 
 @csrf_exempt
 def create(request):
+    params = humps.decamelize(json.loads(request.body))
+    dataset = Dataset.objects.create(name=params["name"])
+    return JsonResponse(humps.camelize(model_to_dict(dataset)))
+
+
+@csrf_exempt
+def _back_create(request):
     params = humps.decamelize(json.loads(request.body))
     dataset = Dataset.objects.create(name=params["name"])
     tables = params["tables"]

@@ -1,30 +1,34 @@
-import { Fragment } from "react"
-import { Popover as HeadlessPopover, Transition } from "@headlessui/react"
+import { Popover as HeadlessPopover } from "@headlessui/react"
+import { classnames } from "../lib/classnames"
 
-export const Popover = ({ Button, children }) => {
+type PopoverProps = {
+  Button: JSX.Element
+  children: JSX.Element
+  position?: "bottom-left" | "bottom-right"
+}
+export const Popover = ({ Button, children, position }: PopoverProps) => {
+  position ||= "bottom-right"
+
+  const positionClass = classnames({
+    "left-0 top-full": position == "bottom-right",
+    "right-0 top-full": position == "bottom-left",
+  })
+  const classes = classnames("w-fit absolute z-10 bg-white", positionClass)
   return (
     <HeadlessPopover className="relative">
       {({ open }) => (
         <>
-          <HeadlessPopover.Button>{Button}</HeadlessPopover.Button>
-          <Transition
-            as={Fragment}
-            show={open}
-            enter="transition ease-out duration-200"
-            enterFrom="opacity-0"
-            enterTo="opacity-100"
-            leave="transition ease-in duration-200"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
-          >
-            <HeadlessPopover.Panel className="w-fit absolute left-full z-10 top-0 bg-white">
-              <div className="oveflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
-                <div className="relative grid bg-white p-7 overflow-auto ">{children}</div>
-              </div>
-            </HeadlessPopover.Panel>
-          </Transition>
+          <HeadlessPopover.Button as="span">{Button}</HeadlessPopover.Button>
+
+          <HeadlessPopover.Panel className={classes}>
+            <div className="oveflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
+              <div className="relative grid bg-white overflow-auto whitespace-nowrap">{children}</div>
+            </div>
+          </HeadlessPopover.Panel>
         </>
       )}
     </HeadlessPopover>
   )
 }
+
+Popover.Button = HeadlessPopover.Button
