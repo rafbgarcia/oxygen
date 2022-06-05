@@ -5,8 +5,9 @@ from django.utils import timezone
 from model_utils.models import TimeStampedModel
 from o2.connectors import MySQLConnector
 from o2.dataset_helpers import DatasetHelper
-from o2.widgets.pivot import Pivot
-from o2.widgets.vertical_bar_chart import VerticalBarChart
+
+# from o2.widgets.pivot import Pivot
+# from o2.widgets.vertical_bar_chart import VerticalBarChart
 from powerBi.settings import BASE_DIR
 import pandas as pd
 import pantab
@@ -124,7 +125,7 @@ class Widget(TimeStampedModel):
     type = models.CharField(max_length=20, choices=Types.choices)
     build_info = models.JSONField(default=dict)
 
-    WIDGET = {Types.PIVOT_TABLE: Pivot, Types.VERTICAL_BAR_CHART: VerticalBarChart}
+    # WIDGET = {Types.PIVOT_TABLE: Pivot, Types.VERTICAL_BAR_CHART: VerticalBarChart}
 
     def builder(self):
         return self.WIDGET[self.type]

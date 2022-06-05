@@ -1,7 +1,7 @@
 from django.test import TransactionTestCase
 from o2.models import Dataset, DatasetTable
 from o2.widgets.pivot import Pivot, _build_sql
-from o2.tests.fixtures.branches import (
+from o2.tests.fixtures.territories_branches import (
     territories_df_to_dict,
     territories_columns,
     branches_df_to_dict,
@@ -39,10 +39,10 @@ class PivotCase(TransactionTestCase):
     #
     def test_two_tables_join(self):
         build_info = {
-            "rows": [{"table_id": self.territories.id, "name": "name", "alias": "Territory"}],
+            "rows": [{"column_id": territories_columns[1].id, "alias": "Territory"}],
             "columns": [],
             "values": [
-                {"table_id": self.branches.id, "agg": "COUNT", "name": "id", "alias": "# of branches"},
+                {"column_id": branches_columns[0].id, "agg": "COUNT", "alias": "# of branches"},
             ],
         }
         expected = {
@@ -69,6 +69,7 @@ class PivotCase(TransactionTestCase):
         }
         pivot = Pivot.build(self.dataset, build_info).to_dict()
         self.assertDictEqual(pivot, expected)
+        # self.assertHTMLEqual(_build_sql(self.dataset, build_info), "expected")
 
     # #
     # #

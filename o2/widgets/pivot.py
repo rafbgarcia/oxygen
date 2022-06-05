@@ -15,6 +15,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.dialects import postgresql
 from o2.errors import ValueNotSupported
+from o2.models import DatasetTable, DatasetTableColumn
 
 
 class Pivot:
@@ -121,81 +122,93 @@ def _build_ctes(table, rows, values):
 ### new code
 
 
-def _define_tables(tables_with_fks, tables_without_fks):
-    without_fks = {table.id: _define_table(table) for table in tables_without_fks}
-    with_fks = {table.id: _define_table(table, without_fks) for table in tables_with_fks}
+def _columns_map(tables_with_fks, tables_without_fks):
+    without_fks = {}
+    for table in tables_without_fks:
+        without_fks.update(_define_table(table, {}))
+
+    with_fks = {}
+    for table in tables_with_fks:
+        with_fks.update(_define_table(table, without_fks))
+
     return {**without_fks, **with_fks}
 
 
-def _define_table(datasetTable, tables=[]):
-    columns = list()
-
-    for column in datasetTable.columns.all():
+def _define_table(dataset_table, columns_map):
+    columns = dict()
+    dataset_cols = dataset_table.columns.all()
+    for column in dataset_cols:
         if column.foreign_key:
-            fk = tables[column.foreign_key.table_id].c[column.foreign_key.name]
-            columns.append(Column(column.name, None, ForeignKey(fk)))
+            fk = columns_map[column.foreign_key_id]
+            columns[column.id] = Column(column.name, None, ForeignKey(fk))
         else:
-            columns.append(Column(column.name))
+            columns[column.id] = Column(column.name)
 
-    return Table(datasetTable.name, MetaData(), *columns)
-
-
-def _aliased_col(tables, field):
-    return getattr(tables[field["table_id"]].c, field["name"]).label(field["alias"])
+    table = Table(dataset_table.name, MetaData(), *columns.values())
+    return {col.id: columns[col.id] for col in dataset_cols}
 
 
-def _build_dimensions(tables, build_info):
-    rows = [_aliased_col(tables, field) for field in build_info["rows"]]
-    columns = [_aliased_col(tables, field) for field in build_info["columns"]]
-    return rows, columns
+def _aliased_col(columns, field):
+    return columns[field["column_id"]].label(field["alias"])
 
 
-def _build_measures(tables, build_info):
-    values = list()
-    for field in build_info["values"]:
-        values.append(_build_agg2(tables, field))
-    return values
+def _build_dimensions(columns, fields):
+    return [_aliased_col(columns, field) for field in fields]
 
 
-def _build_agg2(tables, field):
-    table_id, name, alias, agg = itemgetter("table_id", "name", "alias", "agg")(field)
+def _build_measures(columns, values):
+    measures = list()
+    for field in values:
+        measures.append(_build_agg2(columns, field))
+    return measures
+
+
+def _build_agg2(columns_map, field):
+    column_id, alias, agg = itemgetter("column_id", "alias", "agg")(field)
     if agg not in AGG_FN:
         raise ValueNotSupported("Aggregation", agg)
 
-    return AGG_FN[agg](tables[table_id].c[name]).label(alias)
+    return AGG_FN[agg](columns_map[column_id]).label(alias)
 
 
-def _select_from(tables, tables_with_fks):
-    if len(tables_with_fks) == 0:
-        return None
+def _select_from(tables, cols_map):
+    if len(tables) == 1:
+        return []
 
-    # TODO: do not join tables
-    # pode ter tabelas sem relacao e tabelas relacionadas
-    ts = list(tables.values())
-    joined = ts[0]
-    for t in ts[1:]:
-        joined = joined.join(t)
-    return joined
+    relations = list(
+        DatasetTableColumn.objects.filter(table_id__in=tables).filter(foreign_key__isnull=False).all()
+    )
+    table1 = cols_map[relations[0].id].table
+    join1 = cols_map[relations[0].foreign_key_id].table
+    joins = table1.join(join1)
+    return [joins]
 
 
 def _build_sql(dataset, build_info):
-    tables_with_fks = dataset.tables.distinct().filter(columns__foreign_key__isnull=False).all()
-    tables_without_fks = dataset.tables.exclude(id__in=tables_with_fks).all()
-    tables = _define_tables(tables_with_fks, tables_without_fks)
+    rows, values, columns = itemgetter("rows", "values", "columns")(build_info)
+    column_ids = list(map(itemgetter("column_id"), rows + values + columns))
 
-    rows, columns = _build_dimensions(tables, build_info)
-    values = _build_measures(tables, build_info)
-
-    select_columns = rows + columns + values
-    select_from = _select_from(
-        tables,
-        tables_with_fks,
+    tables_with_fks = (
+        dataset.tables.distinct()
+        .filter(columns__foreign_key__isnull=False)
+        .filter(columns__id__in=column_ids)
+        .all()
     )
-    group_by_columns = rows + columns
+    tables_without_fks = (
+        dataset.tables.exclude(id__in=tables_with_fks).filter(columns__id__in=column_ids).all()
+    )
+    columns_map = _columns_map(tables_with_fks, tables_without_fks)
+
+    rows_columns = _build_dimensions(columns_map, rows + columns)
+    values = _build_measures(columns_map, build_info["values"])
+
+    select_columns = rows_columns + values
+    select_from = _select_from(list(tables_with_fks) + list(tables_without_fks), columns_map)
+    group_by_columns = rows_columns
 
     query = (
         select(*select_columns)
-        .select_from(select_from)
+        .select_from(*select_from)
         .group_by(*group_by_columns)
         .order_by(*group_by_columns)
     )
