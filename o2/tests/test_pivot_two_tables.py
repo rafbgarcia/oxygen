@@ -11,8 +11,7 @@ from unittest.mock import MagicMock, Mock
 
 
 class PivotCase(TransactionTestCase):
-    @classmethod
-    def setUpClass(self):
+    def setUp(self):
         self.maxDiff = None
 
         Dataset.objects.all().delete()
@@ -31,13 +30,48 @@ class PivotCase(TransactionTestCase):
         self.territories = territories
         self.branches = branches
 
-    @classmethod
-    def tearDownClass(self) -> None:
+    def tearDown(self):
         Dataset.objects.all().delete()
 
     #
     #
     def test_two_tables_join(self):
+        build_info = {
+            "rows": [{"column_id": territories_columns[1].id, "alias": "Territory"}],
+            "columns": [],
+            "values": [
+                {"column_id": branches_columns[0].id, "agg": "COUNT", "alias": "# of branches"},
+            ],
+        }
+        expected = {
+            "# of branches": {
+                ("Atlanta",): 1,
+                ("Austin",): 1,
+                ("Boston",): 1,
+                ("Charlotte",): 1,
+                ("Chicago",): 2,
+                ("Connecticut",): 1,
+                ("Dallas",): 2,
+                ("Denver",): 1,
+                ("Detroit",): 1,
+                ("Houston",): 1,
+                ("Long Island",): 2,
+                ("Maryland",): 3,
+                ("Nashville",): 1,
+                ("New Jersey",): 2,
+                ("Philadelphia",): 1,
+                ("Phoenix",): 1,
+                ("Pittsburgh",): 1,
+                ("Tampa",): 1,
+            }
+        }
+        pivot = Pivot.build(self.dataset, build_info).to_dict()
+        self.assertDictEqual(pivot, expected)
+        # self.assertHTMLEqual(_build_sql(self.dataset, build_info), "expected")
+
+    #
+    #
+    def _test_two_tables_join2(self):
         build_info = {
             "rows": [{"column_id": territories_columns[1].id, "alias": "Territory"}],
             "columns": [],

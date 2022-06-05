@@ -1,20 +1,17 @@
 import graphene
 from graphene_django import DjangoObjectType
 from o2.graphql.types.json import JSON
-from o2.models import Dataset, DatasetTable, Dashboard, Widget
+from o2.models import Dataset, DatasetTable, Dashboard, DatasetTableColumn, Widget
+from o2.widgets.builder import build_widget
 
 
-class DatasetTableFieldsObject(graphene.ObjectType):
-    name = graphene.String(required=True)
-    type = graphene.String(required=True)
-
+class DatasetTableColumnObject(DjangoObjectType):
     class Meta:
-        name = "DatasetTableFields"
+        model = DatasetTableColumn
+        name = model.__name__
 
 
 class DatasetTableObject(DjangoObjectType):
-    fields = graphene.List(graphene.NonNull(DatasetTableFieldsObject), required=True)
-
     class Meta:
         model = DatasetTable
         name = model.__name__
@@ -56,4 +53,4 @@ class WidgetObject(DjangoObjectType):
         name = model.__name__
 
     def resolve_render_data(widget, info):
-        return widget.metadata(widget.dashboard.dataset)
+        return build_widget(widget)

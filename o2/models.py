@@ -5,9 +5,6 @@ from django.utils import timezone
 from model_utils.models import TimeStampedModel
 from o2.connectors import MySQLConnector
 from o2.dataset_helpers import DatasetHelper
-
-# from o2.widgets.pivot import Pivot
-# from o2.widgets.vertical_bar_chart import VerticalBarChart
 from powerBi.settings import BASE_DIR
 import pandas as pd
 import pantab
@@ -111,7 +108,7 @@ class DatasetTableColumn(models.Model):
 
 
 class Dashboard(TimeStampedModel):
-    dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE)
+    dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE, related_name="dashboards")
     name = models.CharField(max_length=100)
     layout = models.JSONField(null=False, default=list)
 
@@ -124,11 +121,3 @@ class Widget(TimeStampedModel):
     dashboard = models.ForeignKey(Dashboard, on_delete=models.CASCADE, related_name="widgets")
     type = models.CharField(max_length=20, choices=Types.choices)
     build_info = models.JSONField(default=dict)
-
-    # WIDGET = {Types.PIVOT_TABLE: Pivot, Types.VERTICAL_BAR_CHART: VerticalBarChart}
-
-    def builder(self):
-        return self.WIDGET[self.type]
-
-    def metadata(self, dataset):
-        return self.builder().metadata(dataset, self.build_info)

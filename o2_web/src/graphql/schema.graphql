@@ -36,7 +36,7 @@ type Dataset {
   lastBuiltAt: DateTime
   buildDurationSeconds: Int
   tables: [DatasetTable!]!
-  dashboardSet: [Dashboard!]!
+  dashboards: [Dashboard!]!
 }
 
 type DatasetTable {
@@ -46,12 +46,29 @@ type DatasetTable {
   query: String!
   totalRecords: Int
   htmlPreview: String
-  fields: [DatasetTableFields!]!
+  columns: [DatasetTableColumn!]!
 }
 
-type DatasetTableFields {
+type DatasetTableColumn {
+  id: ID!
   name: String!
-  type: String!
+  type: DatasetTableColumnType!
+  table: DatasetTable!
+  foreignKey: DatasetTableColumn
+  joinType: DatasetTableColumnJoinType!
+  relationships: [DatasetTableColumn!]!
+}
+
+enum DatasetTableColumnJoinType {
+  INNER_JOIN
+  LEFT_JOIN
+}
+
+enum DatasetTableColumnType {
+  TEXT
+  INTEGER
+  FLOAT
+  DATETIME
 }
 
 scalar DateTime
