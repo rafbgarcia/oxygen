@@ -8,12 +8,14 @@ from o2.graphql.objects import DashboardObject
 
 from o2.graphql.mutation_createWidget import CreateWidgetMutationHandler
 from o2.graphql.mutation_buildDataset import BuildDatasetMutationHandler
+from o2.graphql.mutation_updateColumn import UpdateColumnMutationHandler
 
 
 class Mutation(graphene.ObjectType):
     create_dataset = CreateDatasetMutationHandler.Field()
     build_dataset = BuildDatasetMutationHandler.Field()
     create_dataset_table = CreateDatasetTableMutationHandler.Field()
+    update_column = UpdateColumnMutationHandler.Field()
 
     create_dashboard = graphene.Field(
         DashboardObject,

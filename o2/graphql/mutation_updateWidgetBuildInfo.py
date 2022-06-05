@@ -12,11 +12,9 @@ class UpdateWidgetBuildInfoMutationHandler(graphene.Mutation):
 
     Output = WidgetObject
 
-    @classmethod
-    def mutate(cls, root, info, widget_id, build_info):
+    def mutate(root, info, widget_id, build_info):
         widget = Widget.objects.get(pk=widget_id)
         widget.build_info = build_info
         widget.save()
 
-        # dashboard = Dashboard.objects.prefetch_related("widgets").get(pk=widget.dashboard_id)
         return widget

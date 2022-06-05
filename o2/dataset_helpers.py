@@ -44,7 +44,7 @@ def convert_to_pandas_dtype(type):
     if "Text" in type:
         return "string"
     elif "Integer" in type:
-        return "int64"
+        return "Int64"  # Capital "I" @see https://pandas.pydata.org/docs/user_guide/integer_na.html
     elif "Float" in type:
         return "float64"
     elif "DateTime" in type:

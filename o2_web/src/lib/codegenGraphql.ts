@@ -17,6 +17,11 @@ export type Scalars = {
   JSON: any;
 };
 
+export type ColumnInput = {
+  foreignKeyId?: InputMaybe<Scalars['ID']>;
+  type?: InputMaybe<DatasetTableColumnType>;
+};
+
 export type CreateWidgetMutationHandler = {
   __typename?: 'CreateWidgetMutationHandler';
   dashboard: Dashboard;
@@ -74,7 +79,7 @@ export type DatasetTableColumn = {
   id: Scalars['ID'];
   joinType: DatasetTableColumnJoinType;
   name: Scalars['String'];
-  relationships: Array<DatasetTableColumn>;
+  references: Array<DatasetTableColumn>;
   table: DatasetTable;
   type: DatasetTableColumnType;
 };
@@ -99,6 +104,7 @@ export type Mutation = {
   createDatasetTable?: Maybe<Dataset>;
   createWidget?: Maybe<CreateWidgetMutationHandler>;
   deleteWidget: Dashboard;
+  updateColumn?: Maybe<DatasetTableColumn>;
   updateDashboardLayout: Dashboard;
   updateWidgetBuildInfo?: Maybe<Widget>;
 };
@@ -137,6 +143,12 @@ export type MutationCreateWidgetArgs = {
 
 export type MutationDeleteWidgetArgs = {
   widgetId: Scalars['ID'];
+};
+
+
+export type MutationUpdateColumnArgs = {
+  data?: InputMaybe<ColumnInput>;
+  id: Scalars['ID'];
 };
 
 
@@ -198,7 +210,9 @@ export type DashboardLayoutPartsFragment = { __typename?: 'DashboardLayout', i: 
 
 export type DatasetPartsFragment = { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null };
 
-export type DatasetTablePartsFragment = { __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, columns: Array<{ __typename?: 'DatasetTableColumn', id: string, name: string, type: DatasetTableColumnType }> };
+export type DatasetTablePartsFragment = { __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, columns: Array<{ __typename?: 'DatasetTableColumn', id: string, name: string, type: DatasetTableColumnType, foreignKey?: { __typename?: 'DatasetTableColumn', id: string } | null }> };
+
+export type DatasetTableColumnPartsFragment = { __typename?: 'DatasetTableColumn', id: string, name: string, type: DatasetTableColumnType, foreignKey?: { __typename?: 'DatasetTableColumn', id: string } | null };
 
 export type WidgetPartsFragment = { __typename?: 'Widget', id: string, type: WidgetType, buildInfo?: any | null, renderData?: any | null };
 
@@ -231,7 +245,7 @@ export type CreateDatasetTableMutationVariables = Exact<{
 }>;
 
 
-export type CreateDatasetTableMutation = { __typename?: 'Mutation', dataset?: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, columns: Array<{ __typename?: 'DatasetTableColumn', id: string, name: string, type: DatasetTableColumnType }> }> } | null };
+export type CreateDatasetTableMutation = { __typename?: 'Mutation', dataset?: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, columns: Array<{ __typename?: 'DatasetTableColumn', id: string, name: string, type: DatasetTableColumnType, foreignKey?: { __typename?: 'DatasetTableColumn', id: string } | null }> }> } | null };
 
 export type CreateWidgetMutationVariables = Exact<{
   widgetType: WidgetType;
@@ -249,6 +263,14 @@ export type DeleteWidgetMutationVariables = Exact<{
 
 
 export type DeleteWidgetMutation = { __typename?: 'Mutation', dashboard: { __typename?: 'Dashboard', id: string, widgets: Array<{ __typename?: 'Widget', id: string, type: WidgetType, buildInfo?: any | null, renderData?: any | null }> } };
+
+export type UpdateColumnMutationVariables = Exact<{
+  id: Scalars['ID'];
+  data: ColumnInput;
+}>;
+
+
+export type UpdateColumnMutation = { __typename?: 'Mutation', column?: { __typename?: 'DatasetTableColumn', id: string, name: string, type: DatasetTableColumnType, foreignKey?: { __typename?: 'DatasetTableColumn', id: string } | null } | null };
 
 export type UpdateDashboardLayoutMutationVariables = Exact<{
   dashboardId: Scalars['ID'];
@@ -271,7 +293,7 @@ export type DashboardQueryVariables = Exact<{
 }>;
 
 
-export type DashboardQuery = { __typename?: 'Query', dashboard: { __typename?: 'Dashboard', id: string, name: string, created: any, modified: any, dataset: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, columns: Array<{ __typename?: 'DatasetTableColumn', id: string, name: string, type: DatasetTableColumnType }> }> }, widgets: Array<{ __typename?: 'Widget', id: string, type: WidgetType, buildInfo?: any | null, renderData?: any | null }>, layout?: Array<{ __typename?: 'DashboardLayout', i: string, x: number, y: number, w: number, h: number } | null> | null } };
+export type DashboardQuery = { __typename?: 'Query', dashboard: { __typename?: 'Dashboard', id: string, name: string, created: any, modified: any, dataset: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, columns: Array<{ __typename?: 'DatasetTableColumn', id: string, name: string, type: DatasetTableColumnType, foreignKey?: { __typename?: 'DatasetTableColumn', id: string } | null }> }> }, widgets: Array<{ __typename?: 'Widget', id: string, type: WidgetType, buildInfo?: any | null, renderData?: any | null }>, layout?: Array<{ __typename?: 'DashboardLayout', i: string, x: number, y: number, w: number, h: number } | null> | null } };
 
 export type DashboardsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -283,7 +305,7 @@ export type DatasetQueryVariables = Exact<{
 }>;
 
 
-export type DatasetQuery = { __typename?: 'Query', dataset: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, columns: Array<{ __typename?: 'DatasetTableColumn', id: string, name: string, type: DatasetTableColumnType }> }> } };
+export type DatasetQuery = { __typename?: 'Query', dataset: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, columns: Array<{ __typename?: 'DatasetTableColumn', id: string, name: string, type: DatasetTableColumnType, foreignKey?: { __typename?: 'DatasetTableColumn', id: string } | null }> }> } };
 
 export type DatasetsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -317,6 +339,16 @@ export const DatasetPartsFragmentDoc = /*#__PURE__*/ gql`
   lastBuiltAt
 }
     `;
+export const DatasetTableColumnPartsFragmentDoc = /*#__PURE__*/ gql`
+    fragment DatasetTableColumnParts on DatasetTableColumn {
+  id
+  name
+  type
+  foreignKey {
+    id
+  }
+}
+    `;
 export const DatasetTablePartsFragmentDoc = /*#__PURE__*/ gql`
     fragment DatasetTableParts on DatasetTable {
   id
@@ -325,12 +357,10 @@ export const DatasetTablePartsFragmentDoc = /*#__PURE__*/ gql`
   totalRecords
   htmlPreview
   columns {
-    id
-    name
-    type
+    ...DatasetTableColumnParts
   }
 }
-    `;
+    ${DatasetTableColumnPartsFragmentDoc}`;
 export const WidgetPartsFragmentDoc = /*#__PURE__*/ gql`
     fragment WidgetParts on Widget {
   id
@@ -564,6 +594,40 @@ export function useDeleteWidgetMutation(baseOptions?: Apollo.MutationHookOptions
 export type DeleteWidgetMutationHookResult = ReturnType<typeof useDeleteWidgetMutation>;
 export type DeleteWidgetMutationResult = Apollo.MutationResult<DeleteWidgetMutation>;
 export type DeleteWidgetMutationOptions = Apollo.BaseMutationOptions<DeleteWidgetMutation, DeleteWidgetMutationVariables>;
+export const UpdateColumnDocument = /*#__PURE__*/ gql`
+    mutation updateColumn($id: ID!, $data: ColumnInput!) {
+  column: updateColumn(id: $id, data: $data) {
+    ...DatasetTableColumnParts
+  }
+}
+    ${DatasetTableColumnPartsFragmentDoc}`;
+export type UpdateColumnMutationFn = Apollo.MutationFunction<UpdateColumnMutation, UpdateColumnMutationVariables>;
+
+/**
+ * __useUpdateColumnMutation__
+ *
+ * To run a mutation, you first call `useUpdateColumnMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateColumnMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateColumnMutation, { data, loading, error }] = useUpdateColumnMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useUpdateColumnMutation(baseOptions?: Apollo.MutationHookOptions<UpdateColumnMutation, UpdateColumnMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateColumnMutation, UpdateColumnMutationVariables>(UpdateColumnDocument, options);
+      }
+export type UpdateColumnMutationHookResult = ReturnType<typeof useUpdateColumnMutation>;
+export type UpdateColumnMutationResult = Apollo.MutationResult<UpdateColumnMutation>;
+export type UpdateColumnMutationOptions = Apollo.BaseMutationOptions<UpdateColumnMutation, UpdateColumnMutationVariables>;
 export const UpdateDashboardLayoutDocument = /*#__PURE__*/ gql`
     mutation updateDashboardLayout($dashboardId: ID!, $layout: JSON!) {
   dashboard: updateDashboardLayout(dashboardId: $dashboardId, layout: $layout) {

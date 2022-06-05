@@ -3,6 +3,11 @@ schema {
   mutation: Mutation
 }
 
+input ColumnInput {
+  foreignKeyId: ID
+  type: DatasetTableColumnType
+}
+
 type CreateWidgetMutationHandler {
   dashboard: Dashboard!
   widget: Widget!
@@ -56,7 +61,7 @@ type DatasetTableColumn {
   table: DatasetTable!
   foreignKey: DatasetTableColumn
   joinType: DatasetTableColumnJoinType!
-  relationships: [DatasetTableColumn!]!
+  references: [DatasetTableColumn!]!
 }
 
 enum DatasetTableColumnJoinType {
@@ -79,6 +84,7 @@ type Mutation {
   createDataset(name: String!): Dataset
   buildDataset(id: ID!): Dataset!
   createDatasetTable(datasetId: ID!, name: String!, query: String!): Dataset
+  updateColumn(data: ColumnInput, id: ID!): DatasetTableColumn
   createDashboard(name: String!, datasetId: ID!): Dashboard!
   createWidget(buildInfo: JSON!, dashboardId: ID!, layout: WidgetLayoutInput!, widgetType: WidgetType!): CreateWidgetMutationHandler
   updateWidgetBuildInfo(buildInfo: JSON!, widgetId: ID!): Widget

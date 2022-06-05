@@ -6,8 +6,6 @@ fragment DatasetTableParts on DatasetTable {
   htmlPreview
 
   columns {
-    id
-    name
-    type
+    ...DatasetTableColumnParts
   }
 }

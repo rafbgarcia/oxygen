@@ -90,18 +90,16 @@ class DatasetTableColumn(models.Model):
         INNER_JOIN = "INNER JOIN"
         LEFT_JOIN = "LEFT JOIN"
 
-    class FieldTypes(models.TextChoices):
+    class ColumnTypes(models.TextChoices):
         TEXT = "Text"
         INTEGER = "Integer"
         FLOAT = "Float"
         DATETIME = "DateTime"
 
     name = models.CharField(max_length=50)
-    type = models.CharField(max_length=20, choices=FieldTypes.choices)
+    type = models.CharField(max_length=20, choices=ColumnTypes.choices)
     table = models.ForeignKey(DatasetTable, on_delete=models.CASCADE, related_name="columns")
-    foreign_key = models.ForeignKey(
-        "self", on_delete=models.SET_NULL, related_name="relationships", null=True
-    )
+    foreign_key = models.ForeignKey("self", on_delete=models.SET_NULL, related_name="references", null=True)
     join_type = models.CharField(max_length=20, choices=JoinTypes.choices)
 
     models.UniqueConstraint(fields=[table, name], name="unique_table_column_name")
