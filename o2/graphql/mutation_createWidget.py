@@ -22,11 +22,10 @@ class CreateWidgetMutationHandler(graphene.Mutation):
     dashboard = graphene.Field(DashboardObject, required=True)
     widget = graphene.Field(WidgetObject, required=True)
 
-    @classmethod
-    def mutate(cls, root, info, dashboard_id, widget_type, layout, build_info):
+    def mutate(root, info, dashboard_id, widget_type, layout, build_info):
         dashboard = Dashboard.objects.get(pk=dashboard_id)
         widget = dashboard.widgets.create(type=widget_type, build_info=build_info)
-        layout["i"] = widget.id
-        dashboard.layout.append(layout)
+
+        dashboard.layout.append({**layout, "i": widget.id})
         dashboard.save()
         return CreateWidgetMutationHandler(dashboard=dashboard, widget=widget)

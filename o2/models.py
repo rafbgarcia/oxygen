@@ -5,13 +5,12 @@ from django.utils import timezone
 from model_utils.models import TimeStampedModel
 from o2.connectors import MySQLConnector
 from o2.dataset_helpers import DatasetHelper
-from o2.widgets.pivot import Pivot
-from o2.widgets.vertical_bar_chart import VerticalBarChart
 from powerBi.settings import BASE_DIR
 import pandas as pd
 import pantab
 from os.path import exists
 
+TABLE_MODE_REPLACE = "w"
 TABLE_MODE_APPEND = "a"
 
 
@@ -25,6 +24,8 @@ class Dataset(TimeStampedModel):
     @staticmethod
     def build(id):
         dataset = Dataset.objects.prefetch_related("tables").get(pk=id)
+        if dataset.file_exists():
+            os.remove(dataset.file_path())
 
         start_time = time()
         for table in dataset.tables.all():
@@ -49,15 +50,20 @@ class Dataset(TimeStampedModel):
         return dataset
 
     def file_path(self):
-        return BASE_DIR / "datasources" / f"{self.name}.hyper"
+        return BASE_DIR / "datasets" / f"{self.name}.hyper"
 
     def file_exists(self):
         return exists(self.file_path())
 
     def append(self, table, rows):
-        df = pd.DataFrame(rows, columns=table.field_names())
+        df = pd.DataFrame(rows, columns=table.column_names())
         df = df.astype(table.dtypes(), errors="ignore")
         pantab.frame_to_hyper(df, self.file_path(), table=table.name, table_mode=TABLE_MODE_APPEND)
+
+    def replace(self, table, rows):
+        df = pd.DataFrame(rows, columns=table.column_names())
+        df = df.astype(table.dtypes(), errors="ignore")
+        pantab.frame_to_hyper(df, self.file_path(), table=table.name, table_mode=TABLE_MODE_REPLACE)
 
     def execute(self, sql):
         return pantab.frame_from_hyper_query(self.file_path(), sql)
@@ -67,21 +73,40 @@ class DatasetTable(models.Model):
     dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE, related_name="tables")
     name = models.CharField(max_length=50)
     query = models.TextField()
-    fields = models.JSONField(null=True)
     total_records = models.IntegerField(null=True)
     html_preview = models.TextField(null=True)
 
     models.UniqueConstraint(fields=[dataset, name], name="unique_dataset_table_name")
 
     def dtypes(self):
-        return DatasetHelper.fields_to_pandas_dtype(self.fields)
+        return DatasetHelper.fields_to_pandas_dtype(self.columns.all())
 
-    def field_names(self):
-        return [field["name"] for field in self.fields]
+    def column_names(self):
+        return [column.name for column in self.columns.all()]
+
+
+class DatasetTableColumn(models.Model):
+    class JoinTypes(models.TextChoices):
+        INNER_JOIN = "INNER JOIN"
+        LEFT_JOIN = "LEFT JOIN"
+
+    class ColumnTypes(models.TextChoices):
+        TEXT = "Text"
+        INTEGER = "Integer"
+        FLOAT = "Float"
+        DATETIME = "DateTime"
+
+    name = models.CharField(max_length=50)
+    type = models.CharField(max_length=20, choices=ColumnTypes.choices)
+    table = models.ForeignKey(DatasetTable, on_delete=models.CASCADE, related_name="columns")
+    foreign_key = models.ForeignKey("self", on_delete=models.SET_NULL, related_name="references", null=True)
+    join_type = models.CharField(max_length=20, choices=JoinTypes.choices)
+
+    models.UniqueConstraint(fields=[table, name], name="unique_table_column_name")
 
 
 class Dashboard(TimeStampedModel):
-    dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE)
+    dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE, related_name="dashboards")
     name = models.CharField(max_length=100)
     layout = models.JSONField(null=False, default=list)
 
@@ -94,11 +119,3 @@ class Widget(TimeStampedModel):
     dashboard = models.ForeignKey(Dashboard, on_delete=models.CASCADE, related_name="widgets")
     type = models.CharField(max_length=20, choices=Types.choices)
     build_info = models.JSONField(default=dict)
-
-    WIDGET = {Types.PIVOT_TABLE: Pivot, Types.VERTICAL_BAR_CHART: VerticalBarChart}
-
-    def builder(self):
-        return self.WIDGET[self.type]
-
-    def metadata(self, dataset):
-        return self.builder().metadata(dataset, self.build_info)

@@ -51,9 +51,9 @@ const BuildInfoSection = ({
   dataset: DashboardQuery["dashboard"]["dataset"]
   onChange: any
 }) => {
-  const didAddField = (table, field) => () => {
+  const didAddField = (table, column) => () => {
     const updatedBuildInfo = produce(buildInfo, (draft) => {
-      const item = { name: field.name, alias: field.name, tableId: table.id, agg: `COUNT` }
+      const item = { tableId: table.id, columnId: column.id, alias: column.name, agg: `COUNT` }
       draft[section.renderDataKey].push(item)
     })
     onChange(updatedBuildInfo)
@@ -81,7 +81,7 @@ const BuildInfoSection = ({
           >
             <div className="flex flex-col gap-y-8 max-h-96">
               {dataset.tables.map((table) => (
-                <TableFields
+                <TableColumns
                   key={table.id}
                   dataType={section.dataType}
                   table={table}
@@ -125,23 +125,23 @@ const FIELD_TYPE_DEFAULT_ACTION = {
     DateTime: "All Items",
   },
 }
-const TableFields = ({ table, dataType, didAddField }) => {
+const TableColumns = ({ table, dataType, didAddField }) => {
   return (
     <div>
       <div className="p-4 border-b">
         <Title size={4}>{table.name}</Title>
       </div>
       <ul>
-        {table.fields.map((field) => (
+        {table.columns.map((column) => (
           <Popover.Button
             as="li"
-            key={table.id + field.name}
+            key={column.id}
             className="py-2 px-6 group flex items-center gap-x-3 cursor-pointer hover:bg-gray-100"
-            onClick={didAddField(table, field)}
+            onClick={didAddField(table, column)}
           >
-            {field.name}
+            {column.name}
             <span className="invisible group-hover:visible text-gray-300 text-sm">
-              {FIELD_TYPE_DEFAULT_ACTION[dataType][field.type]}
+              {FIELD_TYPE_DEFAULT_ACTION[dataType][column.type]}
             </span>
           </Popover.Button>
         ))}

@@ -1,0 +1,5 @@
+mutation updateColumn($id: ID!, $data: ColumnInput!) {
+  column: updateColumn(id: $id, data: $data) {
+    ...DatasetTableColumnParts
+  }
+}

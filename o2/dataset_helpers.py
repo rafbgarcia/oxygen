@@ -9,21 +9,20 @@ class DatasetHelper:
         return [{"name": name, "type": convert_to_user_type(dtype)} for (name, dtype) in dict.items()]
 
     @classmethod
-    def fields_to_pandas_dtype(klass, fields):
-        return {field["name"]: convert_to_pandas_dtype(field["type"]) for field in fields}
+    def fields_to_pandas_dtype(klass, columns):
+        return {column.name: convert_to_pandas_dtype(column.type) for column in columns}
 
     @classmethod
     def preview(klass, query):
         with MySQLConnector().execute(query) as cursor:
-            fields = cursor.column_names
-            df = pd.DataFrame(cursor.fetchmany(25), columns=fields)
+            columns = cursor.column_names
+            df = pd.DataFrame(cursor.fetchmany(25), columns=columns)
 
         dtypes = df.dtypes.to_frame("dtypes").reset_index().set_index("index")["dtypes"].astype(str).to_dict()
 
-        return {
-            "fields": DatasetHelper.pandas_dtypes_to_fields(dtypes),
-            "html_preview": df.to_html(index=False, na_rep="", escape=False),
-        }
+        columns = DatasetHelper.pandas_dtypes_to_fields(dtypes)
+        preview = df.to_html(index=False, na_rep="", escape=False)
+        return columns, preview
 
 
 def convert_to_user_type(dtype):
@@ -45,7 +44,7 @@ def convert_to_pandas_dtype(type):
     if "Text" in type:
         return "string"
     elif "Integer" in type:
-        return "int64"
+        return "Int64"  # Capital "I" @see https://pandas.pydata.org/docs/user_guide/integer_na.html
     elif "Float" in type:
         return "float64"
     elif "DateTime" in type:

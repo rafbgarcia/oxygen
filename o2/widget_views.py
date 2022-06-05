@@ -4,15 +4,15 @@ from django.http import JsonResponse
 import humps
 from o2.models import Dataset, Widget
 from django.views.decorators.csrf import csrf_exempt
+from o2.widgets.builder import build_widget
 
 
 @csrf_exempt
 def preview(request, dashboard_id):
     params = humps.decamelize(json.loads(request.body))
     widget = Widget(build_info=params["build_info"], type=params["type"])
-    dataset = Dataset.objects.get(pk=params["dataset"]["id"])
 
-    return JsonResponse({"meta": widget.metadata(dataset)})
+    return JsonResponse({"meta": build_widget(widget)})
 
 
 @csrf_exempt

@@ -5,8 +5,7 @@ fragment DatasetTableParts on DatasetTable {
   totalRecords
   htmlPreview
 
-  fields {
-    name
-    type
+  columns {
+    ...DatasetTableColumnParts
   }
 }

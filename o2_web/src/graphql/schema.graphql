@@ -3,6 +3,11 @@ schema {
   mutation: Mutation
 }
 
+input ColumnInput {
+  foreignKeyId: ID
+  type: DatasetTableColumnType
+}
+
 type CreateWidgetMutationHandler {
   dashboard: Dashboard!
   widget: Widget!
@@ -36,7 +41,7 @@ type Dataset {
   lastBuiltAt: DateTime
   buildDurationSeconds: Int
   tables: [DatasetTable!]!
-  dashboardSet: [Dashboard!]!
+  dashboards: [Dashboard!]!
 }
 
 type DatasetTable {
@@ -44,14 +49,31 @@ type DatasetTable {
   dataset: Dataset!
   name: String!
   query: String!
-  fields: [DatasetTableFields!]!
   totalRecords: Int
   htmlPreview: String
+  columns: [DatasetTableColumn!]!
 }
 
-type DatasetTableFields {
+type DatasetTableColumn {
+  id: ID!
   name: String!
-  type: String!
+  type: DatasetTableColumnType!
+  table: DatasetTable!
+  foreignKey: DatasetTableColumn
+  joinType: DatasetTableColumnJoinType!
+  references: [DatasetTableColumn!]!
+}
+
+enum DatasetTableColumnJoinType {
+  INNER_JOIN
+  LEFT_JOIN
+}
+
+enum DatasetTableColumnType {
+  TEXT
+  INTEGER
+  FLOAT
+  DATETIME
 }
 
 scalar DateTime
@@ -59,9 +81,10 @@ scalar DateTime
 scalar JSON
 
 type Mutation {
-  createDataset(name: String!): Dataset!
+  createDataset(name: String!): Dataset
   buildDataset(id: ID!): Dataset!
   createDatasetTable(datasetId: ID!, name: String!, query: String!): Dataset
+  updateColumn(data: ColumnInput, id: ID!): DatasetTableColumn
   createDashboard(name: String!, datasetId: ID!): Dashboard!
   createWidget(buildInfo: JSON!, dashboardId: ID!, layout: WidgetLayoutInput!, widgetType: WidgetType!): CreateWidgetMutationHandler
   updateWidgetBuildInfo(buildInfo: JSON!, widgetId: ID!): Widget
