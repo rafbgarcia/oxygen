@@ -2,10 +2,7 @@ from copy import deepcopy
 from operator import itemgetter
 from sqlalchemy import (
     ForeignKey,
-    ForeignKeyConstraint,
     MetaData,
-    table as makeTable,
-    column,
     select,
     func,
     cast,
@@ -16,6 +13,7 @@ from sqlalchemy import (
 from sqlalchemy.dialects import postgresql
 from o2.errors import ValueNotSupported
 from o2.models import DatasetTable, DatasetTableColumn
+from django.db.models import Q
 
 
 class Pivot:
@@ -122,19 +120,26 @@ AGG_FN = {
 ### new code
 
 
-def _columns_map(dataset_tables):
-    metadata = MetaData()
-    tables = {}
-    columns = {}
-    for table in dataset_tables:
-        t, c = _define_table(table, metadata)
-        tables.update(t)
-        columns.update(c)
+def _define_tables(dataset, selected_columns):
+    table_ids = list(map(itemgetter("table_id"), selected_columns))
+    dataset_tables = dataset.tables.filter(id__in=table_ids).all()
 
-    return columns, tables
+    metadata = MetaData()
+    tables_mapping = {}
+    columns_mapping = {}
+    for table in dataset_tables:
+        table, column = _define_table(table, metadata)
+        tables_mapping.update(table)
+        columns_mapping.update(column)
+
+    return tables_mapping, columns_mapping
 
 
 def _define_table(dataset_table, metadata):
+    """
+    The table definition needs to contain all so that relationships
+    between columns can be accessed.
+    """
     columns = dict()
     dataset_cols = dataset_table.columns.all()
     for column in dataset_cols:
@@ -184,17 +189,14 @@ def _select_from(tables_map):
 
 def _build_sql(dataset, build_info):
     rows, values, columns = itemgetter("rows", "values", "columns")(build_info)
-    column_ids = list(map(itemgetter("column_id"), rows + values + columns))
+    tables_mapping, columns_mapping = _define_tables(dataset, rows + columns + values)
 
-    dataset_tables = dataset.tables.distinct().filter(columns__id__in=column_ids).all()
-    columns_map, tables_map = _columns_map(dataset_tables)
+    dimensions = _build_dimensions(columns_mapping, rows + columns)
+    measures = _build_measures(columns_mapping, values)
 
-    rows_columns = _build_dimensions(columns_map, rows + columns)
-    values = _build_measures(columns_map, build_info["values"])
-
-    select_columns = rows_columns + values
-    select_from = _select_from(tables_map)
-    group_by_columns = rows_columns
+    select_columns = dimensions + measures
+    select_from = _select_from(tables_mapping)
+    group_by_columns = dimensions
 
     query = (
         select(*select_columns)
