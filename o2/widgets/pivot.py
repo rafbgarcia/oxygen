@@ -178,9 +178,12 @@ def _select_from(tables, cols_map):
     relations = list(
         DatasetTableColumn.objects.filter(table_id__in=tables).filter(foreign_key__isnull=False).all()
     )
-    table1 = cols_map[relations[0].id].table
-    join1 = cols_map[relations[0].foreign_key_id].table
-    joins = table1.join(join1)
+    unique_tables = {cols_map[rel.id].table: True for rel in relations}
+    unique_tables.update({cols_map[rel.foreign_key_id].table: True for rel in relations})
+    unique_tables = list(unique_tables.keys())
+    joins = unique_tables[0]
+    for table in unique_tables[1:]:
+        joins = joins.join(table)
     return [joins]
 
 
