@@ -20,9 +20,9 @@ export const DatasetIndex = () => {
     <>
       <Modal children={NewDatasourceForm} />
       <Page.Header $flex>
-        <Page.Title>Data Sources</Page.Title>
-        <Button size="sm" onClick={showModal} variant="secondary">
-          + Data Source
+        <Page.Title>Datasets</Page.Title>
+        <Button onClick={showModal} variant="secondary">
+          + Dataset
         </Button>
       </Page.Header>
       <Page.Main className="container m-auto max-w-screen-lg">

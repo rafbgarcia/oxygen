@@ -5,23 +5,28 @@ import { Page } from "../Page"
 import { Wait } from "../../components/Wait"
 import { PlayIcon } from "@heroicons/react/solid"
 import { TableIcon, PlusSmIcon, MenuIcon, HashtagIcon, CalendarIcon } from "@heroicons/react/outline"
-import { DatasetQuery, useBuildDatasetMutation, useDatasetQuery } from "../../lib/codegenGraphql"
+import {
+  DatasetQuery,
+  useBuildDatasetMutation,
+  useDatasetQuery,
+  DatasetTableColumnType,
+} from "../../lib/codegenGraphql"
 import { classnames } from "../../lib/classnames"
 import { toast } from "react-toastify"
 
-const FIELD_TYPE_ICON = {
-  Text: () => (
+const FIELD_TYPE_ICON: Record<DatasetTableColumnType, any> = {
+  [DatasetTableColumnType.Text]: () => (
     <div className="border border-gray-500 rounded-sm p-0.5">
       <MenuIcon className="w-3" />
     </div>
   ),
-  Integer: () => (
+  [DatasetTableColumnType.Integer]: () => (
     <div className="border border-gray-500 rounded-sm p-0.5">
       <HashtagIcon className="w-3" />
     </div>
   ),
-  Float: () => FIELD_TYPE_ICON["Integer"](),
-  DateTime: () => (
+  [DatasetTableColumnType.Float]: () => FIELD_TYPE_ICON["Integer"](),
+  [DatasetTableColumnType.Datetime]: () => (
     <div className="p-0.5">
       <CalendarIcon className="w-4" />
     </div>
@@ -100,13 +105,13 @@ const TableFields = ({ dataset, tableId }: { dataset: DatasetQuery["dataset"]; t
             </li>
           </ul>
           <ul className={classnames({ hidden: tableId != table.id })}>
-            {table.fields.map((field) => (
+            {table.columns.map((column) => (
               <li
-                key={field.name}
+                key={column.id}
                 className="flex items-center gap-x-2 py-3 pl-10 pr-3 hover:bg-gray-100 cursor-default"
               >
-                {React.createElement(FIELD_TYPE_ICON[field.type])}
-                {field.name}
+                {React.createElement(FIELD_TYPE_ICON[column.type])}
+                {column.name}
               </li>
             ))}
           </ul>

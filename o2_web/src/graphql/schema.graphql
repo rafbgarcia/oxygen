@@ -76,7 +76,7 @@ scalar DateTime
 scalar JSON
 
 type Mutation {
-  createDataset(name: String!): Dataset!
+  createDataset(name: String!): Dataset
   buildDataset(id: ID!): Dataset!
   createDatasetTable(datasetId: ID!, name: String!, query: String!): Dataset
   createDashboard(name: String!, datasetId: ID!): Dashboard!

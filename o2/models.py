@@ -50,7 +50,7 @@ class Dataset(TimeStampedModel):
         return dataset
 
     def file_path(self):
-        return BASE_DIR / "datasources" / f"{self.name}.hyper"
+        return BASE_DIR / "datasets" / f"{self.name}.hyper"
 
     def file_exists(self):
         return exists(self.file_path())

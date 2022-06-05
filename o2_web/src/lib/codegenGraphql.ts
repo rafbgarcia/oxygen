@@ -95,7 +95,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   buildDataset: Dataset;
   createDashboard: Dashboard;
-  createDataset: Dataset;
+  createDataset?: Maybe<Dataset>;
   createDatasetTable?: Maybe<Dataset>;
   createWidget?: Maybe<CreateWidgetMutationHandler>;
   deleteWidget: Dashboard;
@@ -222,7 +222,7 @@ export type CreateDatasetMutationVariables = Exact<{
 }>;
 
 
-export type CreateDatasetMutation = { __typename?: 'Mutation', dataset: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null } };
+export type CreateDatasetMutation = { __typename?: 'Mutation', dataset?: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null } | null };
 
 export type CreateDatasetTableMutationVariables = Exact<{
   datasetId: Scalars['ID'];

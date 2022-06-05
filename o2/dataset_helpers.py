@@ -9,21 +9,20 @@ class DatasetHelper:
         return [{"name": name, "type": convert_to_user_type(dtype)} for (name, dtype) in dict.items()]
 
     @classmethod
-    def fields_to_pandas_dtype(klass, tableColumns):
-        return {tableColumn.name: convert_to_pandas_dtype(tableColumn.type) for tableColumn in tableColumns}
+    def fields_to_pandas_dtype(klass, columns):
+        return {column.name: convert_to_pandas_dtype(column.type) for column in columns}
 
     @classmethod
     def preview(klass, query):
         with MySQLConnector().execute(query) as cursor:
-            tableColumns = cursor.column_names
-            df = pd.DataFrame(cursor.fetchmany(25), columns=tableColumns)
+            columns = cursor.column_names
+            df = pd.DataFrame(cursor.fetchmany(25), columns=columns)
 
         dtypes = df.dtypes.to_frame("dtypes").reset_index().set_index("index")["dtypes"].astype(str).to_dict()
 
-        return {
-            "tableColumns": DatasetHelper.pandas_dtypes_to_fields(dtypes),
-            "html_preview": df.to_html(index=False, na_rep="", escape=False),
-        }
+        columns = DatasetHelper.pandas_dtypes_to_fields(dtypes)
+        preview = df.to_html(index=False, na_rep="", escape=False)
+        return columns, preview
 
 
 def convert_to_user_type(dtype):
