@@ -11,9 +11,9 @@ import React from "react"
 
 const initialLayout = (type: WidgetType) => {
   if (type == WidgetType.Text) {
-    return { w: 6, h: 3, x: 0, y: -1 }
+    return { w: 6, h: 3, x: 0, y: 10000 }
   }
-  return { w: 12, h: 15, x: 0, y: -1 }
+  return { w: 12, h: 15, x: 0, y: 10000 }
 }
 const WIDGET_TYPE_ICON: Record<WidgetType, any> = {
   [WidgetType.PivotTable]: TableIcon,
@@ -76,11 +76,7 @@ export const DashboardEdit = () => {
       <Page.Main>
         <div className="flex items-start">
           <div className="flex-grow flex-shrink basis-full">
-            <DashboardLayout
-              key={data?.dashboard.widgets.length}
-              dashboard={data?.dashboard!}
-              activeWidgetId={widgetId}
-            />
+            <DashboardLayout dashboard={data?.dashboard!} activeWidgetId={widgetId} />
           </div>
           <div className="flex-grow-1 flex-shrink basis-0">
             <Outlet context={{ dashboard: data!.dashboard }} />

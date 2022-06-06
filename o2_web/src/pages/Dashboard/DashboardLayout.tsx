@@ -48,34 +48,24 @@ export const DashboardLayout = ({
         rowHeight={10}
         onLayoutChange={layoutDidChange}
         compactType={"vertical"}
-        measureBeforeMount
+        measureBeforeMount={true}
         autoSize
       >
         {dashboard.widgets.map((widget) => {
           return (
-            <div key={widget.id} className="relative group">
+            <WidgetContainer key={widget.id} className="group" $editting={widget.id == activeWidgetId}>
               <WidgetActions widgetId={widget.id} />
 
-              <WidgetContainer $editting={widget.id == activeWidgetId}>
+              <div className="h-full overflow-auto">
                 <Widget type={widget.type} renderData={widget.renderData || {}} />
-              </WidgetContainer>
-            </div>
+              </div>
+            </WidgetContainer>
           )
         })}
       </GridLayoutAutoWidth>
     </section>
   )
 }
-
-const WidgetActionsContainer = tw.div`
-  absolute top-[-13px] right-0 w-full text-right z-10
-  hidden group-hover:block
-`
-
-const WidgetActionsButton = tw.a`
-  bg-white shadow-md p-2 rounded-md
-  cursor-pointer text-gray-500 hover:text-gray-700 hover:bg-gray-100
-`
 
 const WidgetActions = ({ widgetId }) => {
   const { dashboardId } = useParams()
@@ -85,18 +75,26 @@ const WidgetActions = ({ widgetId }) => {
   return (
     <WidgetActionsContainer>
       <WidgetActionsButton onClick={didClickEdit}>
-        <PencilAltIcon className="w-6 inline-block" />
+        <PencilAltIcon className="w-5 inline-block" />
       </WidgetActionsButton>
     </WidgetActionsContainer>
   )
 }
 
+const WidgetActionsContainer = tw.div`
+  absolute top-[-13px] right-0 w-full text-right z-10
+  hidden group-hover:block
+`
+const WidgetActionsButton = tw.a`
+  bg-white shadow-sm p-1 rounded-md border
+  cursor-pointer text-gray-500 hover:text-gray-700 hover:bg-gray-100
+`
 const WidgetContainer = tw.figure`
-  relative h-full overflow-auto
-  hover:outline-dashed hover:outline-2 hover:outline-gray-300
+  relative
 
   ${(p) =>
     classnames({
       "ring-2": p.$editting,
+      "hover:outline-dashed hover:outline-2 hover:outline-gray-300": !p.$editting,
     })}
 `

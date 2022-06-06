@@ -3,6 +3,7 @@ import { WidgetType } from "../../lib/codegenGraphql"
 import { Pivot } from "./Pivot"
 import { Text } from "./Text"
 import { VerticalBarChart } from "./VerticalBarChart"
+import { isEmpty } from "lodash-es"
 
 const WIDGETS: Record<WidgetType, any> = {
   [WidgetType.PivotTable]: Pivot,
@@ -11,7 +12,7 @@ const WIDGETS: Record<WidgetType, any> = {
 }
 
 export const Widget = ({ type, renderData }) => {
-  if (!renderData) {
+  if (isEmpty(renderData)) {
     return null
   }
 

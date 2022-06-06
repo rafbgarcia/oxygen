@@ -1,5 +1,7 @@
 ## Next items:
 
+- Fix enum labels
+- Operations between fields
 - unique field aliases
 
 ## MVP Roadmap:
@@ -19,3 +21,4 @@
 - https://react-hook-form.com/advanced-usage#SmartFormComponent
 - Graphene --watch error causes foreman to exit
 - SQL descriptor
+- One query per column?

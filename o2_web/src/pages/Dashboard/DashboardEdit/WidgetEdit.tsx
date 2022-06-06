@@ -41,7 +41,7 @@ export const WidgetEdit = () => {
     <aside className="bg-white z-10 w-[300px] shadow-md fixed right-0">
       <div className="p-4">
         <header className="flex items-center mb-10">
-          <Title size={4}>{widget?.type}</Title>
+          <Title size={4}>{widget && widget.type}</Title>
           {loading && <Spinner $size="sm" className="ml-2" />}
         </header>
 

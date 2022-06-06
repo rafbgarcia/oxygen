@@ -1,19 +1,24 @@
+import uuid
 from o2.widgets.pivot import Pivot
 
 
 class VerticalBarChart:
     @classmethod
     def metadata(klass, dataset, build_info):
-        pivot = Pivot.build(dataset, build_info)
+        pivot = Pivot.build(dataset=dataset, build_info=build_info)
+        if pivot is None:
+            return None
+
         values = pivot.values.tolist()
         labels = pivot.columns.tolist()
         xaxis = pivot.index.tolist()
+        id = uuid.uuid4()
 
         return {
-            "chartData": [
-                {"name": labels[i], "data": [v[i] for v in values]} for (i, _) in enumerate(labels)
+            "datasets": [
+                {"label": labels[i], "data": [v[i] for v in values], "backgroundColor": "rgb(0,86,207)"}
+                for (i, _) in enumerate(labels)
             ],
-            "legend": True,
-            "xAxisCategories": xaxis,
-            "id": "dashboard-123",
+            "labels": xaxis,
+            "id": f"dashboard-{id}",
         }

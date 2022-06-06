@@ -23,10 +23,10 @@ class Pivot:
 
     @staticmethod
     def metadata(dataset, build_info, limit=25, offset=0):
-        if not Pivot.has_required_attrs(build_info):
+        pivot = Pivot.build(dataset, build_info)
+        if pivot is None:
             return None
 
-        pivot = Pivot.build(dataset, build_info)
         columns = build_info["columns"]
         if len(columns) > 0:
             # Swap the first column with the values table row
@@ -36,6 +36,9 @@ class Pivot:
 
     @staticmethod
     def build(dataset, build_info):
+        if not Pivot.has_required_attrs(build_info):
+            return None
+
         query = _build_sql(dataset, build_info)
         rows = [field["alias"] for field in build_info["rows"]]
         values = [field["alias"] for field in build_info["values"]]

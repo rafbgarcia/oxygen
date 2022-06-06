@@ -1,52 +1,50 @@
-import { BarGraph } from "playbook-ui"
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  LogarithmicScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js"
+import { LineElement, PointElement } from "chart.js"
+import { Bar, Line } from "react-chartjs-2"
 
-type Meta = {
-  axisTitle: string
-  dark?: Boolean
-  xAxisCategories: Array<string>
-  yAxisMin: number
-  yAxisMax: number
-  chartData: Array<{
-    name: string
-    data: Array<number>
-  }>
-  className?: string
-  id: number
-  pointStart: number
-  subTitle?: string
-  title: string
-  type?: string
-  legend?: boolean
-  toggleLegendClick?: boolean
-  height?: string
-  colors: Array<string>
-}
+ChartJS.register(CategoryScale, LinearScale, Title, Tooltip, Legend)
+ChartJS.register(BarElement)
+ChartJS.register(LineElement, PointElement)
+const options = {}
 
-const Default = ({ ...props }) => {
-  return <BarGraph {...props} />
-}
-
-export const VerticalBarChart = ({ meta: props }) => {
-  const height = props?.height || 400
-
-  const types = ["column", "bar", "line"]
-  // const a = {
-  //   chartData: [
-  //     { name: "#", data: [1, 255, 1, 8511, 1] },
-  //     { name: "%", data: [0.0, 0.04, 0.0, 1.39, 0.0] },
-  //   ],
-  //   xAxisCategories: [
-  //     ["answering_machine_left_via_voicemail"],
-  //     ["wrong_number"],
-  //     ["interview_scheduled"],
-  //     ["answering_machine_left_via_voicemail"],
-  //     ["candidate_not_interested"],
-  //   ],
-  // }
-
+export const VerticalBarChart = ({ meta }) => {
   return (
-    <div className={`overflow-hidden h-[${height}px]`}>
-      <BarGraph {...props} type={"bar"} />
-    </div>
+    <Bar
+      options={{
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: "bottom" as const,
+          },
+          title: {
+            display: false,
+            text: "Chart title",
+          },
+        },
+
+        scales: {
+          yAxis: {
+            ticks: {
+              callback: function (value) {
+                if (value % 1 === 0) {
+                  return value
+                }
+              },
+            },
+          },
+        },
+      }}
+      data={meta}
+    />
   )
 }
