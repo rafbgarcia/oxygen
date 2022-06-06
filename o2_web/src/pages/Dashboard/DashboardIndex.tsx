@@ -29,7 +29,7 @@ export const DashboardIndex = () => {
       <Modal children={NewDashboardForm} />
       <Page.Header $flex>
         <Page.Title>Dashboards</Page.Title>
-        <Button size="sm" onClick={showModal} variant="secondary">
+        <Button onClick={showModal} variant="secondary">
           + Dashboard
         </Button>
       </Page.Header>

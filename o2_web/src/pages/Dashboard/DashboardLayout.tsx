@@ -24,6 +24,7 @@ export const DashboardLayout = ({
   dashboard: DashboardQuery["dashboard"]
   activeWidgetId: string | undefined
 }) => {
+  const navigate = useNavigate()
   const [updateLayout] = useUpdateDashboardLayoutMutation()
   const layoutDidChange = (layout) => {
     if (layoutMatch(layout, dashboard.layout)) {
@@ -40,6 +41,10 @@ export const DashboardLayout = ({
     setTimeout(() => window.dispatchEvent(new Event("resize")), 0)
   }, [activeWidgetId])
 
+  const didClickToEdit = (widgetId) => () => {
+    navigate(`/dashboards/${dashboard.id}/widgets/${widgetId}/edit`)
+  }
+
   return (
     <section>
       <GridLayoutAutoWidth
@@ -53,8 +58,17 @@ export const DashboardLayout = ({
       >
         {dashboard.widgets.map((widget) => {
           return (
-            <WidgetContainer key={widget.id} className="group" $editting={widget.id == activeWidgetId}>
-              <WidgetActions widgetId={widget.id} />
+            <WidgetContainer
+              key={widget.id}
+              onDoubleClick={didClickToEdit(widget.id)}
+              className="group"
+              $editting={widget.id == activeWidgetId}
+            >
+              <WidgetActionsContainer>
+                <WidgetActionsButton onClick={didClickToEdit(widget.id)}>
+                  <PencilAltIcon className="w-5 inline-block" />
+                </WidgetActionsButton>
+              </WidgetActionsContainer>
 
               <div className="h-full overflow-auto">
                 <Widget type={widget.type} renderData={widget.renderData || {}} />
@@ -64,20 +78,6 @@ export const DashboardLayout = ({
         })}
       </GridLayoutAutoWidth>
     </section>
-  )
-}
-
-const WidgetActions = ({ widgetId }) => {
-  const { dashboardId } = useParams()
-  const navigate = useNavigate()
-  const didClickEdit = () => navigate(`/dashboards/${dashboardId}/widgets/${widgetId}/edit`)
-
-  return (
-    <WidgetActionsContainer>
-      <WidgetActionsButton onClick={didClickEdit}>
-        <PencilAltIcon className="w-5 inline-block" />
-      </WidgetActionsButton>
-    </WidgetActionsContainer>
   )
 }
 

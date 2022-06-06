@@ -47,6 +47,7 @@ export const WidgetEdit = () => {
 
         {widget ? (
           React.createElement(WIDGET_TYPE_ELEMENT[widget.type], {
+            key: widget.id,
             onChange: didChangeBuildInfo,
             dataset: dashboard.dataset,
             buildInfo: widget.buildInfo,
