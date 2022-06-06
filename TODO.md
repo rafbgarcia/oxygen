@@ -22,10 +22,10 @@ MVP Roadmap:
 - Filters
 - Value as links to external pages
 - Scheduled build
-- Support multiple tables within a Dataset
-- Widget reuse build info
 - Load one widget at a time
 - Package manager?
+- default_database_version=2
+  - https://help.tableau.com/current/api/hyper_api/en-us/reference/sql/databasesettings.html#DEFAULT_DATABASE_VERSION
 
 Tech debt:
 

@@ -1,20 +1,17 @@
 import React from "react"
-import type { WidgetType } from "../../lib/codegenGraphql"
+import { WidgetType } from "../../lib/codegenGraphql"
 import { Pivot } from "./Pivot"
 import { VerticalBarChart } from "./VerticalBarChart"
 
-type PreviewMapping = Record<WidgetType, any>
-type Props = Widget & { type: WidgetType }
-
-const WIDGETS: PreviewMapping = {
-  PIVOT_TABLE: Pivot,
-  VERTICAL_BAR_CHART: VerticalBarChart,
+const WIDGETS: Record<WidgetType, any> = {
+  [WidgetType.PivotTable]: Pivot,
+  [WidgetType.VerticalBarChart]: VerticalBarChart,
 }
 
-export const Widget = ({ type, renderData, theme }) => {
+export const Widget = ({ type, renderData }) => {
   if (!renderData) {
     return null
   }
 
-  return React.createElement(WIDGETS[type], { meta: renderData, theme })
+  return React.createElement(WIDGETS[type], { meta: renderData })
 }

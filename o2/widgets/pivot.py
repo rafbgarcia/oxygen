@@ -154,7 +154,7 @@ def _define_table(dataset_table, metadata):
 
 
 def _aliased_col(columns, field):
-    return columns[field["column_id"]].label(field["alias"])
+    return columns[int(field["column_id"])].label(field["alias"])
 
 
 def _build_dimensions(columns, fields):
@@ -173,7 +173,7 @@ def _build_agg2(columns_map, field):
     if agg not in AGG_FN:
         raise ValueNotSupported("Aggregation", agg)
 
-    return AGG_FN[agg](columns_map[column_id]).label(alias)
+    return AGG_FN[agg](columns_map[int(column_id)]).label(alias)
 
 
 def _select_from(tables_map):

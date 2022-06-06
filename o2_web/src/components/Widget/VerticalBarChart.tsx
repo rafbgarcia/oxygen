@@ -22,19 +22,11 @@ type Meta = {
   colors: Array<string>
 }
 
-interface VerticalBarChartWidget extends Widget {
-  meta?: Meta
-  theme?: {
-    chart?: ComponentTheme
-  }
-}
-
 const Default = ({ ...props }) => {
   return <BarGraph {...props} />
 }
 
-export const VerticalBarChart = ({ meta: props, theme }: VerticalBarChartWidget) => {
-  const Component = theme?.chart || Default
+export const VerticalBarChart = ({ meta: props }) => {
   const height = props?.height || 400
 
   const types = ["column", "bar", "line"]
@@ -54,7 +46,7 @@ export const VerticalBarChart = ({ meta: props, theme }: VerticalBarChartWidget)
 
   return (
     <div className={`overflow-hidden h-[${height}px]`}>
-      <Component {...props} type={"bar"} />
+      <BarGraph {...props} type={"bar"} />
     </div>
   )
 }

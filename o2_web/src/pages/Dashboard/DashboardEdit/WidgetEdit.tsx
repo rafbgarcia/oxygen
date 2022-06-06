@@ -1,15 +1,19 @@
 import { Button, Title } from "playbook-ui"
 import { useNavigate, useOutletContext, useParams } from "react-router-dom"
-import { useDeleteWidgetMutation, useUpdateWidgetBuildInfoMutation } from "../../../lib/codegenGraphql"
+import {
+  useDeleteWidgetMutation,
+  useUpdateWidgetBuildInfoMutation,
+  WidgetType,
+} from "../../../lib/codegenGraphql"
 import type { DashboardQuery } from "../../../lib/codegenGraphql"
 import { find } from "lodash-es"
 import React from "react"
 import { Spinner } from "../../../components/Spinner"
 import { BuildInfoWithDatasetFields } from "./_BuildInfoWithDatasetFields"
 
-const WIDGET_TYPE_ELEMENT = {
-  PIVOT_TABLE: BuildInfoWithDatasetFields,
-  VERTICAL_BAR_CHART: BuildInfoWithDatasetFields,
+const WIDGET_TYPE_ELEMENT: Record<WidgetType, any> = {
+  [WidgetType.PivotTable]: BuildInfoWithDatasetFields,
+  [WidgetType.VerticalBarChart]: BuildInfoWithDatasetFields,
 }
 
 export const WidgetEdit = () => {

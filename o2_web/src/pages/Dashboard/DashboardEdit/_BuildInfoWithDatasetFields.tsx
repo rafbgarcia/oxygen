@@ -2,8 +2,9 @@ import { TrashIcon, PlusSmIcon } from "@heroicons/react/outline"
 import { Button } from "../../../components/Button"
 import { Popover } from "../../../components/Popover"
 import { Title } from "playbook-ui"
-import type { DashboardQuery } from "../../../lib/codegenGraphql"
+import { DashboardQuery, DatasetTableColumnType } from "../../../lib/codegenGraphql"
 import produce from "immer"
+import { Chip } from "../../../components/Chip"
 
 type BuildInfoSectionType = { renderDataKey: string; label: string; dataType: dataType }
 export type BuildInfoSections = Array<BuildInfoSectionType>
@@ -79,7 +80,7 @@ const BuildInfoSection = ({
               </Button>
             }
           >
-            <div className="flex flex-col gap-y-8 max-h-96">
+            <div className="flex flex-col gap-y-8 max-h-96 overflow-y-auto min-w-fit">
               {dataset.tables.map((table) => (
                 <TableColumns
                   key={table.id}
@@ -113,39 +114,41 @@ const BuildItem = ({ item, onRemove }) => {
 
 const FIELD_TYPE_DEFAULT_ACTION = {
   [dataType.MEASURE]: {
-    Text: "Count Unique",
-    Integer: "Sum",
-    Float: "Sum",
-    DateTime: "# of years",
+    [DatasetTableColumnType.Text]: "Count Unique",
+    [DatasetTableColumnType.Integer]: "Sum",
+    [DatasetTableColumnType.Float]: "Sum",
+    [DatasetTableColumnType.Datetime]: "# of years",
   },
   [dataType.DIMENSION]: {
-    Text: "All Items",
-    Integer: "All Items",
-    Float: "All Items",
-    DateTime: "All Items",
+    [DatasetTableColumnType.Text]: "All Items",
+    [DatasetTableColumnType.Integer]: "All Items",
+    [DatasetTableColumnType.Float]: "All Items",
+    [DatasetTableColumnType.Datetime]: "All Items",
   },
 }
-const TableColumns = ({ table, dataType, didAddField }) => {
+type TableColumnsProps = {
+  table: DashboardQuery["dashboard"]["dataset"]["tables"][0]
+  dataType: dataType
+  didAddField: any
+}
+const TableColumns = ({ table, dataType, didAddField }: TableColumnsProps) => {
   return (
-    <div>
-      <div className="p-4 border-b">
-        <Title size={4}>{table.name}</Title>
-      </div>
-      <ul>
-        {table.columns.map((column) => (
-          <Popover.Button
-            as="li"
-            key={column.id}
-            className="py-2 px-6 group flex items-center gap-x-3 cursor-pointer hover:bg-gray-100"
-            onClick={didAddField(table, column)}
-          >
-            {column.name}
-            <span className="invisible group-hover:visible text-gray-300 text-sm">
-              {FIELD_TYPE_DEFAULT_ACTION[dataType][column.type]}
-            </span>
-          </Popover.Button>
-        ))}
-      </ul>
-    </div>
+    <ul className="">
+      {table.columns.map((column) => (
+        <Popover.Button
+          as="li"
+          key={column.id}
+          className="p-3 group flex items-center gap-x-3 cursor-pointer hover:bg-gray-100"
+          onClick={didAddField(table, column)}
+        >
+          <span>
+            <Chip color="gray">{table.name}</Chip>.{column.name}
+          </span>
+          <span className="invisible group-hover:visible text-gray-400 text-sm">
+            {FIELD_TYPE_DEFAULT_ACTION[dataType][column.type]}
+          </span>
+        </Popover.Button>
+      ))}
+    </ul>
   )
 }
