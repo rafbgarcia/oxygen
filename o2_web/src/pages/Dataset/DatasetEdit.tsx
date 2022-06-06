@@ -164,41 +164,39 @@ const TableColumn = ({ column, dataset, currentTable }: TableColumnProps) => {
     >
       <Popover position="right" Button={<PopoverItem>Type</PopoverItem>}>
         {Object.keys(DatasetTableColumnType).map((type) => (
-          <Popover.Button key={type} as="div" onClick={didChangeType(DatasetTableColumnType[type])}>
-            <PopoverItem className="flex items-center justify-between">
-              {type}
-              {DatasetTableColumnType[type] === column.type && <CheckIcon className="w-4" />}
-            </PopoverItem>
-          </Popover.Button>
+          <PopoverItem
+            className="flex items-center justify-between"
+            key={type}
+            onClick={didChangeType(DatasetTableColumnType[type])}
+          >
+            {type}
+            {DatasetTableColumnType[type] === column.type && <CheckIcon className="w-4" />}
+          </PopoverItem>
         ))}
       </Popover>
 
       <Popover position="right" Button={<PopoverItem>Foreign Key</PopoverItem>}>
         <div className="max-h-96 overflow-y-auto min-w-fit">
-          <Popover.Button as="div" onClick={didClearForeignKey(column)}>
-            <PopoverItem className="flex items-center justify-between">
-              <span>None</span>
-              {!column.foreignKey && <CheckIcon className="w-4" />}
-            </PopoverItem>
-          </Popover.Button>
+          <PopoverItem className="flex items-center justify-between" onClick={didClearForeignKey(column)}>
+            <span>None</span>
+            {!column.foreignKey && <CheckIcon className="w-4" />}
+          </PopoverItem>
 
           {dataset.tables
             .filter((table) => currentTable !== table)
             .map((table) => (
               <ul key={table.id} className="border-b">
                 {table.columns.map((tableColumn) => (
-                  <Popover.Button
+                  <PopoverItem
+                    className="flex items-center justify-between"
                     key={tableColumn.id}
-                    as="li"
                     onClick={didChangeForeignKey(column, tableColumn)}
                   >
-                    <PopoverItem className="flex items-center justify-between">
-                      <span>
-                        <Chip color="gray">{table.name}</Chip>.{tableColumn.name}
-                      </span>
-                      {column.foreignKey?.id == tableColumn.id && <CheckIcon className="w-4" />}
-                    </PopoverItem>
-                  </Popover.Button>
+                    <span>
+                      <Chip color="gray">{table.name}</Chip>.{tableColumn.name}
+                    </span>
+                    {column.foreignKey?.id == tableColumn.id && <CheckIcon className="w-4" />}
+                  </PopoverItem>
                 ))}
               </ul>
             ))}

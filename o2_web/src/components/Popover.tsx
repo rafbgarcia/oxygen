@@ -4,10 +4,9 @@ import { classnames } from "../lib/classnames"
 type PopoverProps = {
   Button: React.ReactNode
   position?: "bottom-left" | "bottom-right" | "right"
-  panelClass?: string
 } & React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>
 
-export const Popover = ({ Button, children, position, panelClass, ...props }: PopoverProps) => {
+export const Popover = ({ Button, children, position, ...props }: PopoverProps) => {
   position ||= "bottom-right"
 
   const positionClass = classnames({
@@ -15,10 +14,10 @@ export const Popover = ({ Button, children, position, panelClass, ...props }: Po
     "right-0 top-full": position == "bottom-left",
     "left-full top-0": position == "right",
   })
-  const classes = classnames("min-w-fit absolute z-10 bg-white", positionClass, panelClass)
+  const classes = classnames("min-w-fit absolute z-10 bg-white", positionClass)
 
   return (
-    <HeadlessPopover {...props} className={props.className + " relative"}>
+    <HeadlessPopover {...props} className={classnames("relative", props.className)}>
       {({ open }) => (
         <>
           <HeadlessPopover.Button as="span">{Button}</HeadlessPopover.Button>
