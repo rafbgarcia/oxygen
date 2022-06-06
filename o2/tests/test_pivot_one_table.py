@@ -1,35 +1,57 @@
-from django.test import SimpleTestCase
+from django.test import TransactionTestCase
 from o2.models import Dataset, DatasetTable
 from o2.widgets.pivot import Pivot, _build_sql
-from o2.tests.fixtures.follow_ups import pandas_df_to_dict
 from unittest.mock import MagicMock, Mock
+from o2.tests.fixtures.territories_branches import (
+    territories_df_to_dict,
+    territories_columns,
+    branches_df_to_dict,
+    branches_columns,
+)
 
 
-class PivotCase(SimpleTestCase):
-    @classmethod
-    def setUpClass(self):
+class PivotCase(TransactionTestCase):
+    def setUp(self):
         self.maxDiff = None
 
-        table = DatasetTable(
-            name="Follow ups",
-            query="",
-            fields=[
-                {"name": "title_name", "type": "Text"},
-                {"name": "resulted_by", "type": "Text"},
-                {"name": "application_id", "type": "Integer"},
-                {"name": "follow_up_date", "type": "DateTime"},
-                {"name": "follow_up_number", "type": "Integer"},
-                {"name": "follow_up_result", "type": "Text"},
-                {"name": "follow_up_date_string", "type": "Text"},
+        Dataset.objects.all().delete()
+        dataset = Dataset.objects.create(name="TA - Follow ups")
+
+        territories = dataset.tables.create(name="Territories")
+        territories.columns.set(territories_columns, bulk=False)
+        branches = dataset.tables.create(name="Branches")
+        branches.columns.set(branches_columns, bulk=False)
+
+        dataset.tables.set([territories, branches])
+        dataset.replace(territories, territories_df_to_dict)
+        dataset.append(branches, branches_df_to_dict)
+
+        self.dataset = dataset
+        self.territories = territories
+        self.branches = branches
+
+    def tearDown(self):
+        Dataset.objects.all().delete()
+
+    #
+    #
+    def test_one_field(self):
+        build_info = {
+            "rows": [
+                {
+                    "table_id": self.territories.id,
+                    "column_id": territories_columns[1].id,
+                    "alias": "Territory",
+                }
             ],
+            "columns": [],
+            "values": [],
+        }
+        pivot = Pivot.metadata(self.dataset, build_info)["html"]
+        self.assertHTMLEqual(
+            pivot,
+            '<table border="1" class="dataframe"><thead><tr style="text-align: right;"><th></tr><tr><th>Territory</th></tr></thead><tbody><tr><th>Atlanta</th></tr><tr><th>Austin</th></tr><tr><th>Boston</th></tr><tr><th>Charlotte</th></tr><tr><th>Chicago</th></tr><tr><th>Connecticut</th></tr><tr><th>Dallas</th></tr><tr><th>Denver</th></tr><tr><th>Detroit</th></tr><tr><th>Houston</th></tr><tr><th>Long Island</th></tr><tr><th>Maryland</th></tr><tr><th>Nashville</th></tr><tr><th>New Jersey</th></tr><tr><th>Philadelphia</th></tr><tr><th>Phoenix</th></tr><tr><th>Pittsburgh</th></tr><tr><th>Tampa</th></tr></tbody></table>',
         )
-
-        dataset = Dataset(name="TA - Follow ups")
-        dataset.replace(table, pandas_df_to_dict)
-
-        dataset_mock = Mock()
-        dataset_mock.tables.first = MagicMock(return_value=table)
-        self.dataset = dataset_mock
 
     #
     #

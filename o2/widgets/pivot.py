@@ -19,9 +19,7 @@ from django.db.models import Q
 class Pivot:
     @staticmethod
     def has_required_attrs(build_info):
-        return len(build_info["values"]) > 0 and (
-            len(build_info["rows"]) > 0 or len(build_info["columns"]) > 0
-        )
+        return len(build_info["rows"]) > 0 or len(build_info["columns"]) > 0
 
     @staticmethod
     def metadata(dataset, build_info, limit=25, offset=0):

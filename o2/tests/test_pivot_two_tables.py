@@ -33,9 +33,7 @@ class PivotCase(TransactionTestCase):
     def tearDown(self):
         Dataset.objects.all().delete()
 
-    #
-    #
-    def test_two_tables_join(self):
+    def test_1row_1val(self):
         build_info = {
             "rows": [
                 {
@@ -78,7 +76,55 @@ class PivotCase(TransactionTestCase):
         }
         pivot = Pivot.build(self.dataset, build_info).to_dict()
         self.assertDictEqual(pivot, expected)
-        # self.assertHTMLEqual(_build_sql(self.dataset, build_info), "expected")
+
+    def test_2rows_1val(self):
+        build_info = {
+            "rows": [
+                {
+                    "table_id": self.territories.id,
+                    "column_id": territories_columns[0].id,
+                    "alias": "ID",
+                },
+                {
+                    "table_id": self.territories.id,
+                    "column_id": territories_columns[1].id,
+                    "alias": "Name",
+                },
+            ],
+            "columns": [],
+            "values": [
+                {
+                    "table_id": self.branches.id,
+                    "column_id": branches_columns[0].id,
+                    "agg": "COUNT",
+                    "alias": "# of branches",
+                },
+            ],
+        }
+        expected = {
+            "# of branches": {
+                (1, "Philadelphia"): 1,
+                (2, "New Jersey"): 2,
+                (3, "Maryland"): 3,
+                (4, "Connecticut"): 1,
+                (5, "Long Island"): 2,
+                (6, "Boston"): 1,
+                (7, "Atlanta"): 1,
+                (8, "Chicago"): 2,
+                (9, "Detroit"): 1,
+                (10, "Houston"): 1,
+                (11, "Dallas"): 2,
+                (12, "Denver"): 1,
+                (13, "Tampa"): 1,
+                (14, "Austin"): 1,
+                (15, "Charlotte"): 1,
+                (16, "Nashville"): 1,
+                (17, "Phoenix"): 1,
+                (18, "Pittsburgh"): 1,
+            }
+        }
+        pivot = Pivot.build(self.dataset, build_info).to_dict()
+        self.assertDictEqual(pivot, expected)
 
     # #
     # #

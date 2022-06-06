@@ -36,11 +36,11 @@ export const WidgetEdit = () => {
   }
 
   return (
-    <aside className="bg-white z-10 w-[300px] h-[calc(100vh-120px)] shadow-md">
+    <aside className="bg-white z-10 w-[300px] shadow-md fixed right-0">
       <div className="p-4">
         <header className="flex items-center mb-10">
           <Title size={4}>Pivot Table</Title>
-          {loading && <Spinner $size="sm" />}
+          {loading && <Spinner $size="sm" className="ml-2" />}
         </header>
 
         {widget ? (

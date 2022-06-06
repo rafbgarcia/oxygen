@@ -41,11 +41,7 @@ export const DashboardLayout = ({
   }, [activeWidgetId])
 
   return (
-    <section className="overflow-auto max-h-[calc(100vh-120px)]">
-      <header className="p-4">
-        <Title>{dashboard.name}</Title>
-      </header>
-
+    <section>
       <GridLayoutAutoWidth
         layout={dashboard.layout}
         cols={12}
@@ -61,12 +57,11 @@ export const DashboardLayout = ({
             "ring-2": widget.id == activeWidgetId,
           })
           return (
-            //  data-grid={widget.layout}
             <div key={widget.id} className="relative group">
               <WidgetActions widgetId={widget.id} />
 
               <figure className={widgetContainerClasses}>
-                <Widget type={widget.type} renderData={widget.renderData || {}} theme={{}} />
+                <Widget type={widget.type} renderData={widget.renderData || {}} />
               </figure>
             </div>
           )
