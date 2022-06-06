@@ -5,10 +5,21 @@ import { Wait } from "../../components/Wait"
 import { useCreateWidgetMutation, useDashboardQuery, WidgetType } from "../../lib/codegenGraphql"
 import { DashboardLayout } from "./DashboardLayout"
 import { Popover } from "../../components/Popover"
-import { ChartBarIcon, TableIcon } from "@heroicons/react/outline"
+import { ChartBarIcon, MenuAlt2Icon, TableIcon } from "@heroicons/react/outline"
 import { initialBuildInfo } from "./DashboardEdit/initialBuildInfo"
+import React from "react"
 
-const initialLayout = { w: 12, h: 15, x: 0, y: 0 }
+const initialLayout = (type: WidgetType) => {
+  if (type == WidgetType.Text) {
+    return { w: 6, h: 3, x: 0, y: -1 }
+  }
+  return { w: 12, h: 15, x: 0, y: -1 }
+}
+const WIDGET_TYPE_ICON: Record<WidgetType, any> = {
+  [WidgetType.PivotTable]: TableIcon,
+  [WidgetType.VerticalBarChart]: ChartBarIcon,
+  [WidgetType.Text]: MenuAlt2Icon,
+}
 
 export const DashboardEdit = () => {
   const { dashboardId, widgetId } = useParams()
@@ -24,7 +35,7 @@ export const DashboardEdit = () => {
       variables: {
         dashboardId: dashboardId!,
         widgetType: type,
-        layout: initialLayout,
+        layout: initialLayout(type),
         buildInfo: initialBuildInfo[type],
       },
     }).then(({ data }) => {
@@ -40,6 +51,7 @@ export const DashboardEdit = () => {
         </Page.Title>
         <Popover
           position="bottom-left"
+          className="z-20"
           Button={
             <Button onClick={() => {}} variant="secondary">
               + Widget
@@ -47,22 +59,17 @@ export const DashboardEdit = () => {
           }
         >
           <ul className="whitespace-nowrap">
-            <Popover.Button
-              as="li"
-              className="p-4 flex items-center gap-x-2 cursor-pointer hover:bg-gray-100"
-              onClick={handleCreateWidget(WidgetType.PivotTable)}
-            >
-              <TableIcon className="w-4" />
-              Pivot Table
-            </Popover.Button>
-            <Popover.Button
-              as="li"
-              className="p-4 flex items-center gap-x-2 cursor-pointer hover:bg-gray-100"
-              onClick={handleCreateWidget(WidgetType.VerticalBarChart)}
-            >
-              <ChartBarIcon className="w-4" />
-              Vertical Bar Chart
-            </Popover.Button>
+            {Object.keys(WidgetType).map((type) => (
+              <Popover.Button
+                key={type}
+                as="li"
+                className="p-4 flex items-center gap-x-2 cursor-pointer hover:bg-gray-100"
+                onClick={handleCreateWidget(WidgetType[type])}
+              >
+                {React.createElement(WIDGET_TYPE_ICON[WidgetType[type]], { className: "w-4" })}
+                {type}
+              </Popover.Button>
+            ))}
           </ul>
         </Popover>
       </Page.Header>

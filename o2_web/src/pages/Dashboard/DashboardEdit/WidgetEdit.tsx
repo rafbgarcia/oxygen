@@ -9,11 +9,13 @@ import type { DashboardQuery } from "../../../lib/codegenGraphql"
 import { find } from "lodash-es"
 import React from "react"
 import { Spinner } from "../../../components/Spinner"
-import { BuildInfoWithDatasetFields } from "./_BuildInfoWithDatasetFields"
+import { BuildInfoWithDatasetFields } from "./BuildInfoWithDatasetFields"
+import { BuildInfoText } from "./BuildInfoText"
 
 const WIDGET_TYPE_ELEMENT: Record<WidgetType, any> = {
   [WidgetType.PivotTable]: BuildInfoWithDatasetFields,
   [WidgetType.VerticalBarChart]: BuildInfoWithDatasetFields,
+  [WidgetType.Text]: BuildInfoText,
 }
 
 export const WidgetEdit = () => {
@@ -39,7 +41,7 @@ export const WidgetEdit = () => {
     <aside className="bg-white z-10 w-[300px] shadow-md fixed right-0">
       <div className="p-4">
         <header className="flex items-center mb-10">
-          <Title size={4}>Pivot Table</Title>
+          <Title size={4}>{widget?.type}</Title>
           {loading && <Spinner $size="sm" className="ml-2" />}
         </header>
 

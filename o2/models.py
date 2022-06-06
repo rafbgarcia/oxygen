@@ -113,6 +113,7 @@ class Dashboard(TimeStampedModel):
 
 class Widget(TimeStampedModel):
     class Types(models.TextChoices):
+        TEXT = "Text"
         PIVOT_TABLE = "Pivot Table"
         VERTICAL_BAR_CHART = "Vertical Bar Chart"
 

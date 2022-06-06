@@ -117,6 +117,7 @@ input WidgetLayoutInput {
 }
 
 enum WidgetType {
+  TEXT
   PIVOT_TABLE
   VERTICAL_BAR_CHART
 }

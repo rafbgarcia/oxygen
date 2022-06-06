@@ -201,6 +201,7 @@ export type WidgetLayoutInput = {
 
 export enum WidgetType {
   PivotTable = 'PIVOT_TABLE',
+  Text = 'TEXT',
   VerticalBarChart = 'VERTICAL_BAR_CHART'
 }
 
@@ -210,11 +211,11 @@ export type DashboardLayoutPartsFragment = { __typename?: 'DashboardLayout', i: 
 
 export type DatasetPartsFragment = { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null };
 
-export type DatasetTablePartsFragment = { __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, columns: Array<{ __typename?: 'DatasetTableColumn', id: string, name: string, type: DatasetTableColumnType, foreignKey?: { __typename?: 'DatasetTableColumn', id: string } | null }> };
-
 export type DatasetTableColumnPartsFragment = { __typename?: 'DatasetTableColumn', id: string, name: string, type: DatasetTableColumnType, foreignKey?: { __typename?: 'DatasetTableColumn', id: string } | null };
 
 export type WidgetPartsFragment = { __typename?: 'Widget', id: string, type: WidgetType, buildInfo?: any | null, renderData?: any | null };
+
+export type DatasetTablePartsFragment = { __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, columns: Array<{ __typename?: 'DatasetTableColumn', id: string, name: string, type: DatasetTableColumnType, foreignKey?: { __typename?: 'DatasetTableColumn', id: string } | null }> };
 
 export type BuildDatasetMutationVariables = Exact<{
   id: Scalars['ID'];
@@ -339,6 +340,14 @@ export const DatasetPartsFragmentDoc = /*#__PURE__*/ gql`
   lastBuiltAt
 }
     `;
+export const WidgetPartsFragmentDoc = /*#__PURE__*/ gql`
+    fragment WidgetParts on Widget {
+  id
+  type
+  buildInfo
+  renderData
+}
+    `;
 export const DatasetTableColumnPartsFragmentDoc = /*#__PURE__*/ gql`
     fragment DatasetTableColumnParts on DatasetTableColumn {
   id
@@ -361,14 +370,6 @@ export const DatasetTablePartsFragmentDoc = /*#__PURE__*/ gql`
   }
 }
     ${DatasetTableColumnPartsFragmentDoc}`;
-export const WidgetPartsFragmentDoc = /*#__PURE__*/ gql`
-    fragment WidgetParts on Widget {
-  id
-  type
-  buildInfo
-  renderData
-}
-    `;
 export const BuildDatasetDocument = /*#__PURE__*/ gql`
     mutation buildDataset($id: ID!) {
   dataset: buildDataset(id: $id) {

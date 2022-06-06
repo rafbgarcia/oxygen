@@ -1,7 +1,6 @@
 import { TrashIcon, PlusSmIcon } from "@heroicons/react/outline"
 import { Button } from "../../../components/Button"
 import { Popover } from "../../../components/Popover"
-import { Title } from "playbook-ui"
 import { DashboardQuery, DatasetTableColumnType } from "../../../lib/codegenGraphql"
 import produce from "immer"
 import { Chip } from "../../../components/Chip"

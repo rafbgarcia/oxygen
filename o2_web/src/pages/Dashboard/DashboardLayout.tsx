@@ -52,17 +52,13 @@ export const DashboardLayout = ({
         autoSize
       >
         {dashboard.widgets.map((widget) => {
-          const widgetContainerClasses = classnames("relative h-full overflow-auto", {
-            "border-dashed border-2 border-gray-300": !widget.renderData && widget.id != activeWidgetId,
-            "ring-2": widget.id == activeWidgetId,
-          })
           return (
             <div key={widget.id} className="relative group">
               <WidgetActions widgetId={widget.id} />
 
-              <figure className={widgetContainerClasses}>
+              <WidgetContainer $editting={widget.id == activeWidgetId}>
                 <Widget type={widget.type} renderData={widget.renderData || {}} />
-              </figure>
+              </WidgetContainer>
             </div>
           )
         })}
@@ -72,7 +68,7 @@ export const DashboardLayout = ({
 }
 
 const WidgetActionsContainer = tw.div`
-  absolute top-0 left-0 w-full p-2 text-right z-10
+  absolute top-[-13px] right-0 w-full text-right z-10
   hidden group-hover:block
 `
 
@@ -94,3 +90,13 @@ const WidgetActions = ({ widgetId }) => {
     </WidgetActionsContainer>
   )
 }
+
+const WidgetContainer = tw.figure`
+  relative h-full overflow-auto
+  hover:outline-dashed hover:outline-2 hover:outline-gray-300
+
+  ${(p) =>
+    classnames({
+      "ring-2": p.$editting,
+    })}
+`
