@@ -29,7 +29,7 @@ export const WidgetEdit = () => {
     | DashboardQuery["dashboard"]["widgets"][0]
     | undefined
 
-  const didCancelEdit = () => navigate(`/dashboards/${dashboard.id}`)
+  const didCancelEdit = () => navigate(`/dashboards/${dashboard.id}/edit`)
   const didChangeBuildInfo = (buildInfo) => {
     updateBuildInfo({ variables: { buildInfo, widgetId: widgetId! } })
   }

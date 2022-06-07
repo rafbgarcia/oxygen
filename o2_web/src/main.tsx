@@ -67,11 +67,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
               <Route path="edit" element={null} />
               <Route path="widgets/:widgetId/edit" element={<WidgetEdit />} />
             </Route>
-
-            {/* <Route path="dashboards/new" element={<DashboardNew />} />
-            <Route path="dashboards/:dashboardId/widgets/new" element={<WidgetNew />} /> */}
           </Route>
-          <Route path="/dashboards/:id" element={<EmbeddedDashboard />} />
+
+          <Route path="embed/:dashboardId" element={<EmbeddedDashboard />} />
         </Routes>
       </BrowserRouter>
     </ApolloProvider>

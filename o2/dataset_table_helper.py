@@ -1,12 +1,5 @@
 from o2.connectors import MySQLConnector
-
 import pandas as pd
-
-from o2.dataset_helpers import DatasetHelper
-
-
-def a(b):
-    print(b)
 
 
 class DatasetTableHelper:

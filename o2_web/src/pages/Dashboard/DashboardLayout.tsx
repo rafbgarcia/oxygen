@@ -1,5 +1,4 @@
 import { Widget } from "../../components/Widget"
-import { Title } from "playbook-ui"
 import GridLayout, { WidthProvider } from "react-grid-layout"
 import { PencilAltIcon } from "@heroicons/react/outline"
 import { useNavigate, useParams } from "react-router-dom"
@@ -7,7 +6,6 @@ import { useUpdateDashboardLayoutMutation } from "../../lib/codegenGraphql"
 import type { DashboardQuery } from "../../lib/codegenGraphql"
 import { classnames } from "../../lib/classnames"
 import { tw } from "../../lib/tw"
-import { useEffect } from "react"
 import map from "lodash/fp/map"
 import at from "lodash/fp/at"
 
@@ -26,23 +24,12 @@ export const DashboardLayout = ({
 }) => {
   const navigate = useNavigate()
   const [updateLayout] = useUpdateDashboardLayoutMutation()
+  const didClickToEdit = (widgetId) => () => navigate(`/dashboards/${dashboard.id}/widgets/${widgetId}/edit`)
   const layoutDidChange = (layout) => {
     if (layoutMatch(layout, dashboard.layout)) {
       return
     }
     updateLayout({ variables: { dashboardId: dashboard.id, layout } })
-  }
-
-  useEffect(() => {
-    /**
-     * This hack causes widgets width to get recalculated and adapt to the grid width
-     * change, which doesn't happen automatically.
-     */
-    setTimeout(() => window.dispatchEvent(new Event("resize")), 0)
-  }, [activeWidgetId])
-
-  const didClickToEdit = (widgetId) => () => {
-    navigate(`/dashboards/${dashboard.id}/widgets/${widgetId}/edit`)
   }
 
   return (
