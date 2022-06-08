@@ -41,7 +41,7 @@ type Dataset {
   lastBuiltAt: DateTime
   buildDurationSeconds: Int
   tables: [DatasetTable!]!
-  relationships: [DatasetRelation!]!
+  relations: [DatasetRelation!]!
   dashboards: [Dashboard!]!
 }
 
@@ -52,14 +52,15 @@ type DatasetRelation {
   sourceColumn: String!
   referenceTable: String!
   referenceColumn: String!
-  sizeMb: Float
+  fullSource: String
+  fullReference: String
 }
 
 type DatasetTable {
   id: ID!
   dataset: Dataset!
   name: String!
-  tableName: String!
+  title: String!
   query: String!
   totalRecords: Int
   htmlPreview: String
@@ -71,6 +72,7 @@ type DatasetTableColumn {
   name: String!
   type: DatasetTableColumnType!
   table: DatasetTable!
+  fullName: String
 }
 
 enum DatasetTableColumnType {
@@ -89,6 +91,8 @@ type Mutation {
   buildDataset(id: ID!): Dataset!
   createDatasetTable(datasetId: ID!, name: String!, query: String!): Dataset
   updateColumn(data: ColumnInput, id: ID!): DatasetTableColumn
+  updateRelation(currentRelationId: ID, datasetId: ID, fullReference: String, fullSource: String): DatasetRelation
+  deleteRelation(relationId: ID!): Boolean
   createDashboard(name: String!, datasetId: ID!): Dashboard!
   createWidget(buildInfo: JSON!, dashboardId: ID!, layout: WidgetLayoutInput!, widgetType: WidgetType!): CreateWidgetMutationHandler
   updateWidgetBuildInfo(buildInfo: JSON!, widgetId: ID!): Widget

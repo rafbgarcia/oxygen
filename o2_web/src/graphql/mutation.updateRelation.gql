@@ -1,0 +1,10 @@
+mutation updateRelation($datasetId: ID, $currentRelationId: ID, $fullSource: String, $fullReference: String) {
+  updateRelation(
+    datasetId: $datasetId
+    currentRelationId: $currentRelationId
+    fullSource: $fullSource
+    fullReference: $fullReference
+  ) {
+    ...DatasetRelationParts
+  }
+}

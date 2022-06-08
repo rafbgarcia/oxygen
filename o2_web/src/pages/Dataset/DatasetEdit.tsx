@@ -4,14 +4,7 @@ import { Link, Outlet, useParams } from "react-router-dom"
 import { Page } from "../Page"
 import { Wait } from "../../components/Wait"
 import { CheckIcon, LinkIcon, PlayIcon } from "@heroicons/react/solid"
-import {
-  TableIcon,
-  PlusSmIcon,
-  MenuIcon,
-  HashtagIcon,
-  CalendarIcon,
-  DotsVerticalIcon,
-} from "@heroicons/react/outline"
+import { TableIcon, PlusSmIcon, MenuIcon, HashtagIcon, CalendarIcon } from "@heroicons/react/outline"
 import {
   DatasetQuery,
   useBuildDatasetMutation,
@@ -19,12 +12,15 @@ import {
   DatasetTableColumnType,
   useUpdateColumnMutation,
   DatasetDocument,
+  useUpdateRelationMutation,
+  useDeleteRelationMutation,
 } from "../../lib/codegenGraphql"
 import { classnames } from "../../lib/classnames"
 import { toast } from "react-toastify"
 import { Popover } from "../../components/Popover"
 import { tw } from "../../lib/tw"
 import { Chip } from "../../components/Chip"
+import { find } from "lodash-es"
 
 const FIELD_TYPE_ICON: Record<DatasetTableColumnType, any> = {
   [DatasetTableColumnType.Text]: () => (
@@ -115,7 +111,7 @@ const Tables = ({ dataset, tableId }: { dataset: DatasetQuery["dataset"]; tableI
                 )}
               >
                 <TableIcon className="w-5 text-gray-400 group-hover:text-gray-500" />
-                {table.name}
+                {table.title}
               </Link>
             </li>
           </ul>
@@ -132,6 +128,16 @@ const Tables = ({ dataset, tableId }: { dataset: DatasetQuery["dataset"]; tableI
 
 const PopoverItem = tw.div`p-3 bg-white hover:bg-gray-100 cursor-pointer min-w-[200px]`
 
+const getSourceRelation = (column, dataset): DatasetQuery["dataset"]["relations"][0] | undefined => {
+  if (dataset.relations.length == 0) return
+  return find(dataset.relations, { fullSource: column.fullName })
+}
+const getReferenceRelation = (column, dataset): DatasetQuery["dataset"]["relations"][0] | undefined => {
+  if (dataset.relations.length == 0) return
+
+  return find(dataset.relations, { fullReference: column.fullName })
+}
+
 type TableColumnProps = {
   dataset: DatasetQuery["dataset"]
   column: DatasetQuery["dataset"]["tables"][0]["columns"][0]
@@ -139,14 +145,27 @@ type TableColumnProps = {
 }
 const TableColumn = ({ column, dataset, currentTable }: TableColumnProps) => {
   const [updateColumn] = useUpdateColumnMutation({ refetchQueries: [DatasetDocument] })
+  const [updateRelation] = useUpdateRelationMutation({ refetchQueries: [DatasetDocument] })
+  const [deleteRelation] = useDeleteRelationMutation({ refetchQueries: [DatasetDocument] })
+  const sourceRelation = getSourceRelation(column, dataset)
+
   const didChangeType = (type) => () => {
     updateColumn({ variables: { id: column.id, data: { type } } })
   }
-  const didChangeForeignKey = (column, fk) => () => {
-    updateColumn({ variables: { id: column.id, data: { foreignKeyId: fk.id } } })
+  const didChangeForeignKey = (sourceColumn, referenceColumn) => () => {
+    updateRelation({
+      variables: {
+        datasetId: dataset.id,
+        currentRelationId: sourceRelation?.id,
+        fullSource: sourceColumn.fullName,
+        fullReference: referenceColumn.fullName,
+      },
+    })
   }
-  const didClearForeignKey = (column) => () => {
-    updateColumn({ variables: { id: column.id, data: { foreignKeyId: null } } })
+  const didClearForeignKey = () => () => {
+    if (!sourceRelation) return
+
+    deleteRelation({ variables: { relationId: sourceRelation.id } })
   }
 
   return (
@@ -158,7 +177,7 @@ const TableColumn = ({ column, dataset, currentTable }: TableColumnProps) => {
             {React.createElement(FIELD_TYPE_ICON[column.type])}
             {column.name}
           </span>
-          <span>{column && <LinkIcon className="w-4" />}</span>
+          <span>{sourceRelation && <LinkIcon className="w-4" />}</span>
         </li>
       }
     >
@@ -177,9 +196,9 @@ const TableColumn = ({ column, dataset, currentTable }: TableColumnProps) => {
 
       <Popover position="right" Button={<PopoverItem>Foreign Key</PopoverItem>}>
         <div className="max-h-96 overflow-y-auto min-w-fit">
-          <PopoverItem className="flex items-center justify-between" onClick={didClearForeignKey(column)}>
+          <PopoverItem className="flex items-center justify-between" onClick={didClearForeignKey()}>
             <span>None</span>
-            {!column && <CheckIcon className="w-4" />}
+            {!sourceRelation && <CheckIcon className="w-4" />}
           </PopoverItem>
 
           {dataset.tables
@@ -195,7 +214,9 @@ const TableColumn = ({ column, dataset, currentTable }: TableColumnProps) => {
                     <span>
                       <Chip color="gray">{table.name}</Chip>.{tableColumn.name}
                     </span>
-                    {column.id == tableColumn.id && <CheckIcon className="w-4" />}
+                    {sourceRelation && getReferenceRelation(tableColumn, dataset) && (
+                      <CheckIcon className="w-4" />
+                    )}
                   </PopoverItem>
                 ))}
               </ul>

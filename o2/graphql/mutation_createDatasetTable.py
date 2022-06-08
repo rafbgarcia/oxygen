@@ -17,8 +17,8 @@ class CreateDatasetTableMutationHandler(graphene.Mutation):
         dataset = Dataset.objects.get(pk=dataset_id)
         columns, preview = DatasetHelper.preview(query)
         table = dataset.tables.create(
-            name=name,
-            table_name=humps.decamelize(humps.camelize(name)),
+            title=name,
+            name=humps.decamelize(humps.camelize(name)),
             query=query,
             html_preview=preview,
         )

@@ -19,10 +19,6 @@ class UpdateColumnMutationHandler(graphene.Mutation):
     Output = DatasetTableColumnObject
 
     def mutate(root, info, id, data):
-        # print(">>>>")
-        # print(id)
-        # print(data)
-        # print(">>>>")
         DatasetTableColumn.objects.filter(pk=id).update(**data)
         column = DatasetTableColumn.objects.prefetch_related("table").get(pk=id)
         if hasattr(data, "type"):

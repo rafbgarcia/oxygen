@@ -59,7 +59,7 @@ class Dataset(TimeStampedModel):
     def append(self, table, rows):
         df = pd.DataFrame(rows, columns=table.column_names())
         df = df.astype(table.dtypes(), errors="ignore")
-        pantab.frame_to_hyper(df, self.file_path(), table=table.table_name, table_mode=TABLE_MODE_APPEND)
+        pantab.frame_to_hyper(df, self.file_path(), table=table.name, table_mode=TABLE_MODE_APPEND)
 
     def replace(self, table, rows):
         df = pd.DataFrame(rows, columns=table.column_names())
@@ -73,7 +73,7 @@ class Dataset(TimeStampedModel):
 class DatasetTable(models.Model):
     dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE, related_name="tables")
     name = models.CharField(max_length=50)
-    table_name = models.CharField(max_length=50)
+    title = models.CharField(max_length=50)
     query = models.TextField()
     total_records = models.IntegerField(null=True)
     html_preview = models.TextField(null=True)
@@ -106,7 +106,7 @@ class DatasetTableColumn(models.Model):
 
 
 class DatasetRelation(models.Model):
-    dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE, related_name="relationships")
+    dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE, related_name="relations")
     source_table = models.CharField(max_length=50)
     source_column = models.CharField(max_length=50)
     reference_table = models.CharField(max_length=50)

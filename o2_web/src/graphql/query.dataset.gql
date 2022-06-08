@@ -5,5 +5,9 @@ query dataset($id: ID!) {
     tables {
       ...DatasetTableParts
     }
+
+    relations {
+      ...DatasetRelationParts
+    }
   }
 }

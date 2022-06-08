@@ -1,6 +1,8 @@
 import graphene
 from o2.graphql.mutation_createDataset import CreateDatasetMutationHandler
 from o2.graphql.mutation_createDatasetTable import CreateDatasetTableMutationHandler
+from o2.graphql.mutation_deleteRelation import DeleteRelationMutationHandler
+from o2.graphql.mutation_updateRelation import UpdateRelationMutationHandler
 from o2.graphql.mutation_updateWidgetBuildInfo import UpdateWidgetBuildInfoMutationHandler
 from o2.graphql.types.json import JSON
 from o2.models import Dashboard, Dataset, Widget
@@ -16,6 +18,8 @@ class Mutation(graphene.ObjectType):
     build_dataset = BuildDatasetMutationHandler.Field()
     create_dataset_table = CreateDatasetTableMutationHandler.Field()
     update_column = UpdateColumnMutationHandler.Field()
+    update_relation = UpdateRelationMutationHandler.Field()
+    delete_relation = DeleteRelationMutationHandler.Field()
 
     create_dashboard = graphene.Field(
         DashboardObject,

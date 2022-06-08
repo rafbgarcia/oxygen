@@ -1,0 +1,5 @@
+fragment DatasetRelationParts on DatasetRelation {
+  id
+  fullSource
+  fullReference
+}

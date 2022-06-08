@@ -10,7 +10,7 @@ class SQLBuilder:
         where_clauses = ["1=1"] + _join_where(used_tables, relations)
 
         select_columns = ", ".join(_select(dimensions + measures))
-        from_tables = ", ".join([table.table_name for table in used_tables])
+        from_tables = ", ".join([table.name for table in used_tables])
         where = " AND ".join(where_clauses)
         groupby = ", ".join(_groupby(dimensions))
         orderby = ", ".join(_orderby(dimensions))
@@ -44,7 +44,7 @@ def _select(columns):
 
 
 def _used_tables(tables, columns):
-    return [table for table in tables for column in columns if table.table_name in column.formula]
+    return [table for table in tables for column in columns if table.name in column.formula]
 
 
 def _join_where(used_tables, relations):

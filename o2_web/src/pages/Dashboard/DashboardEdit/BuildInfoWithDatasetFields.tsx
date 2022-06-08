@@ -174,7 +174,7 @@ const QuickAddDimension = ({ section }: { section: SectionType }) => {
 
   const didAddField = (table, column) => () => {
     const updatedBuildInfo = produce(buildInfo, (draft) => {
-      const item = { formula: `${table.tableName}.${column.name}`, alias: column.name }
+      const item = { formula: `${table.name}.${column.name}`, alias: column.name }
       draft[section.renderDataKey].push(item)
     })
     onChange(updatedBuildInfo)
@@ -228,7 +228,7 @@ const QuickAddMeasure = ({ section }: { section: SectionType }) => {
     const defaultAgg = DEFAULT_AGG[column.type]
     const updatedBuildInfo = produce(buildInfo, (draft) => {
       draft[section.renderDataKey].push({
-        formula: template(defaultAgg.formula, { field: `${table.tableName}.${column.name}` }),
+        formula: template(defaultAgg.formula, { field: `${table.name}.${column.name}` }),
         alias: template(defaultAgg.alias, { field: column.name }),
       })
     })

@@ -24,41 +24,53 @@ class DatasetTableColumnObject(DjangoObjectType):
         model = DatasetTableColumn
         name = model.__name__
 
+    full_name = graphene.String()
+
+    def resolve_full_name(column, info):
+        return f"{column.table.name}.{column.name}"
+
 
 class DatasetRelationObject(DjangoObjectType):
-    size_mb = graphene.Float()
-
     class Meta:
         model = DatasetRelation
         name = model.__name__
 
+    full_source = graphene.String()
+    full_reference = graphene.String()
+
+    def resolve_full_source(relation, info):
+        return f"{relation.source_table}.{relation.source_column}"
+
+    def resolve_full_reference(relation, info):
+        return f"{relation.reference_table}.{relation.reference_column}"
+
 
 class DashboardLayoutObject(graphene.ObjectType):
+    class Meta:
+        name = "DashboardLayout"
+
     i = graphene.ID(description="Unique ID to be used as the JSX element `key` prop", required=True)
     w = graphene.Int(description="Width", required=True)
     h = graphene.Int(description="Height", required=True)
     x = graphene.Int(description="X-axis position", required=True)
     y = graphene.Int(description="Y-axis position", required=True)
 
-    class Meta:
-        name = "DashboardLayout"
-
 
 class DashboardObject(DjangoObjectType):
-    layout = graphene.List(DashboardLayoutObject)
-
     class Meta:
         model = Dashboard
         name = model.__name__
 
+    layout = graphene.List(DashboardLayoutObject)
+
 
 class WidgetObject(DjangoObjectType):
-    build_info = graphene.Field(JSON)
-    render_data = graphene.Field(JSON)
-
     class Meta:
         model = Widget
         name = model.__name__
+
+    build_info = graphene.Field(JSON)
+    render_data = graphene.Field(JSON)
 
     def resolve_render_data(widget, info):
         return WidgetBuilder.build(widget)
