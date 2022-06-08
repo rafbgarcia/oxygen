@@ -44,7 +44,7 @@ def _select(columns):
 
 
 def _used_tables(tables, columns):
-    return [table for table in tables for column in columns if table.name in column.formula]
+    return list(set([table for table in tables for column in columns if table.name in column.formula]))
 
 
 def _join_where(used_tables, relations):
@@ -52,7 +52,7 @@ def _join_where(used_tables, relations):
         return []
 
     used_relations = [
-        relation for table in used_tables for relation in relations if table in relation.source_table
+        relation for table in used_tables for relation in relations if table.name == relation.source_table
     ]
 
     return [_relation_where(relation) for relation in used_relations]

@@ -212,7 +212,7 @@ const TableColumn = ({ column, dataset, currentTable }: TableColumnProps) => {
                     onClick={didChangeForeignKey(column, tableColumn)}
                   >
                     <span>
-                      <Chip color="gray">{table.name}</Chip>.{tableColumn.name}
+                      <Chip color="gray">{table.title}</Chip>.{tableColumn.name}
                     </span>
                     {sourceRelation && getReferenceRelation(tableColumn, dataset) && (
                       <CheckIcon className="w-4" />

@@ -117,7 +117,7 @@ const SectionItemMeasure = ({
   return (
     <>
       <Modal $lg>
-        <FieldFormula didUpdateFormula={didUpdateFormula} />
+        <FieldFormula item={item} didUpdateFormula={didUpdateFormula} />
       </Modal>
 
       <div className="my-2 border bg-white group">
@@ -152,15 +152,25 @@ const SectionItemDimension = ({ item, onRemove }: { item: any; onRemove: any }) 
   )
 }
 
-const FieldFormula = ({ didUpdateFormula }) => {
+const FieldFormula = ({ item, didUpdateFormula }) => {
   const { dataset } = React.useContext(Context)
   const [formula, setFormula] = useState("")
+
+  const schema = reduce(dataset.tables, (acc, table) => ({ [table.name]: map(table.columns, "name") }), {})
+  console.log(schema)
   const didSave = () => didUpdateFormula(formula)
 
   return (
     <div className="p-4">
       <Title size={4}>Edit Aggregation Formula</Title>
-      <FormulaEditor dataset={dataset} didUpdateFormula={setFormula} />
+      <CodeMirror
+        value={item.formula}
+        height="200px"
+        className="border mt-2"
+        placeholder={`COUNT(DISTINCT "Table Name".field_name)`}
+        extensions={[sql({ dialect: PostgreSQL, upperCaseKeywords: true, schema })]}
+        onChange={setFormula}
+      />
 
       <div className="mt-4 text-right">
         <Button onClick={didSave}>Save</Button>
@@ -257,23 +267,5 @@ const QuickAddMeasure = ({ section }: { section: SectionType }) => {
         </ul>
       ))}
     </div>
-  )
-}
-
-const FormulaEditor = ({ dataset, didUpdateFormula }) => {
-  const schema = reduce(dataset.tables, (acc, table) => ({ [table.name]: map(table.columns, "name") }), {})
-  const didChange = (value, viewUpdate) => {
-    didUpdateFormula(value)
-  }
-
-  return (
-    <CodeMirror
-      value=""
-      height="200px"
-      className="border mt-2"
-      placeholder={`COUNT(DISTINCT "Table Name".field_name)`}
-      extensions={[sql({ dialect: PostgreSQL, upperCaseKeywords: true, schema })]}
-      onChange={didChange}
-    />
   )
 }

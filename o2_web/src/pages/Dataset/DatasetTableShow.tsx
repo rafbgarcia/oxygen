@@ -12,7 +12,7 @@ export const DatasetTableShow = () => {
   return (
     <>
       <div className="mb-4">
-        <Title size={3}>{table.name}</Title>
+        <Title size={3}>{table.title}</Title>
       </div>
       <Table>
         <Table.HTMLBody html={table.htmlPreview} />
