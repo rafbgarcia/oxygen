@@ -4,7 +4,7 @@ from django.http import JsonResponse
 import humps
 from o2.models import Dashboard, Widget
 from django.views.decorators.csrf import csrf_exempt
-from o2.widgets.builder import build_widget
+from o2.widgets.widget_builder import WidgetBuilder
 
 
 def index(request):
@@ -26,7 +26,7 @@ def show(request, id):
     widgets = list(Widget.objects.filter(dashboard=dashboard).all())
     for (i, widget) in enumerate(widgets):
         widgets[i] = model_to_dict(widget)
-        widgets[i]["meta"] = build_widget(widget)
+        widgets[i]["meta"] = WidgetBuilder.build(widget)
 
     return JsonResponse(
         humps.camelize(

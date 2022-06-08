@@ -2,6 +2,7 @@ import os
 from time import time
 from django.db import models
 from django.utils import timezone
+import humps
 from model_utils.models import TimeStampedModel
 from o2.connectors import MySQLConnector
 from o2.dataset_helpers import DatasetHelper
@@ -58,7 +59,7 @@ class Dataset(TimeStampedModel):
     def append(self, table, rows):
         df = pd.DataFrame(rows, columns=table.column_names())
         df = df.astype(table.dtypes(), errors="ignore")
-        pantab.frame_to_hyper(df, self.file_path(), table=table.name, table_mode=TABLE_MODE_APPEND)
+        pantab.frame_to_hyper(df, self.file_path(), table=table.table_name, table_mode=TABLE_MODE_APPEND)
 
     def replace(self, table, rows):
         df = pd.DataFrame(rows, columns=table.column_names())
@@ -72,6 +73,7 @@ class Dataset(TimeStampedModel):
 class DatasetTable(models.Model):
     dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE, related_name="tables")
     name = models.CharField(max_length=50)
+    table_name = models.CharField(max_length=50)
     query = models.TextField()
     total_records = models.IntegerField(null=True)
     html_preview = models.TextField(null=True)
@@ -99,10 +101,21 @@ class DatasetTableColumn(models.Model):
     name = models.CharField(max_length=50)
     type = models.CharField(max_length=20, choices=ColumnTypes.choices)
     table = models.ForeignKey(DatasetTable, on_delete=models.CASCADE, related_name="columns")
-    foreign_key = models.ForeignKey("self", on_delete=models.SET_NULL, related_name="references", null=True)
-    join_type = models.CharField(max_length=20, choices=JoinTypes.choices)
 
     models.UniqueConstraint(fields=[table, name], name="unique_table_column_name")
+
+
+class DatasetRelation(models.Model):
+    dataset = models.ForeignKey(Dataset, on_delete=models.CASCADE, related_name="relationships")
+    source_table = models.CharField(max_length=50)
+    source_column = models.CharField(max_length=50)
+    reference_table = models.CharField(max_length=50)
+    reference_column = models.CharField(max_length=50)
+
+    models.UniqueConstraint(
+        fields=[dataset, source_table, source_column, reference_table, reference_column],
+        name="unique_dataset_relationship",
+    )
 
 
 class Dashboard(TimeStampedModel):

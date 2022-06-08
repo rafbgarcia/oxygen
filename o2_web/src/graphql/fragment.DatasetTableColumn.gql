@@ -2,7 +2,4 @@ fragment DatasetTableColumnParts on DatasetTableColumn {
   id
   name
   type
-  foreignKey {
-    id
-  }
 }

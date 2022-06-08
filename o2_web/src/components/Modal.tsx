@@ -10,7 +10,7 @@ export const useModal = () => {
   const hideModal = () => setShow(false)
   const Component = ({ children, ...props }) => (
     <Modal show={show} onClose={setShow} $sm {...props}>
-      {children({ showModal, hideModal, Modal: Modal })}
+      {typeof children == "function" ? children({ showModal, hideModal, Modal: Modal }) : children}
     </Modal>
   )
   return { showModal, hideModal, Modal: Component }

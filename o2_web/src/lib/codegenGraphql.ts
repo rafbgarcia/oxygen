@@ -58,8 +58,20 @@ export type Dataset = {
   lastBuiltAt?: Maybe<Scalars['DateTime']>;
   modified: Scalars['DateTime'];
   name: Scalars['String'];
+  relationships: Array<DatasetRelation>;
   sizeMb?: Maybe<Scalars['Float']>;
   tables: Array<DatasetTable>;
+};
+
+export type DatasetRelation = {
+  __typename?: 'DatasetRelation';
+  dataset: Dataset;
+  id: Scalars['ID'];
+  referenceColumn: Scalars['String'];
+  referenceTable: Scalars['String'];
+  sizeMb?: Maybe<Scalars['Float']>;
+  sourceColumn: Scalars['String'];
+  sourceTable: Scalars['String'];
 };
 
 export type DatasetTable = {
@@ -70,24 +82,17 @@ export type DatasetTable = {
   id: Scalars['ID'];
   name: Scalars['String'];
   query: Scalars['String'];
+  tableName: Scalars['String'];
   totalRecords?: Maybe<Scalars['Int']>;
 };
 
 export type DatasetTableColumn = {
   __typename?: 'DatasetTableColumn';
-  foreignKey?: Maybe<DatasetTableColumn>;
   id: Scalars['ID'];
-  joinType: DatasetTableColumnJoinType;
   name: Scalars['String'];
-  references: Array<DatasetTableColumn>;
   table: DatasetTable;
   type: DatasetTableColumnType;
 };
-
-export enum DatasetTableColumnJoinType {
-  InnerJoin = 'INNER_JOIN',
-  LeftJoin = 'LEFT_JOIN'
-}
 
 export enum DatasetTableColumnType {
   Datetime = 'DATETIME',
@@ -209,20 +214,20 @@ export type DashboardPartsFragment = { __typename?: 'Dashboard', id: string, nam
 
 export type DashboardLayoutPartsFragment = { __typename?: 'DashboardLayout', i: string, x: number, y: number, w: number, h: number };
 
-export type DatasetPartsFragment = { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null };
+export type DatasetPartsFragment = { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, relationships: Array<{ __typename?: 'DatasetRelation', sourceTable: string, sourceColumn: string, referenceTable: string, referenceColumn: string }> };
 
-export type DatasetTableColumnPartsFragment = { __typename?: 'DatasetTableColumn', id: string, name: string, type: DatasetTableColumnType, foreignKey?: { __typename?: 'DatasetTableColumn', id: string } | null };
+export type DatasetTableColumnPartsFragment = { __typename?: 'DatasetTableColumn', id: string, name: string, type: DatasetTableColumnType };
 
 export type WidgetPartsFragment = { __typename?: 'Widget', id: string, type: WidgetType, buildInfo?: any | null, renderData?: any | null };
 
-export type DatasetTablePartsFragment = { __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, columns: Array<{ __typename?: 'DatasetTableColumn', id: string, name: string, type: DatasetTableColumnType, foreignKey?: { __typename?: 'DatasetTableColumn', id: string } | null }> };
+export type DatasetTablePartsFragment = { __typename?: 'DatasetTable', id: string, name: string, tableName: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, columns: Array<{ __typename?: 'DatasetTableColumn', id: string, name: string, type: DatasetTableColumnType }> };
 
 export type BuildDatasetMutationVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
 
-export type BuildDatasetMutation = { __typename?: 'Mutation', dataset: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null } };
+export type BuildDatasetMutation = { __typename?: 'Mutation', dataset: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, relationships: Array<{ __typename?: 'DatasetRelation', sourceTable: string, sourceColumn: string, referenceTable: string, referenceColumn: string }> } };
 
 export type CreateDashboardMutationVariables = Exact<{
   name: Scalars['String'];
@@ -237,7 +242,7 @@ export type CreateDatasetMutationVariables = Exact<{
 }>;
 
 
-export type CreateDatasetMutation = { __typename?: 'Mutation', dataset?: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null } | null };
+export type CreateDatasetMutation = { __typename?: 'Mutation', dataset?: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, relationships: Array<{ __typename?: 'DatasetRelation', sourceTable: string, sourceColumn: string, referenceTable: string, referenceColumn: string }> } | null };
 
 export type CreateDatasetTableMutationVariables = Exact<{
   datasetId: Scalars['ID'];
@@ -246,7 +251,7 @@ export type CreateDatasetTableMutationVariables = Exact<{
 }>;
 
 
-export type CreateDatasetTableMutation = { __typename?: 'Mutation', dataset?: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, columns: Array<{ __typename?: 'DatasetTableColumn', id: string, name: string, type: DatasetTableColumnType, foreignKey?: { __typename?: 'DatasetTableColumn', id: string } | null }> }> } | null };
+export type CreateDatasetTableMutation = { __typename?: 'Mutation', dataset?: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, tableName: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, columns: Array<{ __typename?: 'DatasetTableColumn', id: string, name: string, type: DatasetTableColumnType }> }>, relationships: Array<{ __typename?: 'DatasetRelation', sourceTable: string, sourceColumn: string, referenceTable: string, referenceColumn: string }> } | null };
 
 export type CreateWidgetMutationVariables = Exact<{
   widgetType: WidgetType;
@@ -271,7 +276,7 @@ export type UpdateColumnMutationVariables = Exact<{
 }>;
 
 
-export type UpdateColumnMutation = { __typename?: 'Mutation', column?: { __typename?: 'DatasetTableColumn', id: string, name: string, type: DatasetTableColumnType, foreignKey?: { __typename?: 'DatasetTableColumn', id: string } | null } | null };
+export type UpdateColumnMutation = { __typename?: 'Mutation', column?: { __typename?: 'DatasetTableColumn', id: string, name: string, type: DatasetTableColumnType } | null };
 
 export type UpdateDashboardLayoutMutationVariables = Exact<{
   dashboardId: Scalars['ID'];
@@ -294,7 +299,7 @@ export type DashboardQueryVariables = Exact<{
 }>;
 
 
-export type DashboardQuery = { __typename?: 'Query', dashboard: { __typename?: 'Dashboard', id: string, name: string, created: any, modified: any, dataset: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, columns: Array<{ __typename?: 'DatasetTableColumn', id: string, name: string, type: DatasetTableColumnType, foreignKey?: { __typename?: 'DatasetTableColumn', id: string } | null }> }> }, widgets: Array<{ __typename?: 'Widget', id: string, type: WidgetType, buildInfo?: any | null, renderData?: any | null }>, layout?: Array<{ __typename?: 'DashboardLayout', i: string, x: number, y: number, w: number, h: number } | null> | null } };
+export type DashboardQuery = { __typename?: 'Query', dashboard: { __typename?: 'Dashboard', id: string, name: string, created: any, modified: any, dataset: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, tableName: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, columns: Array<{ __typename?: 'DatasetTableColumn', id: string, name: string, type: DatasetTableColumnType }> }>, relationships: Array<{ __typename?: 'DatasetRelation', sourceTable: string, sourceColumn: string, referenceTable: string, referenceColumn: string }> }, widgets: Array<{ __typename?: 'Widget', id: string, type: WidgetType, buildInfo?: any | null, renderData?: any | null }>, layout?: Array<{ __typename?: 'DashboardLayout', i: string, x: number, y: number, w: number, h: number } | null> | null } };
 
 export type DashboardsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -306,12 +311,12 @@ export type DatasetQueryVariables = Exact<{
 }>;
 
 
-export type DatasetQuery = { __typename?: 'Query', dataset: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, columns: Array<{ __typename?: 'DatasetTableColumn', id: string, name: string, type: DatasetTableColumnType, foreignKey?: { __typename?: 'DatasetTableColumn', id: string } | null }> }> } };
+export type DatasetQuery = { __typename?: 'Query', dataset: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, tableName: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, columns: Array<{ __typename?: 'DatasetTableColumn', id: string, name: string, type: DatasetTableColumnType }> }>, relationships: Array<{ __typename?: 'DatasetRelation', sourceTable: string, sourceColumn: string, referenceTable: string, referenceColumn: string }> } };
 
 export type DatasetsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type DatasetsQuery = { __typename?: 'Query', datasets: Array<{ __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null }> };
+export type DatasetsQuery = { __typename?: 'Query', datasets: Array<{ __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, relationships: Array<{ __typename?: 'DatasetRelation', sourceTable: string, sourceColumn: string, referenceTable: string, referenceColumn: string }> }> };
 
 export const DashboardLayoutPartsFragmentDoc = /*#__PURE__*/ gql`
     fragment DashboardLayoutParts on DashboardLayout {
@@ -338,6 +343,12 @@ export const DatasetPartsFragmentDoc = /*#__PURE__*/ gql`
   id
   name
   lastBuiltAt
+  relationships {
+    sourceTable
+    sourceColumn
+    referenceTable
+    referenceColumn
+  }
 }
     `;
 export const WidgetPartsFragmentDoc = /*#__PURE__*/ gql`
@@ -353,15 +364,13 @@ export const DatasetTableColumnPartsFragmentDoc = /*#__PURE__*/ gql`
   id
   name
   type
-  foreignKey {
-    id
-  }
 }
     `;
 export const DatasetTablePartsFragmentDoc = /*#__PURE__*/ gql`
     fragment DatasetTableParts on DatasetTable {
   id
   name
+  tableName
   query
   totalRecords
   htmlPreview

@@ -38,7 +38,7 @@ export const WidgetEdit = () => {
   }
 
   return (
-    <aside className="bg-white z-10 w-[300px] shadow-md fixed right-0">
+    <aside className="bg-gray-100 z-10 w-[300px] shadow-md fixed right-0">
       <div className="p-4">
         <header className="flex items-center mb-10">
           <Title size={4}>{widget && widget.type}</Title>

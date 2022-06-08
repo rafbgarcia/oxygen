@@ -158,7 +158,7 @@ const TableColumn = ({ column, dataset, currentTable }: TableColumnProps) => {
             {React.createElement(FIELD_TYPE_ICON[column.type])}
             {column.name}
           </span>
-          <span>{column.foreignKey && <LinkIcon className="w-4" />}</span>
+          <span>{column && <LinkIcon className="w-4" />}</span>
         </li>
       }
     >
@@ -179,7 +179,7 @@ const TableColumn = ({ column, dataset, currentTable }: TableColumnProps) => {
         <div className="max-h-96 overflow-y-auto min-w-fit">
           <PopoverItem className="flex items-center justify-between" onClick={didClearForeignKey(column)}>
             <span>None</span>
-            {!column.foreignKey && <CheckIcon className="w-4" />}
+            {!column && <CheckIcon className="w-4" />}
           </PopoverItem>
 
           {dataset.tables
@@ -195,7 +195,7 @@ const TableColumn = ({ column, dataset, currentTable }: TableColumnProps) => {
                     <span>
                       <Chip color="gray">{table.name}</Chip>.{tableColumn.name}
                     </span>
-                    {column.foreignKey?.id == tableColumn.id && <CheckIcon className="w-4" />}
+                    {column.id == tableColumn.id && <CheckIcon className="w-4" />}
                   </PopoverItem>
                 ))}
               </ul>

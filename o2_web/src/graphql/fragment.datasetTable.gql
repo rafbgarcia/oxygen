@@ -1,6 +1,7 @@
 fragment DatasetTableParts on DatasetTable {
   id
   name
+  tableName
   query
   totalRecords
   htmlPreview

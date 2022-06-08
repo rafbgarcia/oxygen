@@ -41,13 +41,25 @@ type Dataset {
   lastBuiltAt: DateTime
   buildDurationSeconds: Int
   tables: [DatasetTable!]!
+  relationships: [DatasetRelation!]!
   dashboards: [Dashboard!]!
+}
+
+type DatasetRelation {
+  id: ID!
+  dataset: Dataset!
+  sourceTable: String!
+  sourceColumn: String!
+  referenceTable: String!
+  referenceColumn: String!
+  sizeMb: Float
 }
 
 type DatasetTable {
   id: ID!
   dataset: Dataset!
   name: String!
+  tableName: String!
   query: String!
   totalRecords: Int
   htmlPreview: String
@@ -59,14 +71,6 @@ type DatasetTableColumn {
   name: String!
   type: DatasetTableColumnType!
   table: DatasetTable!
-  foreignKey: DatasetTableColumn
-  joinType: DatasetTableColumnJoinType!
-  references: [DatasetTableColumn!]!
-}
-
-enum DatasetTableColumnJoinType {
-  INNER_JOIN
-  LEFT_JOIN
 }
 
 enum DatasetTableColumnType {

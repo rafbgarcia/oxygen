@@ -1,4 +1,5 @@
 import graphene
+import humps
 from o2.graphql.objects import DatasetObject
 from o2.dataset_helpers import DatasetHelper
 from o2.models import Dataset, DatasetTableColumn
@@ -17,6 +18,7 @@ class CreateDatasetTableMutationHandler(graphene.Mutation):
         columns, preview = DatasetHelper.preview(query)
         table = dataset.tables.create(
             name=name,
+            table_name=humps.decamelize(humps.camelize(name)),
             query=query,
             html_preview=preview,
         )

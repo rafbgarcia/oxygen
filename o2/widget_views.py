@@ -2,9 +2,9 @@ import json
 from django.forms import model_to_dict
 from django.http import JsonResponse
 import humps
-from o2.models import Dataset, Widget
+from o2.models import Widget
 from django.views.decorators.csrf import csrf_exempt
-from o2.widgets.builder import build_widget
+from o2.widgets.widget_builder import WidgetBuilder
 
 
 @csrf_exempt
@@ -12,7 +12,7 @@ def preview(request, dashboard_id):
     params = humps.decamelize(json.loads(request.body))
     widget = Widget(build_info=params["build_info"], type=params["type"])
 
-    return JsonResponse({"meta": build_widget(widget)})
+    return JsonResponse({"meta": WidgetBuilder.build(widget)})
 
 
 @csrf_exempt

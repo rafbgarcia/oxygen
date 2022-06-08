@@ -2,4 +2,11 @@ fragment DatasetParts on Dataset {
   id
   name
   lastBuiltAt
+
+  relationships {
+    sourceTable
+    sourceColumn
+    referenceTable
+    referenceColumn
+  }
 }
