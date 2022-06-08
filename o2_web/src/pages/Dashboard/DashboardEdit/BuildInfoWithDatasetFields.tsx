@@ -10,6 +10,7 @@ import { sql, PostgreSQL } from "@codemirror/lang-sql"
 import { useModal } from "../../../components/Modal"
 import { reduce, map, findIndex } from "lodash-es"
 import React, { useContext, useState } from "react"
+import dedent from "dedent"
 
 type SectionType = { renderDataKey: string; label: string; dataType: DataType }
 export type BuildInfoSections = Array<SectionType>
@@ -22,9 +23,6 @@ export enum DataType {
   MEASURE = "Measure",
   DIMENSION = "Dimension",
 }
-
-const AGGREGATIONS = ["COUNT", "COUNT DISTINCT", "SUM"]
-const FUNCTIONS = ["CONTRIBUTION"]
 
 const Context = React.createContext<BuildInfoWithDatasetFieldsProps>({} as BuildInfoWithDatasetFieldsProps)
 
@@ -152,25 +150,63 @@ const SectionItemDimension = ({ item, onRemove }: { item: any; onRemove: any }) 
   )
 }
 
+enum QuickFunction {
+  "COUNT" = "COUNT",
+  "COUNT DISTINCT" = "COUNT_DISTINCT",
+  "SUM" = "SUM",
+  "CASE" = "CASE",
+  "CONTRIBUTION" = "CONTRIBUTION",
+}
+const QUICK_FUNCTIONS: Record<QuickFunction, string> = {
+  SUM: "SUM(table.column)",
+  COUNT: "COUNT(table.column)",
+  COUNT_DISTINCT: "COUNT(DISTINCT table.column)",
+  CASE: dedent(`
+    CASE
+        WHEN condition_1 THEN result_1
+        WHEN condition_2 THEN result_2
+        [ELSE else_result]
+    END
+  `),
+  CONTRIBUTION: dedent(`
+    COUNT(DISTINCT table.column)::FLOAT
+    /
+    SUM(COUNT(DISTINCT table.column)) OVER ()
+  `),
+}
+
 const FieldFormula = ({ item, didUpdateFormula }) => {
   const { dataset } = React.useContext(Context)
-  const [formula, setFormula] = useState("")
+  const [formula, setFormula] = useState(item.formula)
 
   const schema = reduce(dataset.tables, (acc, table) => ({ [table.name]: map(table.columns, "name") }), {})
-  console.log(schema)
-  const didSave = () => didUpdateFormula(formula)
+  const didSave = () => didUpdateFormula(formula.trim())
 
+  const didAddFunction = (quickFn) => () => {
+    const nl = formula.length > 0 ? "\n" : ""
+    setFormula(nl + QUICK_FUNCTIONS[quickFn])
+  }
   return (
     <div className="p-4">
       <Title size={4}>Edit Aggregation Formula</Title>
       <CodeMirror
-        value={item.formula}
-        height="200px"
+        autoFocus
+        value={formula}
         className="border mt-2"
+        height="150px"
         placeholder={`COUNT(DISTINCT "Table Name".field_name)`}
         extensions={[sql({ dialect: PostgreSQL, upperCaseKeywords: true, schema })]}
         onChange={setFormula}
       />
+
+      <div className="bg-gray-100 p-4 mt-4">
+        <Title size={4}>Quick Functions</Title>
+        <div className="mt-2 grid grid-cols-3 gap-2">
+          {Object.keys(QuickFunction).map((fn) => (
+            <Button onClick={didAddFunction(QuickFunction[fn])}>{fn}</Button>
+          ))}
+        </div>
+      </div>
 
       <div className="mt-4 text-right">
         <Button onClick={didSave}>Save</Button>
