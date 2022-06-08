@@ -39,7 +39,20 @@ class WidgetBuilder:
             return None
 
         df = _dataframe(widget)
-        return df.pivot(columns=columns_aliases, values=values_aliases, index=rows_aliases)
+
+        if widget.build_info.get("row_totals"):
+            df.loc["Grand Total"] = df.sum(numeric_only=True, axis=0)
+            df.iloc[-1, 0] = "Grand Total"
+
+        if widget.build_info.get("columns_totals"):
+            df.loc[:, "Grand Total"] = df.sum(numeric_only=True, axis=1)
+            values_aliases += ["Grand Total"]
+
+        return df.pivot(
+            columns=columns_aliases,
+            values=values_aliases,
+            index=rows_aliases,
+        )
 
     @staticmethod
     def vertical_bar_chart(widget):

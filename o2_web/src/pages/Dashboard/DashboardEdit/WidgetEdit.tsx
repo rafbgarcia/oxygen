@@ -41,7 +41,7 @@ export const WidgetEdit = () => {
 
   return (
     <Tab.Group>
-      <aside className="bg-gray-100 z-10 w-[300px] shadow-md fixed right-0">
+      <aside className="z-10 w-[300px] fixed right-0">
         <div className="p-4">
           <Tab.List className="flex items-center justify-between border-b mb-8">
             <Tab as={Fragment}>
@@ -106,7 +106,7 @@ export const WidgetEdit = () => {
             </Tab.Panel>
           </Tab.Panels>
 
-          <div className="flex items-center gap-x-2">
+          <div className="flex items-center gap-x-2 mt-10">
             <Button variant="secondary" onClick={didCancelEdit}>
               Close
             </Button>

@@ -53,40 +53,38 @@ const Section = ({ section }: { section: SectionType }) => {
   }
 
   return (
-    <div className="mb-10">
-      <div className="mb-5">
-        <header className="flex items-center justify-between">
-          <span className="font-medium">{section.label}</span>
+    <div className="mb-5">
+      <header className="flex items-center justify-between">
+        <span className="font-medium">{section.label}</span>
 
-          <Popover
-            position="bottom-left"
-            Button={
-              <Button className="flex items-center" $iconXs>
-                <PlusSmIcon className="w-4 h-4" />
-              </Button>
-            }
-          >
-            {section.dataType === DataType.DIMENSION ? (
-              <QuickAddDimension section={section} />
-            ) : (
-              <QuickAddMeasure section={section} />
-            )}
-          </Popover>
-        </header>
-
-        {buildInfo[section.renderDataKey].map((item, index) =>
-          section.dataType === DataType.MEASURE ? (
-            <SectionItemMeasure
-              key={item.alias}
-              item={item}
-              section={section}
-              onRemove={didRemoveField(index)}
-            />
+        <Popover
+          position="bottom-left"
+          Button={
+            <Button className="flex items-center" $iconXs>
+              <PlusSmIcon className="w-4 h-4" />
+            </Button>
+          }
+        >
+          {section.dataType === DataType.DIMENSION ? (
+            <QuickAddDimension section={section} />
           ) : (
-            <SectionItemDimension key={item.alias} item={item} onRemove={didRemoveField(index)} />
-          )
-        )}
-      </div>
+            <QuickAddMeasure section={section} />
+          )}
+        </Popover>
+      </header>
+
+      {buildInfo[section.renderDataKey].map((item, index) =>
+        section.dataType === DataType.MEASURE ? (
+          <SectionItemMeasure
+            key={item.alias}
+            item={item}
+            section={section}
+            onRemove={didRemoveField(index)}
+          />
+        ) : (
+          <SectionItemDimension key={item.alias} item={item} onRemove={didRemoveField(index)} />
+        )
+      )}
     </div>
   )
 }

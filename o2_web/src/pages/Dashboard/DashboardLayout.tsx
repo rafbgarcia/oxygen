@@ -8,6 +8,7 @@ import { classnames } from "../../lib/classnames"
 import { tw } from "../../lib/tw"
 import map from "lodash/fp/map"
 import at from "lodash/fp/at"
+import { useEffect } from "react"
 
 const GridLayoutAutoWidth = WidthProvider(GridLayout)
 const layoutMatchFields = map(at(["i", "x", "y", "w", "h"]))
@@ -32,9 +33,18 @@ export const DashboardLayout = ({
     updateLayout({ variables: { dashboardId: dashboard.id, layout } })
   }
 
+  useEffect(() => {
+    /**
+     * This hack causes widgets width to get recalculated and adapt to the grid width
+     * change, which doesn't happen automatically.
+     */
+    setTimeout(() => window.dispatchEvent(new Event("resize")), 0)
+  }, [activeWidgetId])
+
   return (
     <section>
       <GridLayoutAutoWidth
+        className={classnames("min-h-[2000px]", { "w-[calc(100vw-300px)]": activeWidgetId !== undefined })}
         layout={dashboard.layout}
         cols={12}
         rowHeight={10}
