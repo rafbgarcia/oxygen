@@ -7,10 +7,12 @@ import {
 } from "../../../lib/codegenGraphql"
 import type { DashboardQuery } from "../../../lib/codegenGraphql"
 import { find } from "lodash-es"
-import React from "react"
+import React, { Fragment } from "react"
 import { Spinner } from "../../../components/Spinner"
 import { BuildInfoWithDatasetFields } from "./BuildInfoWithDatasetFields"
 import { BuildInfoText } from "./BuildInfoText"
+import { Tab } from "@headlessui/react"
+import { classnames } from "../../../lib/classnames"
 
 const WIDGET_TYPE_ELEMENT: Record<WidgetType, any> = {
   [WidgetType.PivotTable]: BuildInfoWithDatasetFields,
@@ -38,33 +40,82 @@ export const WidgetEdit = () => {
   }
 
   return (
-    <aside className="bg-gray-100 z-10 w-[300px] shadow-md fixed right-0">
-      <div className="p-4">
-        <header className="flex items-center mb-10">
-          <Title size={4}>{widget && widget.type}</Title>
-          {loading && <Spinner $size="sm" className="ml-2" />}
-        </header>
+    <Tab.Group>
+      <aside className="bg-gray-100 z-10 w-[300px] shadow-md fixed right-0">
+        <div className="p-4">
+          <Tab.List className="flex items-center justify-between border-b mb-8">
+            <Tab as={Fragment}>
+              {({ selected }) => (
+                <a
+                  className={classnames(
+                    "p-2 block grow cursor-pointer text-center outline-none font-medium",
+                    {
+                      "opacity-100 font-gray-900": selected,
+                      "opacity-50": !selected,
+                    }
+                  )}
+                >
+                  Build
+                </a>
+              )}
+            </Tab>
+            <Tab as={Fragment}>
+              {({ selected }) => (
+                <a
+                  className={classnames(
+                    "p-2 block grow cursor-pointer text-center outline-none font-medium",
+                    {
+                      "opacity-100 font-gray-900": selected,
+                      "opacity-50": !selected,
+                    }
+                  )}
+                >
+                  Design
+                </a>
+              )}
+            </Tab>
+            <Tab as={Fragment}>
+              {({ selected }) => (
+                <a
+                  className={classnames(
+                    "p-2 block grow cursor-pointer text-center outline-none font-medium",
+                    {
+                      "opacity-100 font-gray-900": selected,
+                      "opacity-50": !selected,
+                    }
+                  )}
+                >
+                  Filters
+                </a>
+              )}
+            </Tab>
+          </Tab.List>
+          <Tab.Panels>
+            <Tab.Panel>
+              {" "}
+              {widget ? (
+                React.createElement(WIDGET_TYPE_ELEMENT[widget.type], {
+                  key: widget.id,
+                  onChange: didChangeBuildInfo,
+                  dataset: dashboard.dataset,
+                  buildInfo: widget.buildInfo,
+                })
+              ) : (
+                <p className="mb-5">Widget not found</p>
+              )}
+            </Tab.Panel>
+          </Tab.Panels>
 
-        {widget ? (
-          React.createElement(WIDGET_TYPE_ELEMENT[widget.type], {
-            key: widget.id,
-            onChange: didChangeBuildInfo,
-            dataset: dashboard.dataset,
-            buildInfo: widget.buildInfo,
-          })
-        ) : (
-          <p className="mb-5">Widget not found</p>
-        )}
-
-        <div className="flex items-center gap-x-2">
-          <Button variant="secondary" onClick={didCancelEdit}>
-            Close
-          </Button>
-          <Button variant="secondary" onClick={didRemoveWidget} loading={deleting}>
-            Remove
-          </Button>
+          <div className="flex items-center gap-x-2">
+            <Button variant="secondary" onClick={didCancelEdit}>
+              Close
+            </Button>
+            <Button variant="secondary" onClick={didRemoveWidget} loading={deleting}>
+              Remove
+            </Button>
+          </div>
         </div>
-      </div>
-    </aside>
+      </aside>
+    </Tab.Group>
   )
 }

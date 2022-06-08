@@ -169,9 +169,7 @@ const QUICK_FUNCTIONS: Record<QuickFunction, string> = {
     END
   `),
   CONTRIBUTION: dedent(`
-    COUNT(DISTINCT table.column)::FLOAT
-    /
-    SUM(COUNT(DISTINCT table.column)) OVER ()
+    COUNT(DISTINCT table.column)::FLOAT / SUM(COUNT(DISTINCT table.column)) OVER ()
   `),
 }
 
@@ -203,7 +201,9 @@ const FieldFormula = ({ item, didUpdateFormula }) => {
         <Title size={4}>Quick Functions</Title>
         <div className="mt-2 grid grid-cols-3 gap-2">
           {Object.keys(QuickFunction).map((fn) => (
-            <Button onClick={didAddFunction(QuickFunction[fn])}>{fn}</Button>
+            <Button key={fn} onClick={didAddFunction(QuickFunction[fn])}>
+              {fn}
+            </Button>
           ))}
         </div>
       </div>
