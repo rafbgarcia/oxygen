@@ -4,15 +4,15 @@ import {
   useDeleteWidgetMutation,
   useUpdateWidgetBuildInfoMutation,
   WidgetType,
-} from "../../../lib/codegenGraphql"
-import type { DashboardQuery } from "../../../lib/codegenGraphql"
+} from "../../lib/codegenGraphql"
+import type { DashboardQuery } from "../../lib/codegenGraphql"
 import { find } from "lodash-es"
 import React, { Fragment } from "react"
-import { Spinner } from "../../../components/Spinner"
+import { Spinner } from "../../components/Spinner"
 import { BuildInfoWithDatasetFields } from "./BuildInfoWithDatasetFields"
 import { BuildInfoText } from "./BuildInfoText"
 import { Tab } from "@headlessui/react"
-import { classnames } from "../../../lib/classnames"
+import { classnames } from "../../lib/classnames"
 
 const WIDGET_TYPE_ELEMENT: Record<WidgetType, any> = {
   [WidgetType.PivotTable]: BuildInfoWithDatasetFields,

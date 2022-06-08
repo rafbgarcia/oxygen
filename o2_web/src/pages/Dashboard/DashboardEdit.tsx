@@ -6,7 +6,7 @@ import { useCreateWidgetMutation, useDashboardQuery, WidgetType } from "../../li
 import { DashboardLayout } from "./DashboardLayout"
 import { Popover } from "../../components/Popover"
 import { ChartBarIcon, MenuAlt2Icon, TableIcon } from "@heroicons/react/outline"
-import { initialBuildInfo } from "./DashboardEdit/initialBuildInfo"
+import { initialBuildInfo } from "../Widget/_initialBuildInfo"
 import React from "react"
 
 const initialLayout = (type: WidgetType) => {

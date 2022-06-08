@@ -1,7 +1,7 @@
 import { Widget } from "../../components/Widget"
 import GridLayout, { WidthProvider } from "react-grid-layout"
 import { PencilAltIcon } from "@heroicons/react/outline"
-import { useNavigate, useParams } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { useUpdateDashboardLayoutMutation } from "../../lib/codegenGraphql"
 import type { DashboardQuery } from "../../lib/codegenGraphql"
 import { classnames } from "../../lib/classnames"

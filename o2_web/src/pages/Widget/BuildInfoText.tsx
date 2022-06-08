@@ -1,6 +1,6 @@
 import produce from "immer"
-import { TextareaField } from "../../../components/TextareaField"
-import { SelectField } from "../../../components/SelectField"
+import { TextareaField } from "../../components/TextareaField"
+import { SelectField } from "../../components/SelectField"
 import { debounce } from "lodash-es"
 
 export const BuildInfoText = ({ buildInfo, onChange }) => {

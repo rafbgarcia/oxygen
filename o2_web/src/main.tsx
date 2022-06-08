@@ -14,7 +14,7 @@ import { DatasetTableShow } from "./pages/Dataset/DatasetTableShow"
 
 import { DashboardIndex } from "./pages/Dashboard/DashboardIndex"
 import { DashboardEdit } from "./pages/Dashboard/DashboardEdit"
-import { WidgetEdit } from "./pages/Dashboard/DashboardEdit/WidgetEdit"
+import { WidgetEdit } from "./pages/Widget/WidgetEdit"
 
 /**
  * Page to display dashboard in Nitro

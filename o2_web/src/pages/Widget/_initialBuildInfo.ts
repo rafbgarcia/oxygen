@@ -1,4 +1,4 @@
-import { WidgetType } from "../../../lib/codegenGraphql"
+import { WidgetType } from "../../lib/codegenGraphql"
 import { DataType } from "./BuildInfoWithDatasetFields"
 
 export const initialBuildInfo: Record<WidgetType, any> = {
