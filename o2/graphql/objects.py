@@ -1,16 +1,19 @@
 import graphene
 from graphene_django import DjangoObjectType
-from o2.graphql.types.json import JSON
+from o2.graphql.types import JSON
 from o2.models import Dataset, DatasetRelation, DatasetTable, Dashboard, DatasetTableColumn, Widget
 from o2.widgets.widget_builder import WidgetBuilder
 
 
 class DatasetObject(DjangoObjectType):
-    size_mb = graphene.Float()
-
     class Meta:
         model = Dataset
         name = model.__name__
+
+    file_path = graphene.String()
+
+    def resolve_file_path(dataset, info):
+        return dataset.file_path()
 
 
 class DatasetTableObject(DjangoObjectType):
@@ -70,7 +73,3 @@ class WidgetObject(DjangoObjectType):
         name = model.__name__
 
     build_info = graphene.Field(JSON)
-    render_data = graphene.Field(JSON)
-
-    def resolve_render_data(widget, info):
-        return WidgetBuilder.build(widget)

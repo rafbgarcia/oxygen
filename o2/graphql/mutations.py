@@ -4,7 +4,7 @@ from o2.graphql.mutation_createDatasetTable import CreateDatasetTableMutationHan
 from o2.graphql.mutation_deleteRelation import DeleteRelationMutationHandler
 from o2.graphql.mutation_updateRelation import UpdateRelationMutationHandler
 from o2.graphql.mutation_updateWidgetBuildInfo import UpdateWidgetBuildInfoMutationHandler
-from o2.graphql.types.json import JSON
+from o2.graphql.types import JSON
 from o2.models import Dashboard, Dataset, Widget
 from o2.graphql.objects import DashboardObject
 

@@ -1,4 +1,5 @@
 import { Table } from "playbook-ui"
+import { useWidgetQuery } from "../../lib/codegenGraphql"
 import "./Pivot.css"
 
 const tableHtmlComponent = (content: string) => {
@@ -7,11 +8,20 @@ const tableHtmlComponent = (content: string) => {
   return template.content.firstChild as Element
 }
 
-export const Pivot = ({ meta }) => {
-  if (!meta?.html) {
-    return null
+export const Pivot = ({ widget, dataset }) => {
+  const { data, loading } = useWidgetQuery({
+    variables: {
+      type: widget.type,
+      build: widget.buildInfo,
+      dataset,
+    },
+  })
+
+  if (loading) {
+    return "Loading..."
   }
-  const table = tableHtmlComponent(meta.html)
+
+  const table = tableHtmlComponent(data?.widget.html)
   const theadHTML = table?.children[0]?.innerHTML
   const tbodyHTML = table?.children[1]?.innerHTML
     .replace(/\<td/g, "<td class='data-cell'")

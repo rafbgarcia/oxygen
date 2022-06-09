@@ -1,0 +1,3 @@
+query widget($type: WidgetType!, $build: JSON!, $dataset: JSON!) {
+  widget(type: $type, build: $build, dataset: $dataset)
+}

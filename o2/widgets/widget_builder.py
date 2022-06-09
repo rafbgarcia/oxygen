@@ -1,5 +1,7 @@
-from operator import attrgetter, itemgetter
+from operator import itemgetter
 import uuid
+
+import pantab
 from o2.models import Dataset, DatasetRelation, DatasetTableColumn, Widget
 from o2.widgets.pivot import Pivot
 from o2.widgets.text import Text
@@ -9,57 +11,55 @@ from o2.widgets.vertical_bar_chart import VerticalBarChart
 
 class WidgetBuilder:
     @staticmethod
-    def build(widget):
+    def build(type, dataset, build):
         fn = {
             Widget.Types.PIVOT_TABLE: WidgetBuilder.pivot,
             Widget.Types.VERTICAL_BAR_CHART: WidgetBuilder.vertical_bar_chart,
-            Widget.Types.TEXT: WidgetBuilder.text,
         }
 
-        return fn[widget.type](widget)
+        return fn[type](dataset=dataset, build=build)
 
     @staticmethod
-    def pivot(widget):
+    def pivot(build, dataset, **_kwargs):
         offset, limit = 0, 25
-        pivot = WidgetBuilder._pivot(widget)
-        if pivot is None:
-            return
-
-        columns = widget.build_info["columns"]
-        if len(columns) > 0:
-            # Swap the first column with the values table row
-            pivot = pivot.swaplevel(0, len(columns), axis="columns").sort_index(axis="columns")
-
-        return {"html": pivot[offset:limit].to_html(escape=False, na_rep="-", index_names=True)}
-
-    @staticmethod
-    def _pivot(widget):
-        rows_aliases, columns_aliases, values_aliases = _aliases(widget.build_info)
+        rows_aliases, columns_aliases, values_aliases = _aliases(build)
         if len(rows_aliases + columns_aliases) == 0:
             return None
 
-        df = _dataframe(widget)
+        df = _dataframe(build, dataset)
 
-        if widget.build_info.get("row_totals"):
+        if build.get("row_totals"):
             df.loc["Grand Total"] = df.sum(numeric_only=True, axis=0)
             df.iloc[-1, 0] = "Grand Total"
 
-        if widget.build_info.get("column_totals"):
+        if build.get("column_totals"):
             df.loc[:, "Grand Total"] = df.sum(numeric_only=True, axis=1)
             values_aliases += ["Grand Total"]
 
-        return df.pivot(
+        pivot = df.pivot(
             columns=columns_aliases,
             values=values_aliases,
             index=rows_aliases,
         )
 
-    @staticmethod
-    def vertical_bar_chart(widget):
-        pivot = WidgetBuilder._pivot(widget)
-        if pivot is None:
-            return
+        if len(columns_aliases) > 0:
+            # Swap the first column with the values table row
+            pivot = pivot.swaplevel(0, len(columns_aliases), axis="columns").sort_index(axis="columns")
 
+        return {"html": pivot[offset:limit].to_html(escape=False, na_rep="-", index_names=True)}
+
+    @staticmethod
+    def vertical_bar_chart(build, dataset, **_kwargs):
+        rows_aliases, columns_aliases, values_aliases = _aliases(build)
+        if len(rows_aliases + columns_aliases) == 0:
+            return None
+
+        df = _dataframe(build, dataset)
+        pivot = df.pivot(
+            columns=columns_aliases,
+            values=values_aliases,
+            index=rows_aliases,
+        )
         values = pivot.values.tolist()
         labels = pivot.columns.tolist()
         xaxis = pivot.index.tolist()
@@ -74,10 +74,6 @@ class WidgetBuilder:
             # "id": f"dashboard-{id}",
         }
 
-    @staticmethod
-    def text(widget):
-        return widget.build_info
-
 
 def _aliases(build_info):
     rows = list(map(itemgetter("alias"), build_info["rows"]))
@@ -86,19 +82,13 @@ def _aliases(build_info):
     return rows, columns, values
 
 
-def _dataframe(widget):
-    dataset = Dataset.objects.prefetch_related("tables").get(pk=widget.dashboard.dataset_id)
-    tables = list(dataset.tables.all())
-    table_names = [table.name for table in dataset.tables.all()]
-    relations = DatasetRelation.objects.filter(source_table__in=table_names).all()
-    rows, columns, values = itemgetter("rows", "columns", "values")(widget.build_info)
-    dimensions = [SQLBuilder.Column(**dimension) for dimension in (rows + columns)]
-    measures = [SQLBuilder.Column(**measure) for measure in values]
-
+def _dataframe(build, dataset):
+    rows, columns, values = itemgetter("rows", "columns", "values")(build)
     query = SQLBuilder.build(
-        dimensions=dimensions,
-        measures=measures,
-        tables=tables,
-        relations=relations,
+        dimensions=[SQLBuilder.Column(**dimension) for dimension in (rows + columns)],
+        measures=[SQLBuilder.Column(**measure) for measure in values],
+        tables=[SQLBuilder.Table(**table) for table in dataset["tables"]],
+        relations=[SQLBuilder.Relation(**relation) for relation in dataset["relations"]],
     )
-    return dataset.execute(query)
+
+    return pantab.frame_from_hyper_query(dataset["file_path"], query)

@@ -1,7 +1,5 @@
 mutation updateWidgetBuildInfo($widgetId: ID!, $buildInfo: JSON!) {
-  widget: updateWidgetBuildInfo(widgetId: $widgetId, buildInfo: $buildInfo) {
-    id
-    buildInfo
-    renderData
+  updateWidgetBuildInfo(widgetId: $widgetId, buildInfo: $buildInfo) {
+    ...WidgetParts
   }
 }

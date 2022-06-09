@@ -27,9 +27,7 @@ export const DashboardLayout = ({
   const [updateLayout] = useUpdateDashboardLayoutMutation()
   const didClickToEdit = (widgetId) => () => navigate(`/dashboards/${dashboard.id}/widgets/${widgetId}/edit`)
   const layoutDidChange = (layout) => {
-    if (layoutMatch(layout, dashboard.layout)) {
-      return
-    }
+    if (layoutMatch(layout, dashboard.layout)) return
     updateLayout({ variables: { dashboardId: dashboard.id, layout } })
   }
 
@@ -68,7 +66,7 @@ export const DashboardLayout = ({
               </WidgetActionsContainer>
 
               <div className="h-full overflow-auto">
-                <Widget type={widget.type} renderData={widget.renderData || {}} />
+                <Widget widget={widget} dataset={dashboard.dataset} />
               </div>
             </WidgetContainer>
           )

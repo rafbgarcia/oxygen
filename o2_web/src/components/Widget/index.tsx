@@ -1,9 +1,8 @@
 import React from "react"
-import { WidgetType } from "../../lib/codegenGraphql"
+import { DashboardQuery, WidgetType } from "../../lib/codegenGraphql"
 import { Pivot } from "./Pivot"
 import { Text } from "./Text"
 import { VerticalBarChart } from "./VerticalBarChart"
-import { isEmpty } from "lodash-es"
 
 const WIDGETS: Record<WidgetType, any> = {
   [WidgetType.PivotTable]: Pivot,
@@ -11,10 +10,12 @@ const WIDGETS: Record<WidgetType, any> = {
   [WidgetType.Text]: Text,
 }
 
-export const Widget = ({ type, renderData }) => {
-  if (isEmpty(renderData)) {
-    return null
-  }
-
-  return React.createElement(WIDGETS[type], { meta: renderData })
+export const Widget = ({
+  widget,
+  dataset,
+}: {
+  widget: DashboardQuery["dashboard"]["widgets"][0]
+  dataset: DashboardQuery["dashboard"]["dataset"]
+}) => {
+  return React.createElement(WIDGETS[widget.type], { widget, dataset })
 }

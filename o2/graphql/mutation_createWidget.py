@@ -1,5 +1,5 @@
 import graphene
-from o2.graphql.types.json import JSON
+from o2.graphql.types import JSON
 from o2.models import Dashboard
 
 from o2.graphql.objects import DashboardObject, WidgetObject

@@ -8,6 +8,10 @@ query dashboard($id: ID!) {
       tables {
         ...DatasetTableParts
       }
+
+      relations {
+        ...DatasetRelationParts
+      }
     }
 
     widgets {

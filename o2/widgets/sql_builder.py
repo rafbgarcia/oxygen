@@ -1,4 +1,16 @@
 class SQLBuilder:
+    class Table:
+        def __init__(self, name, **_kargs):
+            self.name = name
+
+    class Relation:
+        def __init__(self, full_source, full_reference, **_kargs):
+            self.full_source = full_source
+            self.full_reference = full_reference
+
+        def where_clause(self):
+            return f"{self.full_source} = {self.full_reference}"
+
     class Column:
         def __init__(self, formula, alias, **_kargs):
             self.formula = formula
@@ -31,10 +43,6 @@ class SQLBuilder:
         )
 
 
-def _relation_where(relation):
-    return f"{relation.source_table}.{relation.source_column} = {relation.reference_table}.{relation.reference_column}"
-
-
 def _select(columns):
     select = list()
     for column in columns:
@@ -52,10 +60,10 @@ def _join_where(used_tables, relations):
         return []
 
     used_relations = [
-        relation for table in used_tables for relation in relations if table.name == relation.source_table
+        relation for table in used_tables for relation in relations if table.name in relation.full_source
     ]
 
-    return [_relation_where(relation) for relation in used_relations]
+    return [relation.where_clause() for relation in used_relations]
 
 
 def _groupby(columns):

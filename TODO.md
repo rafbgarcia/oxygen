@@ -1,7 +1,7 @@
 ## TODO
 
 - Each widget query its own render data
-- unique field aliases
+- Unique field aliases
 
 ## MVP Roadmap:
 

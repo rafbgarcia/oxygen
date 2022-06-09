@@ -37,12 +37,13 @@ type Dataset {
   modified: DateTime!
   name: String!
   isBuilding: Boolean
-  sizeMb: Float
+  sizeMb: Decimal
   lastBuiltAt: DateTime
   buildDurationSeconds: Int
   tables: [DatasetTable!]!
   relations: [DatasetRelation!]!
   dashboards: [Dashboard!]!
+  filePath: String
 }
 
 type DatasetRelation {
@@ -84,6 +85,8 @@ enum DatasetTableColumnType {
 
 scalar DateTime
 
+scalar Decimal
+
 scalar JSON
 
 type Mutation {
@@ -105,6 +108,7 @@ type Query {
   datasets: [Dataset!]!
   dashboard(id: ID!): Dashboard!
   dashboards: [Dashboard!]!
+  widget(build: JSON!, dataset: JSON!, type: WidgetType!): JSON!
 }
 
 type Widget {
@@ -114,7 +118,6 @@ type Widget {
   dashboard: Dashboard!
   type: WidgetType!
   buildInfo: JSON
-  renderData: JSON
 }
 
 input WidgetLayoutInput {
