@@ -23,28 +23,34 @@ class WidgetBuilder:
     def pivot(build, dataset, **_kwargs):
         offset, limit = 0, 25
         rows_aliases, columns_aliases, values_aliases = _aliases(build)
-        if len(rows_aliases + columns_aliases) == 0:
+        if not _can_build_pivot(build):
             return None
 
         df = _dataframe(build, dataset)
+        df = df.astype("object")
 
-        if build.get("row_totals"):
-            df.loc["Grand Total"] = df.sum(numeric_only=True, axis=0)
-            df.iloc[-1, 0] = "Grand Total"
+        if len(rows_aliases) == 0 and len(columns_aliases) > 0:
+            return {
+                "html": df.set_index(columns_aliases).T.to_html(escape=False, na_rep="-", index_names=True)
+            }
 
-        if build.get("column_totals"):
-            df.loc[:, "Grand Total"] = df.sum(numeric_only=True, axis=1)
-            values_aliases += ["Grand Total"]
-
-        pivot = df.pivot(
-            columns=columns_aliases,
+        pivot = df.pivot_table(
             values=values_aliases,
             index=rows_aliases,
+            columns=columns_aliases,
+            aggfunc="sum",
+            margins=True,
+            margins_name="Grand Total",
         )
+        if not build.get("row_totals"):
+            pivot = pivot.iloc[:-1, :]
 
-        if len(columns_aliases) > 0:
-            # Swap the first column with the values table row
-            pivot = pivot.swaplevel(0, len(columns_aliases), axis="columns").sort_index(axis="columns")
+        if not build.get("column_totals"):
+            pivot = pivot.iloc[:, :-1]
+
+        # if len(columns_aliases) > 0:
+        #     # Swap the first column with the values table row
+        #     pivot = pivot.swaplevel(0, len(columns_aliases), axis="columns").sort_index(axis="columns")
 
         return {"html": pivot[offset:limit].to_html(escape=False, na_rep="-", index_names=True)}
 
@@ -75,6 +81,15 @@ class WidgetBuilder:
         }
 
 
+def _can_build_pivot(build):
+    rows, columns, values = itemgetter("rows", "columns", "values")(build)
+    if len(rows) > 0:
+        return True
+    if len(columns) > 0 and len(values) > 0:
+        return True
+    return False
+
+
 def _aliases(build_info):
     rows = list(map(itemgetter("alias"), build_info["rows"]))
     columns = list(map(itemgetter("alias"), build_info["columns"]))
@@ -90,5 +105,5 @@ def _dataframe(build, dataset):
         tables=[SQLBuilder.Table(**table) for table in dataset["tables"]],
         relations=[SQLBuilder.Relation(**relation) for relation in dataset["relations"]],
     )
-
+    print(query)
     return pantab.frame_from_hyper_query(dataset["file_path"], query)

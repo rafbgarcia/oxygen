@@ -1,4 +1,4 @@
-import { Table } from "playbook-ui"
+import { Table, Title } from "playbook-ui"
 import { useWidgetQuery } from "../../lib/codegenGraphql"
 import { times } from "lodash-es"
 import "./Pivot.css"
@@ -19,11 +19,11 @@ export const Pivot = ({ widget, dataset }) => {
   })
 
   if (loading) {
-    return <Skeleton pulse />
+    return <Loading />
   } else if (error) {
     return <p>Error {JSON.stringify(error)}</p>
   } else if (!data?.widget) {
-    return <Skeleton />
+    return <Empty />
   }
 
   const table = tableHtmlComponent(data.widget.html)
@@ -40,11 +40,18 @@ export const Pivot = ({ widget, dataset }) => {
   )
 }
 
-const Skeleton = (props) => {
+const Empty = () => {
+  return (
+    <div className="flex items-center justify-center h-full">
+      <Title>No data</Title>
+    </div>
+  )
+}
+const Loading = () => {
   const cols = 4
   const rows = 20
   return (
-    <div className={(props.pulse && "animate-pulse") || "opacity-50"}>
+    <div className="animate-pulse">
       <Table>
         <thead>
           <tr>

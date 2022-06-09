@@ -52,13 +52,17 @@ export const PivotBuild = ({ dataset, buildInfo, onChange }: BuildInfoWithDatase
 
       <Label>Grand Totals</Label>
       <div className="flex items-center ">
-        <Switch
-          label="Rows"
-          initialValue={buildInfo.rowTotals}
-          didChange={didUpdateRowsTotal}
-          className="mr-3"
-        />
-        <Switch label="Columns" initialValue={buildInfo.columnTotals} didChange={didUpdateColumnsTotal} />
+        {buildInfo.rows.length > 0 && (
+          <Switch
+            label="Rows"
+            initialValue={buildInfo.rowTotals}
+            didChange={didUpdateRowsTotal}
+            className="mr-3"
+          />
+        )}
+        {buildInfo.columns.length > 0 && (
+          <Switch label="Columns" initialValue={buildInfo.columnTotals} didChange={didUpdateColumnsTotal} />
+        )}
       </div>
     </Context.Provider>
   )
