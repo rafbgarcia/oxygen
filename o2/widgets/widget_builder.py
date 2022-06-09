@@ -44,7 +44,7 @@ class WidgetBuilder:
             df.loc["Grand Total"] = df.sum(numeric_only=True, axis=0)
             df.iloc[-1, 0] = "Grand Total"
 
-        if widget.build_info.get("columns_totals"):
+        if widget.build_info.get("column_totals"):
             df.loc[:, "Grand Total"] = df.sum(numeric_only=True, axis=1)
             values_aliases += ["Grand Total"]
 

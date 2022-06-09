@@ -6,7 +6,7 @@ import { useCreateWidgetMutation, useDashboardQuery, WidgetType } from "../../li
 import { DashboardLayout } from "./DashboardLayout"
 import { Popover } from "../../components/Popover"
 import { ChartBarIcon, MenuAlt2Icon, TableIcon } from "@heroicons/react/outline"
-import { initialBuildInfo } from "../Widget/_initialBuildInfo"
+import { initialBuildInfo } from "../Widget/_helpers"
 import React from "react"
 
 const initialLayout = (type: WidgetType) => {
@@ -78,7 +78,7 @@ export const DashboardEdit = () => {
           <div className="flex-grow flex-shrink basis-full">
             <DashboardLayout dashboard={data?.dashboard!} activeWidgetId={widgetId} />
           </div>
-          <div className="flex-grow-1 flex-shrink basis-0">
+          <div className="flex-grow-1 flex-shrink basis-0 sticky top-0">
             <Outlet context={{ dashboard: data!.dashboard }} />
           </div>
         </div>

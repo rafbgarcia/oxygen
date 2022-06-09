@@ -13,9 +13,10 @@ import { BuildInfoWithDatasetFields } from "./BuildInfoWithDatasetFields"
 import { BuildInfoText } from "./BuildInfoText"
 import { Tab } from "@headlessui/react"
 import { classnames } from "../../lib/classnames"
+import { PivotBuild } from "./PivotBuild"
 
 const WIDGET_TYPE_ELEMENT: Record<WidgetType, any> = {
-  [WidgetType.PivotTable]: BuildInfoWithDatasetFields,
+  [WidgetType.PivotTable]: PivotBuild,
   [WidgetType.VerticalBarChart]: BuildInfoWithDatasetFields,
   [WidgetType.Text]: BuildInfoText,
 }
@@ -41,9 +42,9 @@ export const WidgetEdit = () => {
 
   return (
     <Tab.Group>
-      <aside className="z-10 w-[300px] fixed right-0">
+      <aside className="z-10 w-[300px]">
         <div className="p-4">
-          <Tab.List className="flex items-center justify-between border-b mb-8">
+          <Tab.List className="flex items-center justify-between border-b">
             <Tab as={Fragment}>
               {({ selected }) => (
                 <a
@@ -90,7 +91,9 @@ export const WidgetEdit = () => {
               )}
             </Tab>
           </Tab.List>
-          <Tab.Panels>
+        </div>
+        <div className="max-h-[calc(100vh-150px)] overflow-auto">
+          <Tab.Panels className="p-4">
             <Tab.Panel>
               {" "}
               {widget ? (
@@ -106,7 +109,7 @@ export const WidgetEdit = () => {
             </Tab.Panel>
           </Tab.Panels>
 
-          <div className="flex items-center gap-x-2 mt-10">
+          <div className="flex items-center gap-x-2 mt-10 p-4">
             <Button variant="secondary" onClick={didCancelEdit}>
               Close
             </Button>
