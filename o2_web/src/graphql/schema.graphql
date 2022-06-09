@@ -108,7 +108,7 @@ type Query {
   datasets: [Dataset!]!
   dashboard(id: ID!): Dashboard!
   dashboards: [Dashboard!]!
-  widget(build: JSON!, dataset: JSON!, type: WidgetType!): JSON!
+  widget(build: JSON!, dataset: JSON!, type: WidgetType!): JSON
 }
 
 type Widget {

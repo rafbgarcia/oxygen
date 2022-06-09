@@ -193,7 +193,7 @@ export type Query = {
   dashboards: Array<Dashboard>;
   dataset: Dataset;
   datasets: Array<Dataset>;
-  widget: Scalars['JSON'];
+  widget?: Maybe<Scalars['JSON']>;
 };
 
 
@@ -370,7 +370,7 @@ export type WidgetQueryVariables = Exact<{
 }>;
 
 
-export type WidgetQuery = { __typename?: 'Query', widget: any };
+export type WidgetQuery = { __typename?: 'Query', widget?: any | null };
 
 export const DashboardLayoutPartsFragmentDoc = /*#__PURE__*/ gql`
     fragment DashboardLayoutParts on DashboardLayout {

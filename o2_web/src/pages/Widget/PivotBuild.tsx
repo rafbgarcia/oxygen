@@ -8,11 +8,12 @@ import { Chip } from "../../components/Chip"
 import CodeMirror from "@uiw/react-codemirror"
 import { sql, PostgreSQL } from "@codemirror/lang-sql"
 import { useModal } from "../../components/Modal"
-import { reduce, map, findIndex } from "lodash-es"
+import { reduce, map, findIndex, isEmpty } from "lodash-es"
 import React, { Fragment, useContext, useState } from "react"
 import dedent from "dedent"
 import { Switch } from "../../components/Switch"
 import { tw } from "../../lib/tw"
+import { template } from "./_helpers"
 
 export type BuildInfoWithDatasetFieldsProps = {
   dataset: DashboardQuery["dashboard"]["dataset"]
@@ -20,9 +21,23 @@ export type BuildInfoWithDatasetFieldsProps = {
   onChange: any
 }
 
-const Context = React.createContext<BuildInfoWithDatasetFieldsProps>({} as BuildInfoWithDatasetFieldsProps)
-
 const Label = tw.div`font-medium mb-2`
+const FieldSkeleton = tw.div`bg-gray-200 h-16`
+const Context = React.createContext<BuildInfoWithDatasetFieldsProps>({} as BuildInfoWithDatasetFieldsProps)
+const DEFAULT_AGG = {
+  [DatasetTableColumnType.Text]: {
+    label: "Count Unique",
+    alias: "# of unique :field",
+    formula: "COUNT(DISTINCT :field)",
+  },
+  [DatasetTableColumnType.Integer]: { label: "Sum", alias: "total :field", formula: "SUM(:field)" },
+  [DatasetTableColumnType.Float]: { label: "Sum", alias: "total :field", formula: "SUM(:field)" },
+  [DatasetTableColumnType.Datetime]: {
+    label: "# of years",
+    alias: "# of unique :field",
+    formula: "COUNT(DISTINCT EXTRACT(YEAR FROM :field))",
+  },
+}
 
 export const PivotBuild = ({ dataset, buildInfo, onChange }: BuildInfoWithDatasetFieldsProps) => {
   const context = { dataset, onChange, buildInfo }
@@ -50,7 +65,7 @@ export const PivotBuild = ({ dataset, buildInfo, onChange }: BuildInfoWithDatase
 }
 
 const DimensionSection = ({ label, section }) => {
-  const { buildInfo, dataset, onChange } = useContext(Context)
+  const { buildInfo, onChange } = useContext(Context)
 
   const didQuickAddField = (table, column) => () => {
     onChange(
@@ -81,28 +96,11 @@ const DimensionSection = ({ label, section }) => {
             </Button>
           }
         >
-          <div className="flex flex-col gap-y-8 max-h-96 overflow-auto w-[270px]">
-            {dataset.tables.map((table) => (
-              <div key={table.id}>
-                <p className="font-medium p-3 border-b">{table.title}</p>
-                <ul>
-                  {table.columns.map((column) => (
-                    <Popover.Button
-                      as="li"
-                      key={column.id}
-                      className="p-3 group flex items-center gap-x-3 cursor-pointer hover:bg-gray-100"
-                      onClick={didQuickAddField(table, column)}
-                    >
-                      <span>{column.name}</span>
-                      <span className="invisible group-hover:visible text-gray-400 text-sm">All items</span>
-                    </Popover.Button>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
+          <QuickAdd measure={false} didAdd={didQuickAddField} />
         </Popover>
       </header>
+
+      {isEmpty(buildInfo[section]) && <FieldSkeleton />}
 
       {buildInfo[section].map((item, index) => (
         <div key={item.alias} className="mb-2 border bg-white">
@@ -124,6 +122,24 @@ const SectionMeasure = ({ label, section }) => {
   const { buildInfo, onChange } = useContext(Context)
   const { hideModal, showModal, Modal } = useModal()
 
+  const didQuickAddField = (table, column) => () => {
+    const defaultAgg = DEFAULT_AGG[column.type]
+    onChange(
+      produce(buildInfo, (draft) => {
+        draft[section].push({
+          formula: template(defaultAgg.formula, { field: `${table.name}.${column.name}` }),
+          alias: template(defaultAgg.alias, { field: column.name }),
+        })
+      })
+    )
+  }
+  const didRemoveField = (index) => () => {
+    onChange(
+      produce(buildInfo, (draft) => {
+        draft[section].splice(index, 1)
+      })
+    )
+  }
   const didUpdateFormula = (formula) => {
     onChange(
       produce(buildInfo, (draft) => {
@@ -133,18 +149,11 @@ const SectionMeasure = ({ label, section }) => {
     )
     hideModal()
   }
-  const didRemoveField = (index) => () => {
-    onChange(
-      produce(buildInfo, (draft) => {
-        draft[section].splice(index, 1)
-      })
-    )
-  }
 
   return (
     <div className="mb-5">
       <header className="flex items-center justify-between">
-        <span className="font-medium">{label}</span>
+        <Label>{label}</Label>
 
         <Popover
           position="bottom-left"
@@ -154,9 +163,11 @@ const SectionMeasure = ({ label, section }) => {
             </Button>
           }
         >
-          <QuickAddMeasure section={section} />
+          <QuickAdd measure didAdd={didQuickAddField} />
         </Popover>
       </header>
+
+      {isEmpty(buildInfo[section]) && <FieldSkeleton />}
 
       {buildInfo[section].map((item, index) => (
         <Fragment key={item.alias}>
@@ -178,6 +189,34 @@ const SectionMeasure = ({ label, section }) => {
             </div>
           </div>
         </Fragment>
+      ))}
+    </div>
+  )
+}
+
+const QuickAdd = ({ measure, didAdd }: { measure?: boolean; didAdd: any }) => {
+  const { dataset } = useContext(Context)
+  return (
+    <div className="flex flex-col max-h-96 overflow-auto w-[270px]">
+      {dataset.tables.map((table) => (
+        <div key={table.id}>
+          <p className="font-medium p-3 border-b sticky top-0 bg-gray-100">{table.title}</p>
+          <ul>
+            {table.columns.map((column) => (
+              <Popover.Button
+                as="li"
+                key={column.id}
+                className="p-3 group flex items-center gap-x-3 cursor-pointer hover:bg-gray-100"
+                onClick={didAdd(table, column)}
+              >
+                <span>{column.name}</span>
+                <span className="invisible group-hover:visible text-gray-400 text-sm">
+                  {measure ? DEFAULT_AGG[column.type].label : "All items"}
+                </span>
+              </Popover.Button>
+            ))}
+          </ul>
+        </div>
       ))}
     </div>
   )
@@ -244,59 +283,6 @@ const FieldFormula = ({ item, didUpdateFormula }) => {
       <div className="mt-4 text-right">
         <Button onClick={didSave}>Save</Button>
       </div>
-    </div>
-  )
-}
-
-const DEFAULT_AGG = {
-  [DatasetTableColumnType.Text]: {
-    label: "Count Unique",
-    alias: "# of unique :field",
-    formula: "COUNT(DISTINCT :field)",
-  },
-  [DatasetTableColumnType.Integer]: { label: "Sum", alias: "total :field", formula: "SUM(:field)" },
-  [DatasetTableColumnType.Float]: { label: "Sum", alias: "total :field", formula: "SUM(:field)" },
-  [DatasetTableColumnType.Datetime]: {
-    label: "# of years",
-    alias: "# of unique :field",
-    formula: "COUNT(DISTINCT EXTRACT(YEAR FROM :field))",
-  },
-}
-const QuickAddMeasure = ({ section }: { section: string }) => {
-  const { buildInfo, dataset, onChange } = useContext(Context)
-
-  const didAddField = (table, column) => () => {
-    const defaultAgg = DEFAULT_AGG[column.type]
-    const updatedBuildInfo = produce(buildInfo, (draft) => {
-      draft[section].push({
-        formula: template(defaultAgg.formula, { field: `${table.name}.${column.name}` }),
-        alias: template(defaultAgg.alias, { field: column.name }),
-      })
-    })
-    onChange(updatedBuildInfo)
-  }
-
-  return (
-    <div className="flex flex-col gap-y-8 max-h-96 overflow-y-auto min-w-fit">
-      {dataset.tables.map((table) => (
-        <ul key={table.id}>
-          {table.columns.map((column) => (
-            <Popover.Button
-              as="li"
-              key={column.id}
-              className="p-3 group flex items-center gap-x-3 cursor-pointer hover:bg-gray-100"
-              onClick={didAddField(table, column)}
-            >
-              <span>
-                <Chip color="gray">{table.name}</Chip>.{column.name}
-              </span>
-              <span className="invisible group-hover:visible text-gray-400 text-sm">
-                {DEFAULT_AGG[column.type].label}
-              </span>
-            </Popover.Button>
-          ))}
-        </ul>
-      ))}
     </div>
   )
 }

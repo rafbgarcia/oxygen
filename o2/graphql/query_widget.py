@@ -10,7 +10,7 @@ class WidgetQuery(graphene.Mutation):
         dataset = JSON(required=True)
         build = JSON(required=True)
 
-    Output = graphene.NonNull(JSON)
+    Output = JSON
 
     def mutate(root, info, type, dataset, build):
         return WidgetBuilder.build(

@@ -19,9 +19,11 @@ export const Pivot = ({ widget, dataset }) => {
   })
 
   if (loading) {
-    return <Loading />
-  } else if (!data || error) {
+    return <Skeleton pulse />
+  } else if (error) {
     return <p>Error {JSON.stringify(error)}</p>
+  } else if (!data?.widget) {
+    return <Skeleton />
   }
 
   const table = tableHtmlComponent(data.widget.html)
@@ -38,26 +40,26 @@ export const Pivot = ({ widget, dataset }) => {
   )
 }
 
-const Loading = () => {
+const Skeleton = (props) => {
   const cols = 4
   const rows = 20
   return (
-    <div className="animate-pulse">
+    <div className={(props.pulse && "animate-pulse") || "opacity-50"}>
       <Table>
         <thead>
           <tr>
-            {times(cols, () => (
-              <th>
+            {times(cols, (i) => (
+              <th key={i}>
                 <div className="h-4 bg-slate-300 rounded"></div>
               </th>
             ))}
           </tr>
         </thead>
         <tbody>
-          {times(rows, () => (
-            <tr>
-              {times(cols, () => (
-                <td>
+          {times(rows, (i) => (
+            <tr key={i}>
+              {times(cols, (j) => (
+                <td key={j}>
                   <div className="h-8 bg-slate-300 rounded"></div>
                 </td>
               ))}
