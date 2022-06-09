@@ -29,9 +29,11 @@ class WidgetBuilder:
         df = _dataframe(build, dataset)
         df = df.astype("object")
 
-        if len(rows_aliases) == 0 and len(columns_aliases) > 0:
+        if len(values_aliases) == 0:
             return {
-                "html": df.set_index(columns_aliases).T.to_html(escape=False, na_rep="-", index_names=True)
+                "html": df.pivot(index=rows_aliases, columns=columns_aliases, values=values_aliases).to_html(
+                    escape=False, na_rep="-", index_names=True
+                )
             }
 
         pivot = df.pivot_table(

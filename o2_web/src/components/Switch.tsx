@@ -8,13 +8,16 @@ export const Switch = ({ label, initialValue, didChange, ...props }) => {
     setEnabled(value)
     didChange(value)
   }
-  const { className } = props
+  const { className, disabled, ...rest } = props
 
   return (
     <HeadlessSwitch.Group>
-      <div className={classnames("flex items-center", className)} {...props}>
-        <HeadlessSwitch.Label className="mr-4">{label}</HeadlessSwitch.Label>
+      <div className={classnames("flex items-center", className)} {...rest}>
+        <HeadlessSwitch.Label className={classnames("mr-4", { "opacity-50": disabled })}>
+          {label}
+        </HeadlessSwitch.Label>
         <HeadlessSwitch
+          disabled={disabled}
           checked={enabled}
           onChange={enabledDidChange}
           className={`${

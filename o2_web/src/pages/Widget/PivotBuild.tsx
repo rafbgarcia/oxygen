@@ -22,7 +22,17 @@ export type BuildInfoWithDatasetFieldsProps = {
 }
 
 const Label = tw.div`font-medium mb-2`
-const FieldSkeleton = tw.div`bg-gray-200 h-16`
+const FieldSkeleton = () => {
+  return (
+    <div
+      className="bg-repeat h-16"
+      style={{
+        backgroundImage:
+          "url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAYAAADgkQYQAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyNpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNS1jMDE0IDc5LjE1MTQ4MSwgMjAxMy8wMy8xMy0xMjowOToxNSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIChNYWNpbnRvc2gpIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOkZBRjVCRjc5NEQzRDExRTM4NzI0OUEwOEVGMTdFN0ZGIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOkZBRjVCRjdBNEQzRDExRTM4NzI0OUEwOEVGMTdFN0ZGIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6RkFGNUJGNzc0RDNEMTFFMzg3MjQ5QTA4RUYxN0U3RkYiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6RkFGNUJGNzg0RDNEMTFFMzg3MjQ5QTA4RUYxN0U3RkYiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz6OV1kjAAAAUklEQVR42mLavHnzISBW+v//PwMuzOTj42PHwMCwYMuWLUoMOAATiCCkkAnGwKeQCZmDSyETui5sCpmwuQFdISPIi7gAUNEhIJWAVxFMIUCAAQBCMT4o+pmFmwAAAABJRU5ErkJggg==)",
+      }}
+    />
+  )
+}
 const Context = React.createContext<BuildInfoWithDatasetFieldsProps>({} as BuildInfoWithDatasetFieldsProps)
 const DEFAULT_AGG = {
   [DatasetTableColumnType.Text]: {
@@ -52,17 +62,19 @@ export const PivotBuild = ({ dataset, buildInfo, onChange }: BuildInfoWithDatase
 
       <Label>Grand Totals</Label>
       <div className="flex items-center ">
-        {buildInfo.rows.length > 0 && (
-          <Switch
-            label="Rows"
-            initialValue={buildInfo.rowTotals}
-            didChange={didUpdateRowsTotal}
-            className="mr-3"
-          />
-        )}
-        {buildInfo.columns.length > 0 && (
-          <Switch label="Columns" initialValue={buildInfo.columnTotals} didChange={didUpdateColumnsTotal} />
-        )}
+        <Switch
+          label="Rows"
+          disabled={buildInfo.rows.length == 0}
+          initialValue={buildInfo.rowTotals}
+          didChange={didUpdateRowsTotal}
+          className="mr-3"
+        />
+        <Switch
+          disabled={buildInfo.columns.length == 0}
+          label="Columns"
+          initialValue={buildInfo.columnTotals}
+          didChange={didUpdateColumnsTotal}
+        />
       </div>
     </Context.Provider>
   )
