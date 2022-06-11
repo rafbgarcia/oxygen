@@ -14,6 +14,8 @@ import dedent from "dedent"
 import { Switch } from "../../components/Switch"
 import { tw } from "../../lib/tw"
 import { template } from "./_helpers"
+import { useRef } from "react"
+import { useEffect } from "react"
 
 export type BuildInfoWithDatasetFieldsProps = {
   dataset: DashboardQuery["dashboard"]["dataset"]
@@ -44,7 +46,7 @@ const DEFAULT_AGG = {
   [DatasetTableColumnType.Float]: { label: "Sum", alias: "total :field", formula: "SUM(:field)" },
   [DatasetTableColumnType.Datetime]: {
     label: "# of years",
-    alias: "# of unique :field",
+    alias: "# of unique years in :field",
     formula: "COUNT(DISTINCT EXTRACT(YEAR FROM :field))",
   },
 }
@@ -64,13 +66,13 @@ export const PivotBuild = ({ dataset, buildInfo, onChange }: BuildInfoWithDatase
       <div className="flex items-center ">
         <Switch
           label="Rows"
-          disabled={buildInfo.rows.length == 0}
+          disabled={buildInfo.values.length == 0 || buildInfo.rows.length == 0}
           initialValue={buildInfo.rowTotals}
           didChange={didUpdateRowsTotal}
           className="mr-3"
         />
         <Switch
-          disabled={buildInfo.columns.length == 0}
+          disabled={buildInfo.values.length == 0 || buildInfo.columns.length == 0}
           label="Columns"
           initialValue={buildInfo.columnTotals}
           didChange={didUpdateColumnsTotal}
@@ -99,6 +101,10 @@ const DimensionSection = ({ label, section }) => {
     )
   }
 
+  const didEditAlias = () => {
+    console.log("dblc")
+  }
+
   return (
     <div className="mb-5">
       <header className="flex items-center justify-between">
@@ -121,7 +127,7 @@ const DimensionSection = ({ label, section }) => {
       {buildInfo[section].map((item, index) => (
         <div key={item.alias} className="mb-2 border bg-white">
           <div className="border-b py-1 px-2 flex justify-between items-center">
-            <span>{item.alias}</span>
+            <ColumnAlias item={item} section={section} />
           </div>
           <div className="p-2 flex justify-between items-center">
             <a className="cursor-pointer" onClick={didRemoveField(index)}>
@@ -193,7 +199,7 @@ const SectionMeasure = ({ label, section }) => {
 
           <div className="my-2 border bg-white group">
             <div className="border-b py-1 px-2 flex justify-between items-center">
-              <span>{item.alias}</span>
+              <ColumnAlias item={item} section={section} />
               <a className="cursor-pointer hidden group-hover:block" onClick={showModal}>
                 <PencilIcon className="w-4" />
               </a>
@@ -300,5 +306,45 @@ const FieldFormula = ({ item, didUpdateFormula }) => {
         <Button onClick={didSave}>Save</Button>
       </div>
     </div>
+  )
+}
+
+const ColumnAlias = ({ item, section }) => {
+  const [editing, setEditing] = useState(false)
+  const { onChange, buildInfo } = useContext(Context)
+  const inputRef = useRef<HTMLInputElement | null>(null)
+  const didClickToEdit = () => {
+    setEditing(true)
+  }
+  const didUpdateAlias = (e) => {
+    onChange(
+      produce(buildInfo, (draft) => {
+        const index = findIndex(buildInfo[section], (item) => item === item)
+        draft[section][index].alias = e.target.value
+      })
+    )
+    setEditing(false)
+  }
+  useEffect(() => {
+    editing && inputRef.current?.focus()
+  }, [editing])
+  const didPressKey = (e) => {
+    e.key == "Enter" && didUpdateAlias(e)
+  }
+
+  return (
+    <span className="w-full hover:bg-gray-100 cursor-default" onDoubleClick={didClickToEdit}>
+      {editing ? (
+        <input
+          ref={inputRef}
+          className="w-full"
+          defaultValue={item.alias}
+          onBlur={didUpdateAlias}
+          onKeyDown={didPressKey}
+        />
+      ) : (
+        item.alias
+      )}
+    </span>
   )
 }

@@ -44,10 +44,10 @@ class WidgetBuilder:
             margins=True,
             margins_name="Grand Total",
         )
-        if not build.get("row_totals"):
+        if len(rows_aliases) > 0 and not build.get("row_totals"):
             pivot = pivot.iloc[:-1, :]
 
-        if not build.get("column_totals"):
+        if len(columns_aliases) > 0 and not build.get("column_totals"):
             pivot = pivot.iloc[:, :-1]
 
         # if len(columns_aliases) > 0:

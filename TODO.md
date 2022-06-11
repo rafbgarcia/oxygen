@@ -1,15 +1,16 @@
 ## TODO
 
-- Each widget query its own render data
-- Unique field aliases
+- Edit field alias
+- Field Mask
+- Field Sort
 
 ## MVP Roadmap:
 
 - Filters
 - Pivot table Pagination
-- Field Mask
 - Value as links to external pages
 - Scheduled build
+- Unique field aliases
 - Package manager?
 - default_database_version=2
   - https://help.tableau.com/current/api/hyper_api/en-us/reference/sql/databasesettings.html#DEFAULT_DATABASE_VERSION
