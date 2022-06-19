@@ -11,7 +11,7 @@ app.conf.update(
 )
 
 # Redis config
-app.conf.broker_url = 'redis://localhost:6379/0'
+app.conf.broker_url = 'redis://localhost:6380/0'
 app.conf.result_backend_transport_options = {
     'retry_policy': {
         'timeout': 300.0

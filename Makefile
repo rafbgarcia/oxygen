@@ -6,8 +6,11 @@ up:
 stop:
 	docker-compose stop db redis
 
-start:
-	honcho start
+start_server:
+	honcho start -f Procfile
+
+start_client:
+	(cd o2_web && yarn foreman)
 
 graphql_schema:
 	python manage.py graphql_schema --schema o2.graphql.schema.schema --out o2_web/src/graphql/schema.graphql --watch

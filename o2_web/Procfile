@@ -1,0 +1,3 @@
+client: yarn dev --port 4000
+client_graphql: yarn graphql:watch
+client_css: yarn css:watch

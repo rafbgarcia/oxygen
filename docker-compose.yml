@@ -1,25 +1,37 @@
-version: "2.4"
+version: "3.9"
 volumes:
   db_data:
   redis_data:
 services:
   redis:
-    image: quay.io/powerhome/bitnami-redis:6.2.6
+    image: bitnami/redis:6.2.6
     environment:
       ALLOW_EMPTY_PASSWORD: "true"
     volumes:
       - redis_data:/data
     ports:
-      - 6379:6379
+      - 6380:6379
     mem_limit: 100m
+
   db:
-    image: docker.io/mysql/mysql-server:8.0.26
+    image: amd64/mysql:8.0.29
     volumes:
       - db_data:/var/lib/mysql
       - ./config/mysql.cnf:/etc/my.cnf.d/compose.cnf
     ports:
       - 3306:3306
     environment:
-      MYSQL_ROOT_HOST: "%"
-      MYSQL_ROOT_PASSWORD: talkbox
+      MYSQL_DATABASE: oracle_dev
+      MYSQL_ROOT_PASSWORD: rootpassword
     mem_limit: 2g
+
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/code
+    depends_on:
+      - db
+      # - redis
+    ports:
+      - 8000:8000

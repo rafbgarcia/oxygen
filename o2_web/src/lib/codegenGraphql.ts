@@ -236,17 +236,17 @@ export enum WidgetType {
   VerticalBarChart = 'VERTICAL_BAR_CHART'
 }
 
-export type DashboardPartsFragment = { __typename?: 'Dashboard', id: string, name: string, created: any, modified: any, layout?: Array<{ __typename?: 'DashboardLayout', i: string, x: number, y: number, w: number, h: number } | null> | null };
-
 export type DashboardLayoutPartsFragment = { __typename?: 'DashboardLayout', i: string, x: number, y: number, w: number, h: number };
-
-export type DatasetPartsFragment = { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, filePath?: string | null };
 
 export type DatasetRelationPartsFragment = { __typename?: 'DatasetRelation', id: string, fullSource?: string | null, fullReference?: string | null };
 
-export type DatasetTablePartsFragment = { __typename?: 'DatasetTable', id: string, name: string, title: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, columns: Array<{ __typename?: 'DatasetTableColumn', id: string, name: string, fullName?: string | null, type: DatasetTableColumnType }> };
-
 export type DatasetTableColumnPartsFragment = { __typename?: 'DatasetTableColumn', id: string, name: string, fullName?: string | null, type: DatasetTableColumnType };
+
+export type DashboardPartsFragment = { __typename?: 'Dashboard', id: string, name: string, created: any, modified: any, layout?: Array<{ __typename?: 'DashboardLayout', i: string, x: number, y: number, w: number, h: number } | null> | null };
+
+export type DatasetPartsFragment = { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, filePath?: string | null };
+
+export type DatasetTablePartsFragment = { __typename?: 'DatasetTable', id: string, name: string, title: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, columns: Array<{ __typename?: 'DatasetTableColumn', id: string, name: string, fullName?: string | null, type: DatasetTableColumnType }> };
 
 export type WidgetPartsFragment = { __typename?: 'Widget', id: string, type: WidgetType, buildInfo?: any | null };
 
@@ -372,6 +372,13 @@ export type WidgetQueryVariables = Exact<{
 
 export type WidgetQuery = { __typename?: 'Query', widget?: any | null };
 
+export const DatasetRelationPartsFragmentDoc = /*#__PURE__*/ gql`
+    fragment DatasetRelationParts on DatasetRelation {
+  id
+  fullSource
+  fullReference
+}
+    `;
 export const DashboardLayoutPartsFragmentDoc = /*#__PURE__*/ gql`
     fragment DashboardLayoutParts on DashboardLayout {
   i
@@ -398,13 +405,6 @@ export const DatasetPartsFragmentDoc = /*#__PURE__*/ gql`
   name
   lastBuiltAt
   filePath
-}
-    `;
-export const DatasetRelationPartsFragmentDoc = /*#__PURE__*/ gql`
-    fragment DatasetRelationParts on DatasetRelation {
-  id
-  fullSource
-  fullReference
 }
     `;
 export const DatasetTableColumnPartsFragmentDoc = /*#__PURE__*/ gql`

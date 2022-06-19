@@ -80,11 +80,11 @@ WSGI_APPLICATION = "powerBi.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
-        "NAME": "o2_dev",
-        "USER": "root",
-        "PASSWORD": "talkbox",
-        "HOST": "127.0.0.1",
+        "HOST": "db",
         "PORT": "3306",
+        "USER": "root",
+        "PASSWORD": "rootpassword",
+        "NAME": "oracle_dev",
         "ATOMIC_REQUESTS": True,
     }
 }
