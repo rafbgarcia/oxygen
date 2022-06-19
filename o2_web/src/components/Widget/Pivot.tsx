@@ -33,7 +33,7 @@ export const Pivot = ({ widget, dataset }) => {
     .replace(/\<th/g, "<td class='header-cell'")
 
   return (
-    <Table sticky dataTable className="o2-default-pivot-widget">
+    <Table sticky dataTable className="oracle-default-pivot-widget">
       <thead dangerouslySetInnerHTML={{ __html: theadHTML }}></thead>
       <tbody dangerouslySetInnerHTML={{ __html: tbodyHTML }}></tbody>
     </Table>

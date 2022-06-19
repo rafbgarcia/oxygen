@@ -1,5 +1,5 @@
 {
-  "name": "power-o2",
+  "name": "power-oracle",
   "private": true,
   "version": "0.0.1",
   "scripts": {
@@ -62,12 +62,12 @@
     "dist"
   ],
   "license": "MIT",
-  "main": "./dist/power-o2.es.js",
-  "module": "./dist/power-o2.es.js",
+  "main": "./dist/power-oracle.es.js",
+  "module": "./dist/power-oracle.es.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/power-o2.es.js"
+      "import": "./dist/power-oracle.es.js"
     }
   }
 }

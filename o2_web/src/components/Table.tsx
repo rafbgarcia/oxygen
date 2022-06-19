@@ -17,11 +17,11 @@ Table.HTMLBody = ({ html }) => {
   return (
     <>
       <thead
-        className="o2-html-table-thead"
+        className="oracle-html-table-thead"
         dangerouslySetInnerHTML={{ __html: table?.children[0]?.innerHTML }}
       ></thead>
       <tbody
-        className="o2-html-table-tbody"
+        className="oracle-html-table-tbody"
         dangerouslySetInnerHTML={{ __html: table?.children[1]?.innerHTML }}
       ></tbody>
     </>

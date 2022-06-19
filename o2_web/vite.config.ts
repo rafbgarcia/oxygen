@@ -13,10 +13,10 @@ export default defineConfig({
   ],
   build: {
     lib: {
-      entry: path.resolve(__dirname, 'src/power-o2/index.ts'),
+      entry: path.resolve(__dirname, 'src/power-oracle/index.ts'),
       name: 'PowerO2',
       formats: ['es'],
-      fileName: (format) => `power-o2.${format}.js`,
+      fileName: (format) => `power-oracle.${format}.js`,
     },
     rollupOptions: {
       external: ['react', 'react-dom'],

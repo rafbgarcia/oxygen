@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "o2",
+    "oracle",
     "corsheaders",
     "graphene_django",
 ]

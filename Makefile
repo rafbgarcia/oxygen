@@ -13,7 +13,7 @@ start_client:
 	(cd o2_web && yarn foreman)
 
 graphql_schema:
-	python manage.py graphql_schema --schema o2.graphql.schema.schema --out o2_web/src/graphql/schema.graphql --watch
+	python manage.py graphql_schema --schema oracle.graphql.schema.schema --out o2_web/src/graphql/schema.graphql --watch
 
 install_deps:
 	pip install --requirement requirements.txt
@@ -21,6 +21,6 @@ install_deps:
 migrate:
 	python manage.py makemigrations && python manage.py migrate
 
-# make test_watch dir=o2/<folder>
+# make test_watch dir=oracle/<folder>
 test_watch:
 	ag -l --python | entr python manage.py test --keepdb $(dir)
