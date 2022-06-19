@@ -19,7 +19,7 @@ services:
       - db_data:/var/lib/mysql
       - ./config/mysql.cnf:/etc/my.cnf.d/compose.cnf
     ports:
-      - 3306:3306
+      - 3307:3306
     environment:
       MYSQL_DATABASE: oracle_dev
       MYSQL_ROOT_PASSWORD: rootpassword
@@ -35,3 +35,6 @@ services:
       # - redis
     ports:
       - 8000:8000
+    external_links:
+      - nitro-web-db-1
+

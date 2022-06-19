@@ -10,10 +10,10 @@ start_server:
 	honcho start -f Procfile
 
 start_client:
-	(cd o2_web && yarn foreman)
+	(cd oracle_web && yarn foreman)
 
 graphql_schema:
-	python manage.py graphql_schema --schema oracle.graphql.schema.schema --out o2_web/src/graphql/schema.graphql --watch
+	python manage.py graphql_schema --schema oracle.graphql.schema.schema --out oracle_web/src/graphql/schema.graphql --watch
 
 install_deps:
 	pip install --requirement requirements.txt
