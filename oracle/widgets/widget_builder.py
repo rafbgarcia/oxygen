@@ -27,9 +27,9 @@ class WidgetBuilder:
 
         if len(values_aliases) == 0:
             return {
-                "html": df.pivot(
-                    index=rows_aliases, columns=columns_aliases, values=values_aliases
-                ).to_html(escape=False, na_rep="-", index_names=True)
+                "html": df.pivot(index=rows_aliases, columns=columns_aliases, values=values_aliases).to_html(
+                    escape=False, na_rep="-", index_names=True
+                )
             }
 
         pivot = df.pivot_table(
@@ -50,11 +50,7 @@ class WidgetBuilder:
         #     # Swap the first column with the values table row
         #     pivot = pivot.swaplevel(0, len(columns_aliases), axis="columns").sort_index(axis="columns")
 
-        return {
-            "html": pivot[offset:limit].to_html(
-                escape=False, na_rep="-", index_names=True
-            )
-        }
+        return {"html": pivot[offset:limit].to_html(escape=False, na_rep="-", index_names=True)}
 
     @staticmethod
     def vertical_bar_chart(build, dataset, **_kwargs):
@@ -107,9 +103,7 @@ def _dataframe(build, dataset):
         dimensions=[SQLBuilder.Column(**dimension) for dimension in (rows + columns)],
         measures=[SQLBuilder.Column(**measure) for measure in values],
         tables=[SQLBuilder.Table(**table) for table in dataset["tables"]],
-        relations=[
-            SQLBuilder.Relation(**relation) for relation in dataset["relations"]
-        ],
+        relations=[SQLBuilder.Relation(**relation) for relation in dataset["relations"]],
     )
 
     print(f">>> QUERY: {query}")

@@ -8,16 +8,15 @@ import {
 import type { DashboardQuery } from "../../lib/codegenGraphql"
 import { find } from "lodash-es"
 import React, { Fragment } from "react"
-import { Spinner } from "../../components/Spinner"
-import { BuildInfoWithDatasetFields } from "./BuildInfoWithDatasetFields"
 import { BuildInfoText } from "./BuildInfoText"
 import { Tab } from "@headlessui/react"
 import { classnames } from "../../lib/classnames"
 import { PivotBuild } from "./PivotBuild"
+import { VerticalBarChartBuild } from "./VerticalBarChartBuild"
 
 const WIDGET_TYPE_ELEMENT: Record<WidgetType, any> = {
   [WidgetType.PivotTable]: PivotBuild,
-  [WidgetType.VerticalBarChart]: BuildInfoWithDatasetFields,
+  [WidgetType.VerticalBarChart]: VerticalBarChartBuild,
   [WidgetType.Text]: BuildInfoText,
 }
 
@@ -25,7 +24,7 @@ export const WidgetEdit = () => {
   const { dashboard } = useOutletContext<{ dashboard: DashboardQuery["dashboard"] }>()
   const { widgetId } = useParams()
   const navigate = useNavigate()
-  const [updateBuildInfo, { loading }] = useUpdateWidgetBuildInfoMutation()
+  const [updateBuildInfo] = useUpdateWidgetBuildInfoMutation()
   const [removeWidget, { loading: deleting }] = useDeleteWidgetMutation()
 
   const widget = find(dashboard.widgets, { id: widgetId }) as

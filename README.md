@@ -16,3 +16,23 @@ CONCAT(
   (COUNT(DISTINCT id) * SUM(DISTINCT id) OVER ())
 )
 ```
+
+### VS Code
+
+`$ pip install black`
+
+##### Extensions
+
+- Prettier - Code formatter
+- Tailwind CSS IntelliSense
+
+##### > Preferences: Open Settings (JSON)
+
+```json
+  ...
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.python"
+  }
+```

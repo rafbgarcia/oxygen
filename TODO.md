@@ -11,7 +11,8 @@
 - Value as links to external pages
 - Scheduled build
 - Unique field aliases
-- Package manager?
+- Dependency manager
+  - https://python-poetry.org/docs/master/managing-dependencies/
 - default_database_version=2
   - https://help.tableau.com/current/api/hyper_api/en-us/reference/sql/databasesettings.html#DEFAULT_DATABASE_VERSION
 
