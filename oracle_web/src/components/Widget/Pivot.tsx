@@ -47,6 +47,7 @@ const Empty = () => {
     </div>
   )
 }
+
 const Loading = () => {
   const cols = 4
   const rows = 20

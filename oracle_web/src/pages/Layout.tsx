@@ -37,7 +37,7 @@ const Nav = () => {
                 className="block h-8 w-auto"
                 src="https://tailwindui.com/img/logos/workflow-mark-indigo-500.svg"
               />
-              <img className="block h-7 w-auto ml-2" src={logo} />
+              <span className="font-medium text-2xl text-white ml-3">Oracle</span>
             </Link>
             <div className="hidden sm:block sm:ml-6">
               <div className="flex space-x-4">

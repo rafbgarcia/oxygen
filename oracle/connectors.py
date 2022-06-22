@@ -2,7 +2,7 @@ import mysql.connector
 from contextlib import contextmanager
 
 connection_config = {
-    "host": "nitro-web-db-1",
+    "host": "db",
     "port": 3306,
     "user": "root",
     "password": "talkbox",

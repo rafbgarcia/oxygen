@@ -4,5 +4,5 @@ ENV PYTHONUNBUFFERED=1
 WORKDIR /code
 COPY requirements.txt /code/
 RUN pip install -r requirements.txt
-RUN make migrate
+# RUN make migrate
 COPY . /code/

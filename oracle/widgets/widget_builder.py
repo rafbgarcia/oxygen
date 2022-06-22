@@ -1,12 +1,8 @@
 from operator import itemgetter
-import uuid
 
 import pantab
-from oracle.models import Dataset, DatasetRelation, DatasetTableColumn, Widget
-from oracle.widgets.pivot import Pivot
-from oracle.widgets.text import Text
+from oracle.models import Widget
 from oracle.widgets.sql_builder import SQLBuilder
-from oracle.widgets.vertical_bar_chart import VerticalBarChart
 
 
 class WidgetBuilder:
@@ -31,9 +27,9 @@ class WidgetBuilder:
 
         if len(values_aliases) == 0:
             return {
-                "html": df.pivot(index=rows_aliases, columns=columns_aliases, values=values_aliases).to_html(
-                    escape=False, na_rep="-", index_names=True
-                )
+                "html": df.pivot(
+                    index=rows_aliases, columns=columns_aliases, values=values_aliases
+                ).to_html(escape=False, na_rep="-", index_names=True)
             }
 
         pivot = df.pivot_table(
@@ -54,7 +50,11 @@ class WidgetBuilder:
         #     # Swap the first column with the values table row
         #     pivot = pivot.swaplevel(0, len(columns_aliases), axis="columns").sort_index(axis="columns")
 
-        return {"html": pivot[offset:limit].to_html(escape=False, na_rep="-", index_names=True)}
+        return {
+            "html": pivot[offset:limit].to_html(
+                escape=False, na_rep="-", index_names=True
+            )
+        }
 
     @staticmethod
     def vertical_bar_chart(build, dataset, **_kwargs):
@@ -71,15 +71,17 @@ class WidgetBuilder:
         values = pivot.values.tolist()
         labels = pivot.columns.tolist()
         xaxis = pivot.index.tolist()
-        # id = uuid.uuid4()
 
         return {
             "datasets": [
-                {"label": labels[i], "data": [v[i] for v in values], "backgroundColor": "rgb(0,86,207)"}
+                {
+                    "label": labels[i],
+                    "data": [v[i] for v in values],
+                    "backgroundColor": "rgb(0,86,207)",
+                }
                 for (i, _) in enumerate(labels)
             ],
             "labels": xaxis,
-            # "id": f"dashboard-{id}",
         }
 
 
@@ -105,7 +107,10 @@ def _dataframe(build, dataset):
         dimensions=[SQLBuilder.Column(**dimension) for dimension in (rows + columns)],
         measures=[SQLBuilder.Column(**measure) for measure in values],
         tables=[SQLBuilder.Table(**table) for table in dataset["tables"]],
-        relations=[SQLBuilder.Relation(**relation) for relation in dataset["relations"]],
+        relations=[
+            SQLBuilder.Relation(**relation) for relation in dataset["relations"]
+        ],
     )
-    print(query)
+
+    print(f">>> QUERY: {query}")
     return pantab.frame_from_hyper_query(dataset["file_path"], query)

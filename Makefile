@@ -3,6 +3,9 @@ export COMPOSE_PROJECT_NAME=nitro-web
 up:
 	docker-compose up -d db redis
 
+up_web:
+	docker-compose up web
+
 stop:
 	docker-compose stop db redis
 
@@ -18,8 +21,11 @@ graphql_schema:
 install_deps:
 	pip install --requirement requirements.txt
 
-migrate:
-	python manage.py makemigrations && python manage.py migrate
+makemigrate:
+	docker-compose run web python manage.py makemigrations
+
+migrate: makemigrate
+	docker-compose run web python manage.py migrate
 
 # make test_watch dir=oracle/<folder>
 test_watch:

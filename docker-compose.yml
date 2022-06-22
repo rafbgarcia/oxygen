@@ -1,40 +1,37 @@
 version: "3.9"
+networks:
+  nitro-web_default:
+    external: true
+
 volumes:
   db_data:
   redis_data:
+
 services:
   redis:
-    image: bitnami/redis:6.2.6
-    environment:
-      ALLOW_EMPTY_PASSWORD: "true"
-    volumes:
-      - redis_data:/data
-    ports:
-      - 6380:6379
-    mem_limit: 100m
+    extends:
+      file: ~/repos/nitro-web/docker-compose.yml
+      service: redis
+    networks:
+      - nitro-web_default
 
   db:
-    image: amd64/mysql:8.0.29
-    volumes:
-      - db_data:/var/lib/mysql
-      - ./config/mysql.cnf:/etc/my.cnf.d/compose.cnf
-    ports:
-      - 3307:3306
-    environment:
-      MYSQL_DATABASE: oracle_dev
-      MYSQL_ROOT_PASSWORD: rootpassword
-    mem_limit: 2g
+    extends:
+      file: ~/repos/nitro-web/docker-compose.yml
+      service: db
+    networks:
+      - nitro-web_default
 
   web:
     build: .
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/code
-    depends_on:
-      - db
+    # depends_on:
+      # - db
       # - redis
     ports:
       - 8000:8000
-    external_links:
-      - nitro-web-db-1
+    networks:
+      - nitro-web_default
 

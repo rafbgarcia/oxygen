@@ -78,12 +78,21 @@ WSGI_APPLICATION = "powerBi.wsgi.application"
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
 DATABASES = {
+    # "default": {
+    #     "ENGINE": "django.db.backends.mysql",
+    #     "HOST": "db",
+    #     "PORT": "3306",
+    #     "USER": "root",
+    #     "PASSWORD": "rootpassword",
+    #     "NAME": "oracle_dev",
+    #     "ATOMIC_REQUESTS": True,
+    # }
     "default": {
         "ENGINE": "django.db.backends.mysql",
         "HOST": "db",
         "PORT": "3306",
         "USER": "root",
-        "PASSWORD": "rootpassword",
+        "PASSWORD": "talkbox",
         "NAME": "oracle_dev",
         "ATOMIC_REQUESTS": True,
     }
