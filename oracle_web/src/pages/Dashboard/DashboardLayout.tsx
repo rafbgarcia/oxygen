@@ -85,7 +85,7 @@ const WidgetActionsButton = tw.a`
   cursor-pointer text-gray-500 hover:text-gray-700 hover:bg-gray-100
 `
 const WidgetContainer = tw.figure`
-  relative overflow-hidden
+  relative
 
   ${(p) =>
     classnames({
