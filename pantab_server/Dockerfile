@@ -5,4 +5,3 @@ ENV PYTHONUNBUFFERED=1
 WORKDIR /pantab_server
 COPY requirements.txt /pantab_server/
 RUN pip install -r requirements.txt
-# COPY server.py /pantab_server/

@@ -2,7 +2,7 @@ from operator import itemgetter
 
 from oracle.models import Widget
 from oracle.widgets.sql_builder import SQLBuilder
-import oracle.pantab_client as pantab
+import pantab_server.pantab_client as pantab
 
 
 class WidgetBuilder:
@@ -107,4 +107,4 @@ def _dataframe(build, dataset):
     )
 
     print(f">>> QUERY: {query}")
-    return pantab.frame_from_hyper_query(dataset["file_path"], query)
+    return pantab.query(dataset["file_name"], query)

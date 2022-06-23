@@ -2,13 +2,13 @@ import os
 from time import time
 from django.db import models
 from django.utils import timezone
-import humps
 from model_utils.models import TimeStampedModel
 from oracle.connectors import MySQLConnector
 from oracle.dataset_helpers import DatasetHelper
 from powerBi.settings import BASE_DIR
 import pandas as pd
 from os.path import exists
+import pantab_server.pantab_client as pantab
 
 TABLE_MODE_REPLACE = "w"
 TABLE_MODE_APPEND = "a"
@@ -58,12 +58,7 @@ class Dataset(TimeStampedModel):
     def append(self, table, rows):
         df = pd.DataFrame(rows, columns=table.column_names())
         df = df.astype(table.dtypes(), errors="ignore")
-        pantab.frame_to_hyper(df, self.file_path(), table=table.name, table_mode=TABLE_MODE_APPEND)
-
-    def replace(self, table, rows):
-        df = pd.DataFrame(rows, columns=table.column_names())
-        df = df.astype(table.dtypes(), errors="ignore")
-        pantab.frame_to_hyper(df, self.file_path(), table=table.name, table_mode=TABLE_MODE_REPLACE)
+        pantab.append(df, to=self.file_name, table=table.name, table_mode=TABLE_MODE_APPEND)
 
     def execute(self, sql):
         return pantab.frame_from_hyper_query(self.file_path(), sql)

@@ -22,7 +22,7 @@ For now, I'm using Nitro's DB and Redis containers, hence this setup assumes you
 - `pip install -r requirements.txt`
 - `(cd oracle_web && yarn install)`
 - `make up`
-- `make migrate`
+- `make migrate` (need to manually create database in the MySQL server)
 
 Tab 1:
 
