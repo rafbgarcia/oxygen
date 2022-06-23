@@ -8,7 +8,6 @@ from oracle.connectors import MySQLConnector
 from oracle.dataset_helpers import DatasetHelper
 from powerBi.settings import BASE_DIR
 import pandas as pd
-import pantab
 from os.path import exists
 
 TABLE_MODE_REPLACE = "w"

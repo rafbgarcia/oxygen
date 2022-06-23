@@ -1,25 +1,40 @@
 ### Start up
 
-- `$ make up` // uses nitro's services for now
-- `$ make start`
-  - Client: http://localhost:4000
-  - Server: http://localhost:8000 (is also GraphiQL)
+# Dev environment
 
-### Some whys:
+### Some history
 
-I'm leaving the formula field as free text so that we can make complex field queries such as CONCAT, CASE, and whatever we need.
+I started developing this project on an Intel chip. When I got the m1 Macbook I learned that Tableau Hyper API is not compatible with ARM architecture.
 
-```sql
-CONCAT(
-  COUNT(DISTINCT id),
-  "/",
-  (COUNT(DISTINCT id) * SUM(DISTINCT id) OVER ())
-)
-```
+I tried:
+
+- Running the whole project in a docker container. That slowed down Python's code reloading by a lot. It was a bad dev experience.
+- Then I tried to keep two versions of homebrew installed, but I thought that would not be a good experience in the long term.
+- Finally, I went with the approach to create a small server for the Tableau API to be used in development only.
+
+### Get started
+
+For now, I'm using Nitro's DB and Redis containers, hence this setup assumes you have ran Nitro's set up.
+
+- `asdf install`
+- `python -m venv .venv`
+- `source .venv/bin/activate`
+- `pip install -r requirements.txt`
+- `(cd oracle_web && yarn install)`
+- `make up`
+- `make migrate`
+
+Tab 1:
+
+- `make start_server`
+  - http://localhost:8000 (also gives you GraphiQL)
+
+Tab 2:
+
+- `make start_client`
+  - http://localhost:4000
 
 ### VS Code
-
-`$ pip install black`
 
 ##### Extensions
 

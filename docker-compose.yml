@@ -27,11 +27,16 @@ services:
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/code
-    # depends_on:
-      # - db
-      # - redis
     ports:
       - 8000:8000
     networks:
       - nitro-web_default
 
+  pantab_server:
+    build: pantab_server
+    command: python server.py
+    volumes:
+      - ./pantab_server:/pantab_server
+      - ./datasets:/datasets
+    ports:
+      - 3333:3333

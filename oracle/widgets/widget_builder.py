@@ -1,8 +1,8 @@
 from operator import itemgetter
 
-import pantab
 from oracle.models import Widget
 from oracle.widgets.sql_builder import SQLBuilder
+import oracle.pantab_client as pantab
 
 
 class WidgetBuilder:

@@ -2,7 +2,7 @@ import mysql.connector
 from contextlib import contextmanager
 
 connection_config = {
-    "host": "db",
+    "host": "127.0.0.1",
     "port": 3306,
     "user": "root",
     "password": "talkbox",

@@ -1,0 +1,1 @@
+pantab==2.1.1 # Python bridge between Pandas and Hyper
