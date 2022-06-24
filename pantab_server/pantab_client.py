@@ -3,7 +3,7 @@ try:
 
 except ModuleNotFoundError:
     import socket
-    from common import recv_all, encode_message, decode_df, df_to_dict, decode_error
+    from .lib import recv_all, encode_message, decode_df, df_to_dict, decode_error
     import pandas as pd
 
     ##

@@ -1,0 +1,9 @@
+fragment DashboardParts on Dashboard {
+  id
+  name
+  created
+  modified
+  layout {
+    ...DashboardLayoutParts
+  }
+}

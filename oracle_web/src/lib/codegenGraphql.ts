@@ -54,6 +54,7 @@ export type Dataset = {
   buildDurationSeconds?: Maybe<Scalars['Int']>;
   created: Scalars['DateTime'];
   dashboards: Array<Dashboard>;
+  fileName: Scalars['String'];
   filePath?: Maybe<Scalars['String']>;
   id: Scalars['ID'];
   isBuilding?: Maybe<Scalars['Boolean']>;
@@ -236,17 +237,17 @@ export enum WidgetType {
   VerticalBarChart = 'VERTICAL_BAR_CHART'
 }
 
+export type DashboardPartsFragment = { __typename?: 'Dashboard', id: string, name: string, created: any, modified: any, layout?: Array<{ __typename?: 'DashboardLayout', i: string, x: number, y: number, w: number, h: number } | null> | null };
+
 export type DashboardLayoutPartsFragment = { __typename?: 'DashboardLayout', i: string, x: number, y: number, w: number, h: number };
+
+export type DatasetPartsFragment = { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, fileName: string };
 
 export type DatasetRelationPartsFragment = { __typename?: 'DatasetRelation', id: string, fullSource?: string | null, fullReference?: string | null };
 
-export type DatasetTableColumnPartsFragment = { __typename?: 'DatasetTableColumn', id: string, name: string, fullName?: string | null, type: DatasetTableColumnType };
-
-export type DashboardPartsFragment = { __typename?: 'Dashboard', id: string, name: string, created: any, modified: any, layout?: Array<{ __typename?: 'DashboardLayout', i: string, x: number, y: number, w: number, h: number } | null> | null };
-
-export type DatasetPartsFragment = { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, filePath?: string | null };
-
 export type DatasetTablePartsFragment = { __typename?: 'DatasetTable', id: string, name: string, title: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, columns: Array<{ __typename?: 'DatasetTableColumn', id: string, name: string, fullName?: string | null, type: DatasetTableColumnType }> };
+
+export type DatasetTableColumnPartsFragment = { __typename?: 'DatasetTableColumn', id: string, name: string, fullName?: string | null, type: DatasetTableColumnType };
 
 export type WidgetPartsFragment = { __typename?: 'Widget', id: string, type: WidgetType, buildInfo?: any | null };
 
@@ -255,7 +256,7 @@ export type BuildDatasetMutationVariables = Exact<{
 }>;
 
 
-export type BuildDatasetMutation = { __typename?: 'Mutation', dataset: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, filePath?: string | null } };
+export type BuildDatasetMutation = { __typename?: 'Mutation', dataset: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, fileName: string } };
 
 export type CreateDashboardMutationVariables = Exact<{
   name: Scalars['String'];
@@ -270,7 +271,7 @@ export type CreateDatasetMutationVariables = Exact<{
 }>;
 
 
-export type CreateDatasetMutation = { __typename?: 'Mutation', dataset?: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, filePath?: string | null } | null };
+export type CreateDatasetMutation = { __typename?: 'Mutation', dataset?: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, fileName: string } | null };
 
 export type CreateDatasetTableMutationVariables = Exact<{
   datasetId: Scalars['ID'];
@@ -279,7 +280,7 @@ export type CreateDatasetTableMutationVariables = Exact<{
 }>;
 
 
-export type CreateDatasetTableMutation = { __typename?: 'Mutation', dataset?: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, filePath?: string | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, title: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, columns: Array<{ __typename?: 'DatasetTableColumn', id: string, name: string, fullName?: string | null, type: DatasetTableColumnType }> }> } | null };
+export type CreateDatasetTableMutation = { __typename?: 'Mutation', dataset?: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, fileName: string, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, title: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, columns: Array<{ __typename?: 'DatasetTableColumn', id: string, name: string, fullName?: string | null, type: DatasetTableColumnType }> }> } | null };
 
 export type CreateWidgetMutationVariables = Exact<{
   widgetType: WidgetType;
@@ -344,7 +345,7 @@ export type DashboardQueryVariables = Exact<{
 }>;
 
 
-export type DashboardQuery = { __typename?: 'Query', dashboard: { __typename?: 'Dashboard', id: string, name: string, created: any, modified: any, dataset: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, filePath?: string | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, title: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, columns: Array<{ __typename?: 'DatasetTableColumn', id: string, name: string, fullName?: string | null, type: DatasetTableColumnType }> }>, relations: Array<{ __typename?: 'DatasetRelation', id: string, fullSource?: string | null, fullReference?: string | null }> }, widgets: Array<{ __typename?: 'Widget', id: string, type: WidgetType, buildInfo?: any | null }>, layout?: Array<{ __typename?: 'DashboardLayout', i: string, x: number, y: number, w: number, h: number } | null> | null } };
+export type DashboardQuery = { __typename?: 'Query', dashboard: { __typename?: 'Dashboard', id: string, name: string, created: any, modified: any, dataset: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, fileName: string, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, title: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, columns: Array<{ __typename?: 'DatasetTableColumn', id: string, name: string, fullName?: string | null, type: DatasetTableColumnType }> }>, relations: Array<{ __typename?: 'DatasetRelation', id: string, fullSource?: string | null, fullReference?: string | null }> }, widgets: Array<{ __typename?: 'Widget', id: string, type: WidgetType, buildInfo?: any | null }>, layout?: Array<{ __typename?: 'DashboardLayout', i: string, x: number, y: number, w: number, h: number } | null> | null } };
 
 export type DashboardsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -356,12 +357,12 @@ export type DatasetQueryVariables = Exact<{
 }>;
 
 
-export type DatasetQuery = { __typename?: 'Query', dataset: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, filePath?: string | null, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, title: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, columns: Array<{ __typename?: 'DatasetTableColumn', id: string, name: string, fullName?: string | null, type: DatasetTableColumnType }> }>, relations: Array<{ __typename?: 'DatasetRelation', id: string, fullSource?: string | null, fullReference?: string | null }> } };
+export type DatasetQuery = { __typename?: 'Query', dataset: { __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, fileName: string, tables: Array<{ __typename?: 'DatasetTable', id: string, name: string, title: string, query: string, totalRecords?: number | null, htmlPreview?: string | null, columns: Array<{ __typename?: 'DatasetTableColumn', id: string, name: string, fullName?: string | null, type: DatasetTableColumnType }> }>, relations: Array<{ __typename?: 'DatasetRelation', id: string, fullSource?: string | null, fullReference?: string | null }> } };
 
 export type DatasetsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type DatasetsQuery = { __typename?: 'Query', datasets: Array<{ __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, filePath?: string | null }> };
+export type DatasetsQuery = { __typename?: 'Query', datasets: Array<{ __typename?: 'Dataset', id: string, name: string, lastBuiltAt?: any | null, fileName: string }> };
 
 export type WidgetQueryVariables = Exact<{
   type: WidgetType;
@@ -372,13 +373,6 @@ export type WidgetQueryVariables = Exact<{
 
 export type WidgetQuery = { __typename?: 'Query', widget?: any | null };
 
-export const DatasetRelationPartsFragmentDoc = /*#__PURE__*/ gql`
-    fragment DatasetRelationParts on DatasetRelation {
-  id
-  fullSource
-  fullReference
-}
-    `;
 export const DashboardLayoutPartsFragmentDoc = /*#__PURE__*/ gql`
     fragment DashboardLayoutParts on DashboardLayout {
   i
@@ -404,7 +398,14 @@ export const DatasetPartsFragmentDoc = /*#__PURE__*/ gql`
   id
   name
   lastBuiltAt
-  filePath
+  fileName
+}
+    `;
+export const DatasetRelationPartsFragmentDoc = /*#__PURE__*/ gql`
+    fragment DatasetRelationParts on DatasetRelation {
+  id
+  fullSource
+  fullReference
 }
     `;
 export const DatasetTableColumnPartsFragmentDoc = /*#__PURE__*/ gql`

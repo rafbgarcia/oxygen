@@ -10,12 +10,10 @@ import pandas as pd
 from os.path import exists
 import pantab_server.pantab_client as pantab
 
-TABLE_MODE_REPLACE = "w"
-TABLE_MODE_APPEND = "a"
-
 
 class Dataset(TimeStampedModel):
     name = models.CharField(max_length=100, unique=True)
+    file_name = models.CharField(max_length=100, unique=True)
     is_building = models.BooleanField(default=False, null=True)
     size_mb = models.DecimalField(max_digits=10, decimal_places=1, null=True)
     last_built_at = models.DateTimeField(null=True)
@@ -50,7 +48,7 @@ class Dataset(TimeStampedModel):
         return dataset
 
     def file_path(self):
-        return BASE_DIR / "datasets" / f"{self.name}.hyper"
+        return BASE_DIR / "datasets" / f"{self.file_name}.hyper"
 
     def file_exists(self):
         return exists(self.file_path())
@@ -58,10 +56,10 @@ class Dataset(TimeStampedModel):
     def append(self, table, rows):
         df = pd.DataFrame(rows, columns=table.column_names())
         df = df.astype(table.dtypes(), errors="ignore")
-        pantab.append(df, to=self.file_name, table=table.name, table_mode=TABLE_MODE_APPEND)
+        pantab.append(df, self.file_name, table.name)
 
     def execute(self, sql):
-        return pantab.frame_from_hyper_query(self.file_path(), sql)
+        return pantab.query(self.file_name, sql)
 
 
 class DatasetTable(models.Model):

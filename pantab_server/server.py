@@ -1,6 +1,6 @@
 import socketserver
 import pantab
-from common import decode_message, recv_all, encode_df, encode_error, df_from_dict
+from .lib import decode_message, recv_all, encode_df, encode_error, df_from_dict
 
 ##
 # API

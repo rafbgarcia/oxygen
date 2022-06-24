@@ -36,6 +36,7 @@ type Dataset {
   created: DateTime!
   modified: DateTime!
   name: String!
+  fileName: String!
   isBuilding: Boolean
   sizeMb: Decimal
   lastBuiltAt: DateTime
