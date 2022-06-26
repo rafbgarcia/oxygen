@@ -1,5 +1,5 @@
 import graphene
-from oracle.models import Dataset
+from oracle.models.dataset import Dataset
 from oracle.graphql.objects import DatasetObject
 
 

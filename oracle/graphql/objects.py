@@ -1,8 +1,12 @@
 import graphene
 from graphene_django import DjangoObjectType
 from oracle.graphql.types import JSON
-from oracle.models import Dataset, DatasetRelation, DatasetTable, Dashboard, DatasetTableColumn, Widget
-from oracle.widgets.widget_builder import WidgetBuilder
+from oracle.models.dataset import Dataset
+from oracle.models.dataset_relation import DatasetRelation
+from oracle.models.dataset_table import DatasetTable
+from oracle.models.dashboard import Dashboard
+from oracle.models.dataset_table_column import DatasetTableColumn
+from oracle.models.widget import Widget
 
 
 class DatasetObject(DjangoObjectType):

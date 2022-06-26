@@ -5,7 +5,9 @@ from oracle.graphql.mutation_deleteRelation import DeleteRelationMutationHandler
 from oracle.graphql.mutation_updateRelation import UpdateRelationMutationHandler
 from oracle.graphql.mutation_updateWidgetBuildInfo import UpdateWidgetBuildInfoMutationHandler
 from oracle.graphql.types import JSON
-from oracle.models import Dashboard, Dataset, Widget
+from oracle.models.dashboard import Dashboard
+from oracle.models.dataset import Dataset
+from oracle.models.widget import Widget
 from oracle.graphql.objects import DashboardObject
 
 from oracle.graphql.mutation_createWidget import CreateWidgetMutationHandler

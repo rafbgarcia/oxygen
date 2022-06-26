@@ -1,6 +1,6 @@
 from django.test import TransactionTestCase
-from oracle.models import Dataset, DatasetTable
-from oracle.widgets.pivot import Pivot, _build_sql
+from oracle.models.dataset import Dataset
+from oracle.widgets.pivot import Pivot
 from oracle.tests.fixtures.territories_branches import (
     territories_df_to_dict,
     territories_columns,

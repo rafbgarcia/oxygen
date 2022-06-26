@@ -1,8 +1,8 @@
 import graphene
 from oracle.graphql.types import JSON
-from oracle.models import Dashboard, Widget
+from oracle.models.widget import Widget
 
-from oracle.graphql.objects import DashboardObject, WidgetObject
+from oracle.graphql.objects import WidgetObject
 
 
 class UpdateWidgetBuildInfoMutationHandler(graphene.Mutation):

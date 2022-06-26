@@ -1,7 +1,7 @@
 import graphene
 from oracle.graphql.query_widget import WidgetQuery
-from oracle.graphql.types import JSON
-from oracle.models import Dashboard, Dataset
+from oracle.models.dashboard import Dashboard
+from oracle.models.dataset import Dataset
 from oracle.graphql.objects import DatasetObject, DashboardObject, WidgetObject
 
 

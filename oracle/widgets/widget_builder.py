@@ -1,6 +1,6 @@
 from operator import itemgetter
 
-from oracle.models import Widget
+from oracle.models.widget import Widget
 from oracle.widgets.sql_builder import SQLBuilder
 import pantab_server.pantab_client as pantab
 

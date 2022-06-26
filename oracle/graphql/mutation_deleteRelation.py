@@ -1,5 +1,5 @@
 import graphene
-from oracle.models import DatasetRelation
+from oracle.models.dataset_relation import DatasetRelation
 
 
 class DeleteRelationMutationHandler(graphene.Mutation):

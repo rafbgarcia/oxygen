@@ -1,6 +1,6 @@
 import graphene
 from oracle.graphql.objects import DatasetRelationObject
-from oracle.models import DatasetRelation
+from oracle.models.dataset_relation import DatasetRelation
 
 
 class Ok(graphene.ObjectType):

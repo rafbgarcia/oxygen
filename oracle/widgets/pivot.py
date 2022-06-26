@@ -1,19 +1,13 @@
-from copy import deepcopy
 from operator import itemgetter
 from sqlalchemy import (
     ForeignKey,
     MetaData,
     select,
     func,
-    cast,
-    Float,
     Table,
     Column,
 )
-from sqlalchemy.dialects import postgresql
 from oracle.errors import ValueNotSupported
-from oracle.models import DatasetTable, DatasetTableColumn
-from django.db.models import Q
 
 
 class Pivot:

@@ -1,6 +1,6 @@
 import graphene
 from oracle.graphql.types import JSON
-from oracle.models import Dashboard
+from oracle.models.dashboard import Dashboard
 
 from oracle.graphql.objects import DashboardObject, WidgetObject
 

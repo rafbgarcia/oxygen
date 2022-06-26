@@ -1,6 +1,6 @@
 import graphene
 from oracle.graphql.objects import DatasetObject
-from oracle.models import Dataset
+from oracle.models.dataset import Dataset
 import oracle.helpers as helpers
 
 

@@ -3,13 +3,8 @@ from MySQLdb import Timestamp
 from pandas import NaT, Timestamp
 from numpy import nan
 
-from oracle.models import DatasetTableColumn
+from oracle.models.dataset_table_column import DatasetTableColumn
 
-import datetime
-from MySQLdb import Timestamp
-from pandas import NaT, Timestamp
-
-from oracle.models import DatasetTableColumn
 
 territories_df_to_dict = [
     {

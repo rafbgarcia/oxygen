@@ -1,5 +1,4 @@
 from django.test import SimpleTestCase
-from oracle.models import Dataset
 from oracle.widgets.vertical_bar_chart import VerticalBarChart
 from oracle.tests.fixtures.follow_ups import pandas_df_to_dict
 

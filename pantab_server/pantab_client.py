@@ -1,6 +1,7 @@
 try:
     from pantab import frame_from_hyper_query
 
+
 except ModuleNotFoundError:
     import socket
     from .lib import recv_all, encode_message, decode_df, df_to_dict, decode_error
@@ -30,18 +31,24 @@ except ModuleNotFoundError:
     # API
     ##
 
-    def _dataset_path(database):
-        return f"/datasets/{database}.hyper"
+    def _dataset_path(dataset):
+        return f"/datasets/{dataset}.hyper"
 
     def query(source, query) -> pd.DataFrame:
         response = _send("frame_from_hyper_query", source=_dataset_path(source), query=query)
         return decode_df(response)
 
     def append(df, database, table) -> None:
+        _frame_to_hyper(df, database, table, "a")
+
+    def replace(df, database, table) -> None:
+        _frame_to_hyper(df, database, table, "w")
+
+    def _frame_to_hyper(df, database, table, table_mode):
         _send(
             "frame_to_hyper",
             df=df_to_dict(df),
             database=_dataset_path(database),
             table=table,
-            table_mode="a",
+            table_mode=table_mode,
         )
