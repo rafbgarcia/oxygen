@@ -9,7 +9,7 @@ import { useForm } from "react-hook-form"
 import { TextField } from "../../components/TextField"
 import { DatasetsDocument, useCreateDatasetMutation, useDatasetsQuery } from "../../lib/codegenGraphql"
 
-export const DatasetIndex = () => {
+export const DatasetList = () => {
   const { error, data } = useDatasetsQuery()
   const { showModal, Modal } = useModal()
 
