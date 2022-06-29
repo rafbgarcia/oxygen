@@ -24,3 +24,9 @@ mmigrate: makemigrate migrate
 # make test_watch dir=oracle/<folder>
 test_watch:
 	ag -l --python | entr python manage.py test --keepdb $(dir)
+
+venv:
+	python -m venv .venv
+
+install_deps:
+	pip install -r requirements.txt
