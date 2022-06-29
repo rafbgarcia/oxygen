@@ -6,7 +6,7 @@ import {
   WidgetType,
 } from "../../lib/codegenGraphql"
 import type { DashboardQuery } from "../../lib/codegenGraphql"
-import { find } from "lodash-es"
+import find from "lodash/find"
 import React, { Fragment } from "react"
 import { BuildInfoText } from "./BuildInfoText"
 import { Tab } from "@headlessui/react"

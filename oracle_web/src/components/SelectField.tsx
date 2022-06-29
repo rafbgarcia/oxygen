@@ -1,4 +1,4 @@
-import { map } from "lodash-es"
+import map from "lodash/map"
 
 export const SelectField = ({
   name,

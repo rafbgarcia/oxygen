@@ -9,11 +9,11 @@ import {
   LineElement,
   PointElement,
 } from "chart.js"
-import { Bar, Line } from "react-chartjs-2"
+import { Bar } from "react-chartjs-2"
 import { useWidgetQuery } from "../../lib/codegenGraphql"
 import { Title as PbTitle } from "playbook-ui"
 import { ChartBarIcon } from "@heroicons/react/outline"
-import { isEmpty } from "lodash-es"
+import isEmpty from "lodash/isEmpty"
 
 ChartJS.register(CategoryScale, LinearScale, Title, Tooltip, Legend)
 ChartJS.register(BarElement)

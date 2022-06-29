@@ -2,7 +2,7 @@ import { Fragment, useState } from "react"
 import { Dialog, Transition } from "@headlessui/react"
 import { tw } from "../lib/tw"
 import { classnames } from "../lib/classnames"
-import { every } from "lodash-es"
+import every from "lodash/every"
 
 export const useModal = () => {
   const [show, setShow] = useState(false)

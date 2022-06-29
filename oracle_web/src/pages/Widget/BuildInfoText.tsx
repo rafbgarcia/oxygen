@@ -1,7 +1,7 @@
 import produce from "immer"
 import { TextareaField } from "../../components/TextareaField"
 import { SelectField } from "../../components/SelectField"
-import { debounce } from "lodash-es"
+import debounce from "lodash/debounce"
 
 export const BuildInfoText = ({ buildInfo, onChange }) => {
   const didUpdate = (field) => (event) => {

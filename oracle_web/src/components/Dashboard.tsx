@@ -1,4 +1,4 @@
-import { filter, map } from "lodash-es"
+import map from "lodash/map"
 import { Widget } from "./Widget"
 import { Title } from "playbook-ui"
 

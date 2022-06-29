@@ -1,7 +1,7 @@
 import { Title } from "playbook-ui"
 import { useOutletContext, useParams } from "react-router-dom"
 import { Dataset } from "../../lib/codegenGraphql"
-import { find } from "lodash-es"
+import find from "lodash/find"
 import { Table } from "../../components/Table"
 
 export const DatasetTableShow = () => {

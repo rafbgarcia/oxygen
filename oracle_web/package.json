@@ -29,7 +29,6 @@
     "graphql": "^16.5.0",
     "immer": "^9.0.14",
     "lodash": "^4.17.21",
-    "lodash-es": "^4.17.21",
     "pathfinding": "^0.4.18",
     "paths-js": "^0.4.11",
     "playbook-ui": "^10.26.1",

@@ -1,7 +1,7 @@
 import { tw } from "../lib/tw"
 import { classnames } from "../lib/classnames"
 import { Spinner } from "./Spinner"
-import { every } from "lodash-es"
+import every from "lodash/every"
 
 type Variants = { [key in keyof typeof variants]?: boolean }
 type Sizes = { [key in keyof typeof sizes]?: boolean }

@@ -21,16 +21,14 @@ import { toast } from "react-toastify"
 import { Popover } from "../../components/Popover"
 import { tw } from "../../lib/tw"
 import { Chip } from "../../components/Chip"
-import { find, reduce, debounce } from "lodash-es"
+import find from "lodash/find"
+import reduce from "lodash/reduce"
+import debounce from "lodash/debounce"
 import createEngine, {
-  DagreEngine,
   DefaultDiagramState,
-  DefaultLabelModel,
   DefaultLinkModel,
   DefaultNodeModel,
-  DefaultPortModel,
   DiagramModel,
-  PathFindingLinkFactory,
 } from "@projectstorm/react-diagrams"
 import { CanvasWidget } from "@projectstorm/react-canvas-core"
 

@@ -1,6 +1,6 @@
 import { Table, Title } from "playbook-ui"
 import { useWidgetQuery } from "../../lib/codegenGraphql"
-import { times } from "lodash-es"
+import times from "lodash/times"
 import "./Pivot.css"
 
 const tableHtmlComponent = (content: string) => {
