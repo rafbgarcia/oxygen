@@ -2,4 +2,8 @@ fragment DatasetRelationParts on DatasetRelation {
   id
   fullSource
   fullReference
+  sourceTable
+  sourceColumn
+  referenceTable
+  referenceColumn
 }

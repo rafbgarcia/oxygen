@@ -15,7 +15,7 @@ import {
   useDatasetsQuery,
 } from "../../lib/codegenGraphql"
 import { SelectField } from "../../components/SelectField"
-import { map } from "lodash-es"
+import map from "lodash/map"
 
 export const DashboardIndex = () => {
   const { error, data } = useDashboardsQuery()

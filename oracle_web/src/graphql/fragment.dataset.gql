@@ -1,6 +1,0 @@
-fragment DatasetParts on Dataset {
-  id
-  name
-  lastBuiltAt
-  fileName
-}

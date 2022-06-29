@@ -1,5 +1,5 @@
 import { WidgetType } from "../../lib/codegenGraphql"
-import { reduce } from "lodash-es"
+import reduce from "lodash/reduce"
 
 export const initialBuildInfo: Record<WidgetType, any> = {
   [WidgetType.PivotTable]: {

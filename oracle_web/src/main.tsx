@@ -7,7 +7,7 @@ import { ToastContainer } from "react-toastify"
 import { Layout } from "./pages/Layout"
 import { Home } from "./pages/Home"
 
-import { DatasetIndex } from "./pages/Dataset/DatasetIndex"
+import { DatasetList } from "./pages/Dataset/DatasetList"
 import { DatasetEdit } from "./pages/Dataset/DatasetEdit"
 import { DatasetTableNew } from "./pages/Dataset/DatasetTableNew"
 import { DatasetTableShow } from "./pages/Dataset/DatasetTableShow"
@@ -55,7 +55,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
 
-            <Route path="datasets" element={<DatasetIndex />} />
+            <Route path="datasets" element={<DatasetList />} />
             <Route path="datasets/:datasetId" element={<DatasetEdit />}>
               <Route path="edit" element={null} />
               <Route path="tables/new" element={<DatasetTableNew />} />

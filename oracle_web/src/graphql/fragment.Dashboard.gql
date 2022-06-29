@@ -3,6 +3,7 @@ fragment DashboardParts on Dashboard {
   name
   created
   modified
+
   layout {
     ...DashboardLayoutParts
   }

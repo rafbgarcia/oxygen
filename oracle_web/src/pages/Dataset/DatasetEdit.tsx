@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect, useMemo } from "react"
 import { Button } from "playbook-ui"
 import { Link, Outlet, useParams } from "react-router-dom"
 import { Page } from "../Page"
@@ -14,13 +14,23 @@ import {
   DatasetDocument,
   useUpdateRelationMutation,
   useDeleteRelationMutation,
+  useUpdateDatasetTableMutation,
 } from "../../lib/codegenGraphql"
 import { classnames } from "../../lib/classnames"
 import { toast } from "react-toastify"
 import { Popover } from "../../components/Popover"
 import { tw } from "../../lib/tw"
 import { Chip } from "../../components/Chip"
-import { find } from "lodash-es"
+import find from "lodash/find"
+import reduce from "lodash/reduce"
+import debounce from "lodash/debounce"
+import createEngine, {
+  DefaultDiagramState,
+  DefaultLinkModel,
+  DefaultNodeModel,
+  DiagramModel,
+} from "@projectstorm/react-diagrams"
+import { CanvasWidget } from "@projectstorm/react-canvas-core"
 
 const FIELD_TYPE_ICON: Record<DatasetTableColumnType, any> = {
   [DatasetTableColumnType.Text]: () => (
@@ -83,13 +93,76 @@ export const DatasetEdit = () => {
           <div className={`bg-white w-[305px] min-h-[calc(100vh-98px)] h-full  shadow-md`}>
             <Tables dataset={data!.dataset} tableId={tableId} />
           </div>
-          <div className="p-4 overflow-auto max-w-[calc(100vw-340px)]">
-            <Outlet context={{ dataset: data?.dataset }} />
+          <div className="p-4 overflow-auto w-full max-w-[calc(100vw-340px)]">
+            <Diagram tables={data?.dataset.tables} relations={data?.dataset.relations} />
           </div>
         </div>
       </Page.Main>
     </>
   )
+}
+
+const getEngine = (tables, relations, updateTable) => {
+  const engine = createEngine()
+
+  const state = engine.getStateMachine().getCurrentState()
+  if (state instanceof DefaultDiagramState) {
+    state.dragNewLink.config.allowLinksFromLockedPorts = false
+    state.dragNewLink.config.allowLooseLinks = false
+    state.dragCanvas.config.allowDrag = false
+  }
+
+  const model = new DiagramModel({})
+  const nodes = reduce(
+    tables,
+    (acc, table) => {
+      const node = new DefaultNodeModel(table.name, "#00b2ff")
+      node.setPosition(table.x, table.y)
+      node.registerListener({
+        positionChanged(event) {
+          const pos = event.entity.getPosition()
+          updateTable({ variables: { id: table.id, params: { x: pos.x, y: pos.y } } })
+        },
+        selectionChanged(event) {
+          // Action menu
+        },
+      })
+      acc[table.name] = node
+      return acc
+    },
+    {}
+  )
+
+  const links = reduce(
+    relations,
+    (acc, relation) => {
+      const port1 = nodes[relation.sourceTable].addOutPort(relation.sourceColumn)
+      const port2 = nodes[relation.referenceTable].addInPort(relation.referenceColumn)
+      const link = port1.link<DefaultLinkModel>(port2)
+
+      acc.push(link)
+      return acc
+    },
+    []
+  )
+
+  const nodesArray: DefaultNodeModel[] = Object.values(nodes)
+  model.addAll(...nodesArray, ...links)
+
+  engine.setModel(model)
+  return engine
+}
+
+const Diagram = ({ tables, relations }) => {
+  const [updateTable] = useUpdateDatasetTableMutation()
+  const debouncedUpdateTable = debounce(updateTable, 500)
+  const engine = useMemo(() => getEngine(tables, relations, debouncedUpdateTable), [])
+
+  useEffect(() => {
+    engine.zoomToFit()
+  }, [])
+
+  return <CanvasWidget className="h-[500px]" engine={engine} />
 }
 
 const Tables = ({ dataset, tableId }: { dataset: DatasetQuery["dataset"]; tableId?: string }) => {

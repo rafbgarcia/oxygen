@@ -1,5 +1,0 @@
-fragment WidgetParts on Widget {
-  id
-  type
-  buildInfo
-}

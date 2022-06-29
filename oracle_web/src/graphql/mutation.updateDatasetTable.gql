@@ -1,0 +1,5 @@
+mutation updateDatasetTable($id: ID!, $params: DatasetTableInput!) {
+  updateDatasetTable(id: $id, params: $params) {
+    ...DatasetTableParts
+  }
+}
