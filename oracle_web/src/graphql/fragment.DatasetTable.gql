@@ -5,6 +5,8 @@ fragment DatasetTableParts on DatasetTable {
   query
   totalRecords
   htmlPreview
+  x
+  y
 
   columns {
     ...DatasetTableColumnParts

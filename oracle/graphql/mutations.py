@@ -2,6 +2,7 @@ import graphene
 from oracle.graphql.mutation_createDataset import CreateDatasetMutationHandler
 from oracle.graphql.mutation_createDatasetTable import CreateDatasetTableMutationHandler
 from oracle.graphql.mutation_deleteRelation import DeleteRelationMutationHandler
+from oracle.graphql.mutation_updateDatasetTable import UpdateDatasetTableMutationHandler
 from oracle.graphql.mutation_updateRelation import UpdateRelationMutationHandler
 from oracle.graphql.mutation_updateWidgetBuildInfo import UpdateWidgetBuildInfoMutationHandler
 from oracle.graphql.types import JSON
@@ -35,6 +36,7 @@ class Mutation(graphene.ObjectType):
     update_dashboard_layout = graphene.Field(
         DashboardObject, dashboard_id=graphene.ID(required=True), layout=JSON(required=True), required=True
     )
+    update_dataset_table = UpdateDatasetTableMutationHandler.Field()
 
     def resolve_build_dataset(root, info, id):
         return Dataset.build(id)
