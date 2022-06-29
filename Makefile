@@ -1,19 +1,13 @@
 export COMPOSE_PROJECT_NAME=nitro-web
 
 up:
-	docker-compose up -d db redis
-
-# up_web:
-# 	docker-compose up web
+	docker-compose up -d db redis pantab_server
 
 stop:
 	docker-compose stop db redis
 
-start_server:
+server:
 	python -m honcho start
-
-start_client:
-	(cd oracle_web && yarn foreman)
 
 graphql_schema:
 	python manage.py graphql_schema --schema oracle.graphql.schema.schema --out oracle_web/src/graphql/schema.graphql --watch
