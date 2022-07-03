@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "oracle",
+    "oxygen",
     "corsheaders",
     "graphene_django",
 ]
@@ -81,10 +81,10 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
         "HOST": "127.0.0.1",
-        "PORT": "3306",
+        "PORT": "3456",
         "USER": "root",
-        "PASSWORD": "talkbox",
-        "NAME": "oracle_dev",
+        "PASSWORD": "oxygen",
+        "NAME": "oxygen_dev",
         "ATOMIC_REQUESTS": True,
     }
 }

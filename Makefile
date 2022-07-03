@@ -1,16 +1,14 @@
-export COMPOSE_PROJECT_NAME=nitro-web
-
 up:
 	docker-compose up -d db redis pantab_server
 
 stop:
-	docker-compose stop db redis
+	docker-compose stop db redis pantab_server
 
 server:
 	python -m honcho start
 
 graphql_schema:
-	python manage.py graphql_schema --schema oracle.graphql.schema.schema --out oracle_web/src/graphql/schema.graphql --watch
+	python manage.py graphql_schema --schema oxygen.graphql.schema.schema --out oxygen_web/src/graphql/schema.graphql --watch
 
 makemigrate:
 	python manage.py makemigrations
@@ -20,8 +18,7 @@ migrate:
 
 mmigrate: makemigrate migrate
 
-
-# make test_watch dir=oracle/<folder>
+# make test_watch dir=oxygen/<folder>
 test_watch:
 	ag -l --python | entr python manage.py test --keepdb $(dir)
 

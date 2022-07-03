@@ -2,35 +2,24 @@
 
 # Dev environment
 
-### Some history
-
-I started developing this project on an Intel chip. When I got the m1 Macbook I learned that Tableau Hyper API is not compatible with ARM architecture.
-
-I tried:
-
-- Running the whole project in a docker container. That slowed down Python's code reloading by a lot. It was a bad dev experience.
-- Then I tried to keep two versions of homebrew installed, but I thought that would not be a good experience in the long term.
-- Finally, I went with the approach to create a small server for the Tableau API to be used in development only.
-
 ### Get started
 
-For now, I'm using Nitro's DB and Redis containers, hence this setup assumes you have ran Nitro's set up.
-
 - `asdf install`
-- `python -m venv .venv`
+- `make venv`
 - `source .venv/bin/activate`
-- `pip install -r requirements.txt`
-- `(cd oracle_web && yarn install)`
+- `make install_deps`
+- `(cd oxygen_web && make install_deps)`
 - `make up`
-- `make migrate` (need to manually create database in the MySQL server)
+- `make migrate`
 
 Tab 1:
 
 - `make start_server`
-  - http://localhost:8000 (also gives you GraphiQL)
+  - http://localhost:8000
 
 Tab 2:
 
+- `cd oxygen_web`
 - `make start_client`
   - http://localhost:4000
 
