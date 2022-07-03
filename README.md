@@ -1,6 +1,6 @@
 ## Demo
 
-<video src="https://youtu.be/70apVKEJP_0" width="500px"></video>
+<video src="https://www.youtube.com/embed/70apVKEJP_0" width="500px"></video>
 
 ## Dev environment
 
