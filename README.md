@@ -1,5 +1,7 @@
 ## Demo
 
+Proof of concept video:
+
 https://user-images.githubusercontent.com/1904314/177020597-730c1547-d367-43f7-9b0b-3281d6571293.mp4
 
 ## Dev environment
