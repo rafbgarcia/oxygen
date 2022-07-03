@@ -3,7 +3,7 @@ from time import time
 from django.utils import timezone
 from oxygen.classes.dataset_tables import DatasetTables
 from oxygen.models.dataset import Dataset
-from manage.settings import BASE_DIR
+from config.settings import BASE_DIR
 
 
 class Datasets:
