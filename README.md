@@ -2,7 +2,8 @@
 
 Proof of concept video:
 
-https://user-images.githubusercontent.com/1904314/177020597-730c1547-d367-43f7-9b0b-3281d6571293.mp4
+https://user-images.githubusercontent.com/1904314/177020620-4a5335b8-1863-4446-87b5-af3806abcfde.mp4
+
 
 ## Dev environment
 
