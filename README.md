@@ -1,6 +1,6 @@
 ## Demo
 
-Proof of concept video:
+Proof of concept demo video:
 
 https://user-images.githubusercontent.com/1904314/177020620-4a5335b8-1863-4446-87b5-af3806abcfde.mp4
 
