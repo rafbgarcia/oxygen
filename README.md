@@ -1,6 +1,6 @@
 ## Demo
 
-<video src="https://www.youtube.com/embed/70apVKEJP_0" width="500px"></video>
+https://user-images.githubusercontent.com/1904314/177020597-730c1547-d367-43f7-9b0b-3281d6571293.mp4
 
 ## Dev environment
 
