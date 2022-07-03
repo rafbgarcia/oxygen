@@ -1,8 +1,10 @@
+WIP
+
 ## Demo
 
-Proof of concept demo video:
+Demo video:
 
-https://user-images.githubusercontent.com/1904314/177020620-4a5335b8-1863-4446-87b5-af3806abcfde.mp4
+https://user-images.githubusercontent.com/1904314/177021192-a26b6392-a04b-4ec2-9e94-85790e7890ca.mp4
 
 
 ## Dev environment
