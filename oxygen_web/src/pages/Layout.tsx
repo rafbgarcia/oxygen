@@ -33,10 +33,6 @@ const Nav = () => {
         <div className="relative flex items-center justify-between h-16">
           <div className="flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">
             <Link to="/" className="flex-shrink-0 flex items-center">
-              <img
-                className="block h-8 w-auto"
-                src="https://tailwindui.com/img/logos/workflow-mark-indigo-500.svg"
-              />
               <span className="font-medium text-2xl text-white ml-3">Oxygen</span>
             </Link>
             <div className="hidden sm:block sm:ml-6">
