@@ -1,6 +1,6 @@
 ## Demo
 
-[![Demo video](https://img.youtube.com/vi/70apVKEJP_0/maxresdefault.jpg)](https://youtu.be/70apVKEJP_0)
+<video src='https://youtu.be/70apVKEJP_0' width=500 />
 
 ## Dev environment
 
