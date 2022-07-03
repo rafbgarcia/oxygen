@@ -1,6 +1,8 @@
-### Start up
+## Demo
 
-# Dev environment
+[![Demo video](https://img.youtube.com/vi/70apVKEJP_0/maxresdefault.jpg)](https://youtu.be/70apVKEJP_0)
+
+## Dev environment
 
 ### Get started
 
