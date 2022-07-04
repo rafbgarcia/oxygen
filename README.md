@@ -1,11 +1,10 @@
-WIP
+Oxygen's aim is to be an open-source data analytics tool companies can host and use internally.
 
 ## Demo
 
 Demo video:
 
 https://user-images.githubusercontent.com/1904314/177021192-a26b6392-a04b-4ec2-9e94-85790e7890ca.mp4
-
 
 ## Dev environment
 
